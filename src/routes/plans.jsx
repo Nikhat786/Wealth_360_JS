@@ -1,6 +1,5 @@
 
 import {
-  ArrowRight,
   BadgeCheck,
   Building,
   Check,
@@ -312,23 +311,16 @@ export default function PlansPage() {
         </div>
 
         {/* Feature comparison guarantee */}
-        <div className="rounded-3xl border bg-muted/30 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <ShieldCheck className="size-6 text-primary shrink-0 mt-1" />
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                Zero Commission Conflicts on Direct Portfolios
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5 max-w-xl">
-                WealthVerse advisory operates with fiduciary transparency. All mutual fund options in Premium & Elite plans can be deployed via direct plans.
-              </p>
-            </div>
+        <div className="rounded-3xl border bg-muted/30 p-6 sm:p-8 flex items-start gap-3">
+          <ShieldCheck className="size-6 text-primary shrink-0 mt-1" />
+          <div>
+            <p className="text-sm font-semibold text-foreground">
+              Zero Commission Conflicts on Direct Portfolios
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5 max-w-xl">
+              WealthVerse advisory operates with fiduciary transparency. All mutual fund options in Premium & Elite plans can be deployed via direct plans.
+            </p>
           </div>
-          <Button variant="outline" asChild className="shrink-0">
-            <a href="/wealthverse-business">
-              View Business Model <ArrowRight className="ml-1 size-3.5" />
-            </a>
-          </Button>
         </div>
       </div>
     </AppShell>);

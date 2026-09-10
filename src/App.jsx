@@ -27,6 +27,7 @@ import Wealth360ReviewPage from "./routes/wealth360.review";
 import WealthVerseBusinessPage from "./routes/wealthverse-business";
 import RmLoginPage from "./routes/rm.login";
 import RmDashboardPage from "./routes/rm.dashboard";
+import RmClientPage from "./routes/rm.client";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,7 @@ export default function App() {
           <Route path="/wealthverse-business" element={<WealthVerseBusinessPage />} />
           <Route path="/rm/login" element={<RmLoginPage />} />
           <Route path="/rm/dashboard" element={<RmDashboardPage />} />
+          <Route path="/rm/client/:clientId" element={<RmClientPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

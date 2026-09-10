@@ -3,6 +3,7 @@ import {
   CalendarCheck,
   CheckCircle2,
   Clock,
+  Lock,
   Mail,
   MapPin,
   Phone,
