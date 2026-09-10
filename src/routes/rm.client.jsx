@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   BadgeIndianRupee,
   CheckCircle2,
   Clock,
+  Download,
+  FileText,
   Gauge,
   Mail,
   Phone,
@@ -18,6 +20,13 @@ import {
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle } from
+"@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useApp } from "@/context/app-context";
 import { formatINR, formatINRShort, formatPct, formatPlainPct } from "@/lib/format";
@@ -33,6 +42,122 @@ const palette = [
 "var(--color-chart-5, #c8b273)",
 "var(--color-muted-foreground)"];
 
+/** Builds the list of report cards this client has available, derived from their existing data. */
+function buildClientReports(client, outreachLog) {
+  const allocation = client.assetAllocation ?? [];
+  const goals = client.goals ?? [];
+  const activityCount = (client.activityLog?.length ?? 0) + outreachLog.length;
+
+  return [
+  {
+    id: "portfolio",
+    title: "Portfolio Statement",
+    icon: BadgeIndianRupee,
+    period: "As of today",
+    summary: allocation.length > 0 ?
+    `${allocation.length} holdings · ${formatINRShort(client.aum || 0)} AUM` :
+    "No holdings on file yet",
+    available: allocation.length > 0
+  },
+  {
+    id: "wealth-score",
+    title: "Wealth Score Report",
+    icon: Gauge,
+    period: "Updated today",
+    summary: Array.isArray(client.scoreBreakdown) ?
+    `Overall score ${client.wealthScore ?? "—"}/100 across ${client.scoreBreakdown.length} pillars` :
+    "Score not yet computed",
+    available: Array.isArray(client.scoreBreakdown) && client.scoreBreakdown.length > 0
+  },
+  {
+    id: "goals",
+    title: "Goal Progress Report",
+    icon: Target,
+    period: "Quarterly",
+    summary: goals.length > 0 ? `${goals.length} tracked goal${goals.length > 1 ? "s" : ""}` : "No goals defined yet",
+    available: goals.length > 0
+  },
+  {
+    id: "protection",
+    title: "Protection & Insurance Review",
+    icon: ShieldCheck,
+    period: "Annual",
+    summary: client.insurance?.hasWill ? "Will on file" : "Will missing",
+    available: Boolean(client.insurance)
+  },
+  {
+    id: "opportunities",
+    title: "Advisory Opportunity Report",
+    icon: Sparkles,
+    period: "This month",
+    summary: (client.upsell?.length ?? 0) > 0 ?
+    `${client.upsell.length} opportunit${client.upsell.length > 1 ? "ies" : "y"} identified` :
+    "No open opportunities",
+    available: (client.upsell?.length ?? 0) > 0
+  },
+  {
+    id: "activity",
+    title: "Relationship Activity Report",
+    icon: Clock,
+    period: "Last 6 months",
+    summary: `${activityCount} logged interaction${activityCount === 1 ? "" : "s"}`,
+    available: activityCount > 0
+  }];
+
+}
+
+/** Renders a plain-text export of one report so an RM can save/share it outside the app. */
+function reportToText(client, report, outreachLog) {
+  const lines = [`${report.title} — ${client.name}`, `Generated: ${report.period}`, ""];
+  const totalAllocation = (client.assetAllocation ?? []).reduce((s, a) => s + a.value, 0);
+
+  switch (report.id) {
+    case "portfolio":
+      lines.push(`Total AUM: ${formatINR(client.aum || 0)}`, "", "Asset allocation:");
+      (client.assetAllocation ?? []).forEach((a) => {
+        lines.push(`- ${a.name}: ${formatINR(a.value)} (${formatPlainPct(totalAllocation > 0 ? a.value / totalAllocation * 100 : 0)})`);
+      });
+      break;
+    case "wealth-score":
+      lines.push(`Overall score: ${client.wealthScore ?? "—"}/100`, "", "Pillar breakdown:");
+      (client.scoreBreakdown ?? []).forEach((p) => lines.push(`- ${p.label}: ${p.score}/100`));
+      break;
+    case "goals":
+      (client.goals ?? []).forEach((g) => {
+        lines.push(`- ${g.name}: ${formatINR(g.saved)} of ${formatINR(g.target)} saved (target ${g.targetYear}) — ${g.onTrack ? "On track" : "Off track"}`);
+      });
+      break;
+    case "protection":
+      lines.push(
+        `Life cover: ${formatINR(client.insurance?.lifeCover || 0)}`,
+        `Health cover: ${formatINR(client.insurance?.healthCover || 0)}`,
+        `Will on file: ${client.insurance?.hasWill ? "Yes" : "No"}`,
+        client.insurance?.note ? `Note: ${client.insurance.note}` : ""
+      );
+      break;
+    case "opportunities":
+      (client.upsell ?? []).forEach((u) => lines.push(`- ${u.title}: ${u.detail} (${u.potential})`));
+      break;
+    case "activity":
+      [...outreachLog, ...client.activityLog ?? []].forEach((a) => lines.push(`[${a.date}] ${a.note}`));
+      break;
+  }
+
+  return lines.filter(Boolean).join("\n");
+}
+
+function downloadReport(client, report, outreachLog) {
+  const text = reportToText(client, report, outreachLog);
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `${client.name.replace(/\s+/g, "_")}_${report.id}.txt`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
 
 export default function RmClientPage() {
   const { isRmSession, logoutRm } = useApp();
@@ -42,10 +167,11 @@ export default function RmClientPage() {
   const [contacted, setContacted] = useState(false);
   const [outreachNote, setOutreachNote] = useState("");
   const [outreachLog, setOutreachLog] = useState([]);
+  const [openReportId, setOpenReportId] = useState(null);
+  const client = roster.find((c) => c.id === clientId);
+  const reports = useMemo(() => client ? buildClientReports(client, outreachLog) : [], [client, outreachLog]);
 
   if (!isRmSession) return <Navigate to="/rm/login" replace />;
-
-  const client = roster.find((c) => c.id === clientId);
 
   if (!client) {
     return (
@@ -62,6 +188,7 @@ export default function RmClientPage() {
   const callPending = client.callRequested && !contacted;
   const allocation = client.assetAllocation ?? [];
   const totalAllocation = allocation.reduce((s, a) => s + a.value, 0);
+  const openReport = reports.find((r) => r.id === openReportId) ?? null;
 
   const logOutreach = () => {
     if (!outreachNote.trim()) return;
@@ -145,6 +272,43 @@ export default function RmClientPage() {
 
           <StatCard icon={ShieldCheck} label="Protection status" value={client.insurance?.hasWill ? "Will on file" : "No will on file"} tone={client.insurance?.hasWill ? "default" : "alert"} />
         </div>
+
+        {/* Client reports */}
+        <section className="surface-card space-y-3 p-5">
+          <p className="font-display flex items-center gap-1.5 text-sm font-semibold">
+            <FileText className="size-4" /> Client reports
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {reports.map((r) =>
+            <div
+              key={r.id}
+              className={cn(
+                "flex flex-col justify-between gap-3 rounded-xl border p-3.5",
+                r.available ? "bg-muted/40" : "bg-muted/20 opacity-60"
+              )}>
+
+                <div className="flex items-start gap-2.5">
+                  <span className="bg-secondary text-secondary-foreground flex size-8 shrink-0 items-center justify-center rounded-lg">
+                    <r.icon className="size-4" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold">{r.title}</p>
+                    <p className="text-muted-foreground text-[10px] uppercase tracking-wide">{r.period}</p>
+                    <p className="text-muted-foreground mt-1 text-xs leading-relaxed">{r.summary}</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" className="flex-1" disabled={!r.available} onClick={() => setOpenReportId(r.id)}>
+                    View
+                  </Button>
+                  <Button size="sm" variant="ghost" disabled={!r.available} onClick={() => downloadReport(client, r, outreachLog)}>
+                    <Download className="size-3.5" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
 
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Wealth score breakdown */}
@@ -300,8 +464,134 @@ export default function RmClientPage() {
           </ul>
         </section>
       </main>
+
+      <Dialog open={Boolean(openReport)} onOpenChange={(o) => !o && setOpenReportId(null)}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+          {openReport &&
+          <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <openReport.icon className="size-4" /> {openReport.title}
+                </DialogTitle>
+                <DialogDescription>{client.name} · {openReport.period}</DialogDescription>
+              </DialogHeader>
+              <ReportBody client={client} report={openReport} outreachLog={outreachLog} totalAllocation={totalAllocation} />
+              <Button size="sm" variant="outline" onClick={() => downloadReport(client, openReport, outreachLog)}>
+                <Download className="mr-1.5 size-3.5" /> Download as text
+              </Button>
+            </>
+          }
+        </DialogContent>
+      </Dialog>
     </div>);
 
+}
+
+function ReportBody({ client, report, outreachLog, totalAllocation }) {
+  switch (report.id) {
+    case "portfolio":
+      return (
+        <div className="space-y-2">
+          <p className="text-sm">Total AUM: <span className="num font-semibold">{formatINR(client.aum || 0)}</span></p>
+          <ul className="divide-y text-xs">
+            {(client.assetAllocation ?? []).map((a) =>
+            <li key={a.name} className="flex items-center justify-between py-2">
+                <span>{a.name}</span>
+                <span className="num text-muted-foreground">
+                  {formatINR(a.value)} · {formatPlainPct(totalAllocation > 0 ? a.value / totalAllocation * 100 : 0)}
+                </span>
+              </li>
+            )}
+          </ul>
+        </div>);
+
+    case "wealth-score":
+      return (
+        <div className="space-y-2.5">
+          <p className="text-sm">Overall score: <span className="num font-semibold">{client.wealthScore ?? "—"}/100</span></p>
+          {(client.scoreBreakdown ?? []).map((p) =>
+          <div key={p.key ?? p.label}>
+              <div className="mb-1 flex items-center justify-between text-xs">
+                <span className="font-medium">{p.label}</span>
+                <span className="num text-muted-foreground">{p.score}/100</span>
+              </div>
+              <div className="bg-muted h-1.5 w-full overflow-hidden rounded-full">
+                <div
+                className={cn("h-full rounded-full", p.score >= 70 ? "bg-success" : p.score >= 45 ? "bg-gold" : "bg-destructive")}
+                style={{ width: `${Math.min(100, Math.max(0, p.score))}%` }} />
+
+              </div>
+            </div>
+          )}
+        </div>);
+
+    case "goals":
+      return (
+        <ul className="space-y-2.5 text-xs">
+          {(client.goals ?? []).map((g, i) => {
+            const pct = g.target > 0 ? Math.min(100, g.saved / g.target * 100) : 0;
+            return (
+              <li key={i} className="rounded-xl border p-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold">{g.name}</span>
+                  <span className={cn("rounded-full px-2 py-0.5 text-[9px] font-bold uppercase", g.onTrack ? "bg-success-soft text-success" : "bg-destructive/10 text-destructive")}>
+                    {g.onTrack ? "On track" : "Off track"}
+                  </span>
+                </div>
+                <p className="text-muted-foreground mt-1">
+                  {formatINRShort(g.saved)} of {formatINRShort(g.target)} · target {g.targetYear}
+                </p>
+                <div className="bg-muted mt-2 h-1.5 w-full overflow-hidden rounded-full">
+                  <div className="bg-primary h-full rounded-full" style={{ width: `${pct}%` }} />
+                </div>
+              </li>);
+
+          })}
+        </ul>);
+
+    case "protection":
+      return (
+        <div className="space-y-2 text-xs">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-muted/40 rounded-xl border p-3">
+              <p className="text-muted-foreground uppercase">Life cover</p>
+              <p className="num mt-1 text-sm font-semibold">{formatINRShort(client.insurance?.lifeCover || 0)}</p>
+            </div>
+            <div className="bg-muted/40 rounded-xl border p-3">
+              <p className="text-muted-foreground uppercase">Health cover</p>
+              <p className="num mt-1 text-sm font-semibold">{formatINRShort(client.insurance?.healthCover || 0)}</p>
+            </div>
+          </div>
+          <p>Will on file: <span className="font-semibold">{client.insurance?.hasWill ? "Yes" : "No"}</span></p>
+          {client.insurance?.note && <p className="text-muted-foreground leading-relaxed">{client.insurance.note}</p>}
+        </div>);
+
+    case "opportunities":
+      return (
+        <ul className="space-y-2.5 text-xs">
+          {(client.upsell ?? []).map((u, i) =>
+          <li key={i} className="bg-muted/40 rounded-xl border p-3">
+              <p className="text-sm font-semibold">{u.title}</p>
+              <p className="text-muted-foreground mt-1 leading-relaxed">{u.detail}</p>
+              <p className="text-primary mt-1.5 font-semibold">{u.potential}</p>
+            </li>
+          )}
+        </ul>);
+
+    case "activity":
+      return (
+        <ul className="space-y-2.5 text-xs">
+          {[...outreachLog, ...client.activityLog ?? []].map((a, i) =>
+          <li key={i} className="flex gap-3">
+              <span className="text-muted-foreground w-20 shrink-0">{a.date}</span>
+              <span>{a.note}</span>
+            </li>
+          )}
+        </ul>);
+
+    default:
+      return null;
+  }
 }
 
 function StatCard({ icon: Icon, label, value, tone = "default" }) {

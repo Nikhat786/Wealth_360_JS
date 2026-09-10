@@ -1275,6 +1275,7 @@ export function AppProvider({ children }) {
     setContributions(Object.fromEntries((answers.goals || []).map((g) => [g.id, g.monthlyContribution]))),
     goalsOffTrack,
     goalsShortfall,
+    projections,
 
     cover,
     addLifeCover: (amount) => setCover((c) => ({ ...c, extraLife: c.extraLife + amount })),
