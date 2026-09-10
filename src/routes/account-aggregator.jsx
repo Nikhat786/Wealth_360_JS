@@ -93,13 +93,22 @@ export default function AccountAggregatorPage() {
   const handleApplyAggregator = () => {
     // Generate synthesized profile data from AA
     const synthesizedData = {
+      pan,
       name: "Rahul Mehta",
       age: 36,
       city: "Mumbai",
       maritalStatus: "Married",
-      annualIncome: 3000000,
-      monthlyTakeHome: 250000,
-      salary: 250000,
+      // Account Aggregator can surface holdings, loans & policies, but not income or
+      // goals — those aren't held by any FIP, so they're left at 0 for manual entry.
+      annualIncome: 0,
+      monthlyTakeHome: 0,
+      salary: 0,
+      businessIncome: 0,
+      annualBonus: 0,
+      rentalIncome: 0,
+      dividendsIncome: 0,
+      interestIncome: 0,
+      otherIncome: 0,
       household: 45000,
       schoolFees: 15000,
       emiExpenses: 60000,
@@ -112,7 +121,10 @@ export default function AccountAggregatorPage() {
       lifeCover: 15000000,
       healthCover: 1000000,
       nomineesOnRecord: "some",
-      hasWill: false
+      hasWill: false,
+      goals: [],
+      selectedGoals: [],
+      goalDetails: {}
     };
 
     connectAccountAggregator(synthesizedData);

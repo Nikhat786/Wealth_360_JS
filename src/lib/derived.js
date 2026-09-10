@@ -142,7 +142,7 @@ export function buildActions(ctx) {
       detail: `Your family needs about 10x income plus loan payoff. You are short ${crore(lifeGap)}.`,
       impact: "+9 to your score",
       severity: "high",
-      to: "/score",
+      to: "/protect",
       cta: "Review cover",
       weight: 9
     });
@@ -178,7 +178,7 @@ export function buildActions(ctx) {
       detail: "A family floater plus a super top-up is the cheapest way to close this.",
       impact: "+4 to your score",
       severity: "medium",
-      to: "/score",
+      to: "/protect",
       cta: "See options",
       weight: 4
     });
@@ -190,7 +190,7 @@ export function buildActions(ctx) {
       detail: "With a home loan running, a lump-sum payout keeps the EMIs safe.",
       impact: "+3 to your score",
       severity: "medium",
-      to: "/score",
+      to: "/protect",
       cta: "See options",
       weight: 3
     });

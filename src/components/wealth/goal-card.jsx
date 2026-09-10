@@ -6,6 +6,7 @@ import {
   Palmtree,
   PiggyBank,
   Shield,
+  Trash2,
   Car } from
 "lucide-react";
 
@@ -24,16 +25,25 @@ export const goalIcons = {
   car: Car
 };
 
-export function GoalCard({ goal, compact = false }) {
+export function GoalCard({ goal, compact = false, onDelete }) {
   const Icon = goalIcons[goal.icon] || PiggyBank;
   const p = projectGoal(goal, goal.monthlyContribution);
 
   return (
     <Link
-      to="/goals/$goalId"
-      params={{ goalId: goal.id }}
-      className="surface-card group hover:shadow-raised block p-4 transition-all hover:-translate-y-0.5">
-      
+      to={`/goals/${goal.id}`}
+      className="surface-card group hover:shadow-raised relative block p-4 transition-all hover:-translate-y-0.5">
+
+      {onDelete &&
+      <button
+        type="button"
+        aria-label={`Remove ${goal.name}`}
+        onClick={(e) => {e.preventDefault();e.stopPropagation();onDelete();}}
+        className="text-muted-foreground hover:text-destructive absolute right-3 top-3 opacity-0 transition-opacity group-hover:opacity-100">
+
+          <Trash2 className="size-4" />
+        </button>
+      }
       <div className="flex items-start gap-3">
         <span className="bg-secondary text-secondary-foreground flex size-10 shrink-0 items-center justify-center rounded-xl">
           <Icon className="size-5" />
@@ -41,7 +51,7 @@ export function GoalCard({ goal, compact = false }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className="truncate font-semibold">{goal.name}</p>
+              <p className="truncate pr-5 font-semibold">{goal.name}</p>
               <p className="text-muted-foreground num mt-0.5 text-xs">
                 {formatINRShort(goal.saved)} of {formatINRShort(goal.target)} · by{" "}
                 {goal.targetYear}

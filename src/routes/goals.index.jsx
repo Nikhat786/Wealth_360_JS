@@ -2,11 +2,14 @@
 import { useState } from "react";
 import {
   Calculator,
-  Flame } from
+  Flame,
+  Plus } from
 "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/wealth/app-shell";
 import { GoalCard } from "@/components/wealth/goal-card";
+import { GoalFormDialog } from "@/components/wealth/goal-form-dialog";
 import { PillarNav } from "@/components/wealth/pillar-nav";
 import { SectionHeader } from "@/components/wealth/section-header";
 import { StatTile } from "@/components/wealth/stat-tile";
@@ -26,9 +29,10 @@ function categorizeGoal(targetYear) {
 }
 
 export default function GoalsPage() {
-  const { goals, contributions, answers } = useApp();
-  const [selectedGoalId, setSelectedGoalId] = useState("education");
+  const { goals, contributions, answers, addGoal, updateGoal, removeGoal } = useApp();
+  const [selectedGoalId, setSelectedGoalId] = useState(goals[0]?.id ?? null);
   const [filter, setFilter] = useState("all");
+  const [goalDialog, setGoalDialog] = useState({ open: false, goal: null });
 
   // What-if simulator state for individual goal
   const [whatIfMonthly, setWhatIfMonthly] = useState(20000);
@@ -94,7 +98,7 @@ export default function GoalsPage() {
           <StatTile
             label="Funded so far"
             value={formatINRShort(savedSum)}
-            sub={formatPlainPct(savedSum / targetSum * 100, 1)} />
+            sub={formatPlainPct(targetSum > 0 ? savedSum / targetSum * 100 : 0, 1)} />
           
         </div>
 
@@ -231,72 +235,107 @@ export default function GoalsPage() {
             <SectionHeader
               title="Family Goals Portfolio"
               description="Grouped by investment horizon and milestone priority." />
-            
 
-            {/* Taxonomy Tabs */}
-            <div className="flex flex-wrap gap-1.5 rounded-xl border bg-muted/50 p-1 text-xs">
-              <button
+
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Taxonomy Tabs */}
+              <div className="flex flex-wrap gap-1.5 rounded-xl border bg-muted/50 p-1 text-xs">
+                <button
                 type="button"
                 onClick={() => setFilter("all")}
                 className={cn(
                   "rounded-lg px-3 py-1.5 font-semibold transition-all",
                   filter === "all" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                 )}>
-                
+
                 All Goals ({goals.length})
               </button>
-              <button
+                <button
                 type="button"
                 onClick={() => setFilter("short")}
                 className={cn(
                   "rounded-lg px-3 py-1.5 font-semibold transition-all",
                   filter === "short" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                 )}>
-                
+
                 Short-Term (&lt; 3 yrs)
               </button>
-              <button
+                <button
                 type="button"
                 onClick={() => setFilter("mid")}
                 className={cn(
                   "rounded-lg px-3 py-1.5 font-semibold transition-all",
                   filter === "mid" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                 )}>
-                
+
                 Mid-Term (3–7 yrs)
               </button>
-              <button
+                <button
                 type="button"
                 onClick={() => setFilter("long")}
                 className={cn(
                   "rounded-lg px-3 py-1.5 font-semibold transition-all",
                   filter === "long" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                 )}>
-                
+
                 Long-Term (7+ yrs)
               </button>
+              </div>
+              <Button size="sm" className="gap-1.5" onClick={() => setGoalDialog({ open: true, goal: null })}>
+                <Plus className="size-4" /> Add goal
+              </Button>
             </div>
           </div>
 
           {/* Goal Cards Grid */}
+          {filteredGoals.length > 0 ?
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {filteredGoals.map((g) =>
-            <div key={g.id} onClick={() => setSelectedGoalId(g.id)}>
-                <GoalCard goal={g} />
-              </div>
+              {filteredGoals.map((g) =>
+            <GoalCard key={g.id} goal={g} onDelete={() => removeGoal(g.id)} />
             )}
-          </div>
+            </div> :
+
+          <div className="surface-card rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+              No goals in this view yet. <button type="button" className="text-primary font-semibold underline" onClick={() => setGoalDialog({ open: true, goal: null })}>Add your first goal</button>.
+            </div>
+          }
         </div>
+
+        <GoalFormDialog
+          open={goalDialog.open}
+          onOpenChange={(open) => setGoalDialog((prev) => ({ ...prev, open }))}
+          initialGoal={goalDialog.goal}
+          onSubmit={(goal) => {
+            if (goalDialog.goal) {
+              updateGoal(goalDialog.goal.id, goal);
+            } else {
+              const id = addGoal(goal);
+              setSelectedGoalId(id);
+            }
+          }} />
 
         {/* ------------------------------------------------------------- */}
         {/* Single Goal What-If Simulator                                 */}
         {/* ------------------------------------------------------------- */}
         {selectedGoal &&
         <section className="surface-card p-5 sm:p-6 space-y-4">
-            <SectionHeader
-            title={`Simulate "${selectedGoal.name}" Path`}
-            description={`Explore alternative monthly commitments and return assumptions for ${selectedGoal.name}.`} />
-          
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <SectionHeader
+              title={`Simulate "${selectedGoal.name}" Path`}
+              description="Explore alternative monthly commitments and return assumptions, or pick a different goal below." />
+
+              <div className="flex shrink-0 items-center gap-2">
+                <select
+                value={selectedGoal.id}
+                onChange={(e) => setSelectedGoalId(e.target.value)}
+                className="border-input bg-background h-9 rounded-md border px-2 text-xs outline-none focus:ring-1 focus:ring-ring">
+
+                  {goals.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+                </select>
+                <Button size="sm" variant="outline" onClick={() => setGoalDialog({ open: true, goal: selectedGoal })}>Edit</Button>
+              </div>
+            </div>
+
             <div className="mt-5 grid gap-5 md:grid-cols-3">
               <WhatIfControl
               label="Monthly contribution"

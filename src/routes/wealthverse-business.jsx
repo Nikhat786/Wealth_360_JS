@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import {
   ArrowRight,
   BadgeDollarSign,
@@ -18,6 +18,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/wealth/app-shell";
+import { useApp } from "@/context/app-context";
 
 
 const FIVE_REVENUE_STREAMS = [
@@ -133,6 +134,9 @@ const BENEFIT_MATRIX = [
 
 
 export default function WealthVerseBusinessPage() {
+  const { isRmSession } = useApp();
+  if (!isRmSession) return <Navigate to="/rm/login" replace />;
+
   return (
     <AppShell>
       <div className="mx-auto max-w-6xl space-y-10 py-6 sm:py-10">
@@ -156,8 +160,8 @@ export default function WealthVerseBusinessPage() {
                 </Link>
               </Button>
               <Button variant="outline" asChild className="border-white/20 bg-white/5 text-white hover:bg-white/15">
-                <Link to="/">
-                  Open WealthVerse Dashboard
+                <Link to="/rm/dashboard">
+                  Back to RM Dashboard
                 </Link>
               </Button>
             </div>

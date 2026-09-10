@@ -9,10 +9,12 @@ import {
   Heart,
   Home,
   PauseCircle,
+  Pencil,
   Plane,
-
+  Plus,
   Sparkles,
   Sun,
+  Trash2,
   TrendingDown,
   TrendingUp } from
 "lucide-react";
@@ -20,6 +22,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/wealth/app-shell";
+import { FutureEventFormDialog } from "@/components/wealth/future-event-form-dialog";
 import { PillarNav } from "@/components/wealth/pillar-nav";
 import { SectionHeader } from "@/components/wealth/section-header";
 
@@ -48,10 +51,15 @@ export default function LifeEventsPage() {
     plannedLifeEvents,
     togglePlannedLifeEvent,
     setRmOpen,
-    canAccessRM
+    canAccessRM,
+    futureEvents,
+    addFutureEvent,
+    updateFutureEvent,
+    removeFutureEvent
   } = useApp();
 
   const [activeEventId, setActiveEventId] = useState("event-child");
+  const [eventDialog, setEventDialog] = useState({ open: false, event: null });
 
   const activeEvent =
   LIFE_EVENTS_CATALOG.find((e) => e.id === activeEventId) ?? LIFE_EVENTS_CATALOG[0];
@@ -104,6 +112,59 @@ export default function LifeEventsPage() {
         </div>
 
         <PillarNav />
+
+        {/* ------------------------------------------------------------- */}
+        {/* Your Own Future Events (optional, personal log)               */}
+        {/* ------------------------------------------------------------- */}
+        <div className="space-y-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <SectionHeader
+              title="Your future events"
+              description="Optional milestones you're planning for — add them whenever you're ready, no rush." />
+
+            <Button size="sm" className="shrink-0 gap-1.5" onClick={() => setEventDialog({ open: true, event: null })}>
+              <Plus className="size-4" /> Add event
+            </Button>
+          </div>
+
+          {futureEvents.length > 0 ?
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {futureEvents.map((event) =>
+            <div key={event.id} className="surface-card flex items-start gap-3 p-4">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold">{event.event}</p>
+                    <p className="text-muted-foreground mt-1 text-xs">{event.year} · {event.importance} importance</p>
+                    <p className="text-muted-foreground mt-1 text-xs">Estimated cost {formatINRShort(event.estimatedCost)}</p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <button type="button" className="text-muted-foreground hover:text-primary" aria-label={`Edit ${event.event}`} onClick={() => setEventDialog({ open: true, event })}>
+                      <Pencil className="size-4" />
+                    </button>
+                    <button type="button" className="text-muted-foreground hover:text-destructive" aria-label={`Remove ${event.event}`} onClick={() => removeFutureEvent(event.id)}>
+                      <Trash2 className="size-4" />
+                    </button>
+                  </div>
+                </div>
+            )}
+            </div> :
+
+          <div className="surface-card rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+              No future events on record yet. This is entirely optional — add one whenever a milestone comes up.
+            </div>
+          }
+        </div>
+
+        <FutureEventFormDialog
+          open={eventDialog.open}
+          onOpenChange={(open) => setEventDialog((prev) => ({ ...prev, open }))}
+          initialEvent={eventDialog.event}
+          onSubmit={(event) => {
+            if (eventDialog.event) {
+              updateFutureEvent(eventDialog.event.id, event);
+            } else {
+              addFutureEvent(event);
+            }
+          }} />
 
         {/* Life Event Selector Cards */}
         <div className="space-y-3">

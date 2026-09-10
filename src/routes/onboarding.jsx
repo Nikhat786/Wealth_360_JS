@@ -5,19 +5,17 @@ import {
   Briefcase,
   Check,
   CheckCircle2,
-  ChevronDown,
   CreditCard,
   HeartHandshake,
   Loader2,
   Lock,
+  Pencil,
   Plus,
   Shield,
   ShieldCheck,
   Sparkles,
-  Target,
   Trash2,
   User,
-  Wallet,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -31,7 +29,6 @@ import {
 "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { AppShell } from "@/components/wealth/app-shell";
 import {
   defaultAnswers,
@@ -45,15 +42,18 @@ import {
 
 
 "@/context/app-context";
-import { formatINR, formatINRShort } from "@/lib/format";
+import { clamp, formatINR, formatINRShort, formatPct } from "@/lib/format";
 import { lifeStage } from "@/lib/wealth360";
 import { cn } from "@/lib/utils";
 
 
-const chapters = ["About You", "Family", "Cashflow", "What You Own", "What You Owe", "Goals", "Protect", "Risk", "Future"];
+const chapters = ["About You", "Family", "Cashflow", "What You Own", "What You Owe", "Goals", "Protect"];
 const assetTypes = ["Cash & Savings", "FD/RD", "Stocks", "Mutual Funds", "ETFs", "Bonds", "Gold/SGB", "Real Estate", "EPF/PPF/NPS", "Pension", "Other Assets"];
 const goalTypes = ["Child Education", "Retirement", "Home", "Emergency Fund", "Travel", "Marriage", "Financial Independence", "Business", "Career Break", "Wealth Creation", "Parents", "Custom"];
-const eventTypes = ["Baby", "Marriage", "Home Purchase", "Job Change", "Career Break", "Education", "Travel", "Business", "Relocation", "Retirement", "Custom"];
+const GOAL_TYPE_ICONS = { "Retirement": "retirement", "Child Education": "education", "Home": "home", "Emergency Fund": "shield", "Travel": "travel" };
+function iconForGoalType(name) {
+  return GOAL_TYPE_ICONS[name] || "retirement";
+}
 
 export default function Onboarding() {
   const {
@@ -156,7 +156,7 @@ export default function Onboarding() {
   return (
     <AppShell minimal>
       <div className="mx-auto max-w-4xl space-y-6 py-2 sm:py-6">
-        <JourneyProgress chapter={chapter} progress={progress} />
+        <JourneyProgress chapter={chapter} progress={progress} onSelect={setChapter} />
 
         <div className="space-y-1">
           <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
@@ -176,8 +176,6 @@ export default function Onboarding() {
           {chapter === 4 && <LiabilitiesStep draft={draft} set={set} />}
           {chapter === 5 && <GoalsStep draft={draft} set={set} />}
           {chapter === 6 && <ProtectionStep draft={draft} set={set} />}
-          {chapter === 7 && <RiskStep draft={draft} set={set} />}
-          {chapter === 8 && <FutureStep draft={draft} set={set} />}
         </div>
 
         {chapter > 0 && (
@@ -210,7 +208,7 @@ export default function Onboarding() {
                   Financial Universe Constructed!
                 </DialogTitle>
                 <DialogDescription className="text-xs">
-                  Income, Expenses, Assets, Loans, Goals, and Protection have been synthesized.
+                  Expenses, Assets, Loans, and Protection have been synthesized. Income and Goals aren&apos;t held by any FIP, so you&apos;ll add those manually.
                 </DialogDescription>
               </div> :
               <div className="py-4 space-y-4">
@@ -264,12 +262,10 @@ function PanEntryStep({ panInput, setPanInput, onFetch, panFetched, draft, onCon
   if (panFetched) {
     // Show fetched summary
     const summaryItems = [
-      { icon: User, label: "Identity", value: `${draft.name}, ${draft.age} yrs`, color: "text-blue-500" },
-      { icon: Wallet, label: "Income", value: `${formatINRShort(draft.annualIncome)}/yr`, color: "text-emerald-500" },
-      { icon: Briefcase, label: "Assets", value: `${draft.assets?.length || 0} holdings mapped`, color: "text-amber-500" },
-      { icon: CreditCard, label: "Liabilities", value: `${draft.liabilities?.length || 0} loans found`, color: "text-rose-500" },
-      { icon: Shield, label: "Protection", value: `${draft.insurancePolicies?.length || 0} policies`, color: "text-violet-500" },
-      { icon: Target, label: "Goals", value: `${draft.goals?.length || 0} goals identified`, color: "text-cyan-500" },
+      { icon: User, label: "Identity", value: `${draft.name}, ${draft.age} yrs`, color: "text-blue-500", fetched: true },
+      { icon: Briefcase, label: "Assets", value: `${draft.assets?.length || 0} holdings mapped`, color: "text-amber-500", fetched: true },
+      { icon: CreditCard, label: "Liabilities", value: `${draft.liabilities?.length || 0} loans found`, color: "text-rose-500", fetched: true },
+      { icon: Shield, label: "Protection", value: `${draft.insurancePolicies?.length || 0} policies`, color: "text-violet-500", fetched: true },
     ];
     return (
       <div className="space-y-6">
@@ -277,13 +273,13 @@ function PanEntryStep({ panInput, setPanInput, onFetch, panFetched, draft, onCon
           <CheckCircle2 className="size-5 text-success shrink-0" />
           <div>
             <p className="text-sm font-bold text-success">Financial Universe Fetched Successfully</p>
-            <p className="text-xs text-success/80 mt-0.5">PAN {panInput} · All financial data has been auto-populated</p>
+            <p className="text-xs text-success/80 mt-0.5">PAN {panInput} · Holdings, loans & policies auto-populated — income and goals aren&apos;t held by any FIP, so add those next.</p>
           </div>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
           {summaryItems.map((item) => (
-            <div key={item.label} className="flex items-center gap-3 rounded-xl bg-muted/50 p-4 animate-in fade-in slide-in-from-bottom-2">
+            <div key={item.label} className={cn("flex items-center gap-3 rounded-xl bg-muted/50 p-4 animate-in fade-in slide-in-from-bottom-2", !item.fetched && "border border-dashed border-muted-foreground/30 bg-transparent")}>
               <span className={cn("flex size-10 items-center justify-center rounded-xl bg-background shadow-sm", item.color)}>
                 <item.icon className="size-5" />
               </span>
@@ -364,7 +360,7 @@ function PanEntryStep({ panInput, setPanInput, onFetch, panFetched, draft, onCon
   );
 }
 
-function JourneyProgress({ chapter, progress }) {
+function JourneyProgress({ chapter, progress, onSelect }) {
   return (
     <div className="space-y-3">
       <div className="flex items-end justify-between gap-4">
@@ -384,20 +380,26 @@ function JourneyProgress({ chapter, progress }) {
         <div
           className="gradient-gold h-full transition-all duration-500"
           style={{ width: `${progress}%` }} />
-        
+
       </div>
       <div className="hidden gap-1 overflow-x-auto pb-1 md:flex">
-        {chapters.map((item, index) =>
-        <span
-          key={item}
-          className={cn(
-            "shrink-0 text-[10px] font-medium",
-            index <= chapter ? "text-foreground" : "text-muted-foreground"
-          )}>
-          
-            {String(index + 1).padStart(2, "0")} {item}
-          </span>
-        )}
+        {chapters.map((item, index) => {
+          const visited = index <= chapter;
+          return (
+            <button
+              key={item}
+              type="button"
+              disabled={!visited}
+              onClick={() => onSelect(index)}
+              title={visited ? `Back to ${item}` : undefined}
+              className={cn(
+                "shrink-0 rounded px-1 text-[10px] font-medium transition-colors",
+                visited ? "text-foreground hover:text-primary" : "text-muted-foreground cursor-not-allowed"
+              )}>
+              {String(index + 1).padStart(2, "0")} {item}
+            </button>
+          );
+        })}
       </div>
     </div>);
 
@@ -411,10 +413,7 @@ function titleFor(chapter) {
   "Let's map what you've already built.",
   "Every wealth journey has two sides.",
   "Your wealth should have a purpose.",
-  "What could protect your family?",
-  "How does your money behave under pressure?",
-  "Life doesn't always follow the plan.",
-  "We've got your story."][
+  "What could protect your family?"][
   chapter];
 }
 function descriptionFor(chapter) {
@@ -425,37 +424,505 @@ function descriptionFor(chapter) {
   "Add investments one at a time so the details remain meaningful.",
   "Understanding debt helps us decide whether your next rupee should go toward investing, saving or repayment.",
   "Choose the milestones that deserve a place in your plan. You can refine them later.",
-  "We'll compare what you already have against what your family may need.",
-  "A simple scenario helps us understand your investment personality.",
-  "Capture changes that may shape your future plan.",
-  "Check the chapters you've shared before we build your WealthVerse."][
+  "We'll compare what you already have against what your family may need."][
   chapter];
 }
 
 /* Old AboutStep removed — replaced by PanEntryStep above */
 
-function FamilyStep({ draft, set }) {const [member, setMember] = useState({ name: "", relation: "Child", age: 0, dependency: "Full", needs: "" });const add = () => {if (!member.name.trim()) return;set("familyMembers", [...draft.familyMembers, { ...member, id: `family-${Date.now()}` }]);setMember({ name: "", relation: "Child", age: 0, dependency: "Full", needs: "" });};return <div className="space-y-5"><div className="grid gap-3 sm:grid-cols-2">{draft.familyMembers.map((person) => <RecordCard key={person.id} title={person.name} subtitle={`${person.relation} · ${person.age} years · ${person.dependency} dependency`} onRemove={() => set("familyMembers", draft.familyMembers.filter((item) => item.id !== person.id))}><p className="text-muted-foreground text-xs">{person.needs || "No specific need added yet"}</p></RecordCard>)}</div><div className="grid gap-3 rounded-xl border border-dashed p-4 sm:grid-cols-2"><Field label="Name"><Input value={member.name} onChange={(e) => setMember({ ...member, name: e.target.value })} placeholder="Add family member" /></Field><Field label="Relationship"><Select value={member.relation} options={["Spouse", "Child", "Parent", "Other"]} onChange={(v) => setMember({ ...member, relation: v })} /></Field><NumberField label="Age" value={member.age} onChange={(v) => setMember({ ...member, age: v })} /><Field label="Financial dependency"><Select value={member.dependency} options={["Full", "Partial", "None"]} onChange={(v) => setMember({ ...member, dependency: v })} /></Field><Field label="Important financial needs"><Input value={member.needs} onChange={(e) => setMember({ ...member, needs: e.target.value })} placeholder="Education, care, home..." /></Field><Button type="button" variant="secondary" className="self-end" onClick={add}><Plus className="size-4" /> Add family member</Button></div></div>;}
+function FamilyStep({ draft, set }) {
+  const emptyMember = { name: "", relation: "Child", age: 0, dependency: "Full", needs: "" };
+  const [editingId, setEditingId] = useState(null);
+  const [member, setMember] = useState(emptyMember);
 
-function CashflowStep({ draft, set }) {const income = derivedIncome(draft);const expenses = derivedExpenses(draft);const surplus = income - expenses;const incomeFields = [["Salary", "salary"], ["Business", "businessIncome"], ["Rental", "rentalIncome"], ["Dividend", "dividendsIncome"], ["Interest", "interestIncome"], ["Other", "otherIncome"]];const expenseFields = [["Household", "household"], ["Education", "schoolFees"], ["EMI", "emiExpenses"], ["Insurance", "insuranceExpenses"], ["Healthcare", "healthcareExpenses"], ["Lifestyle", "lifestyle"], ["Travel", "travelExpenses"], ["Other", "otherExpenses"]];return <div className="space-y-6"><MoneyGroup title="Income sources" fields={incomeFields} draft={draft} set={set} /><MoneyGroup title="Monthly expenses" fields={expenseFields} draft={draft} set={set} /><div className="bg-secondary grid gap-4 rounded-xl p-4 sm:grid-cols-3"><FlowMetric label="Monthly income" value={income} /><FlowMetric label="Monthly expenses" value={expenses} /><FlowMetric label="Future surplus" value={surplus} tone={surplus >= 0 ? "success" : "destructive"} /><p className="text-muted-foreground text-xs sm:col-span-3">INCOME <ArrowRight className="mx-1 inline size-3" /> EXPENSES <ArrowRight className="mx-1 inline size-3" /> AVAILABLE FOR YOUR FUTURE</p></div></div>;}
+  const startEdit = (person) => {
+    setEditingId(person.id);
+    setMember(person);
+  };
+  const cancelEdit = () => {
+    setEditingId(null);
+    setMember(emptyMember);
+  };
+  const submit = () => {
+    if (!member.name.trim()) return;
+    set("familyMembers", editingId ?
+    draft.familyMembers.map((p) => p.id === editingId ? { ...member, id: editingId } : p) :
+    [...draft.familyMembers, { ...member, id: `family-${Date.now()}` }]);
+    cancelEdit();
+  };
+  const remove = (id) => {
+    set("familyMembers", draft.familyMembers.filter((item) => item.id !== id));
+    if (editingId === id) cancelEdit();
+  };
 
-function AssetsStep({ draft, set }) {const [selected, setSelected] = useState("Stocks");const [form, setForm] = useState({ type: "Stocks", risk: "Moderate", liquidity: "Medium", ownership: "Self", startDate: "" });const add = () => {if (!form.name?.trim()) return;const record = { id: `asset-${Date.now()}`, name: form.name, type: selected, investedValue: form.investedValue ?? 0, currentValue: form.currentValue ?? 0, startDate: form.startDate ?? "", holdingPeriod: form.holdingPeriod ?? 0, actualReturn: form.actualReturn ?? 0, expectedReturn: form.expectedReturn ?? 10, risk: form.risk ?? "Moderate", liquidity: form.liquidity ?? "Medium", taxTreatment: form.taxTreatment ?? "To review", incomeGenerated: form.incomeGenerated ?? 0, linkedGoal: form.linkedGoal ?? "", ownership: form.ownership ?? "Self", details: {} };set("assets", [...draft.assets, record]);setForm({ type: selected, risk: "Moderate", liquidity: "Medium", ownership: "Self", startDate: "" });};return <div className="space-y-6"><div><p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">Choose what you want to add</p><div className="flex flex-wrap gap-2">{assetTypes.map((type) => <button key={type} type="button" onClick={() => {setSelected(type);setForm({ ...form, type });}} className={cn("rounded-full border px-3 py-2 text-xs font-medium transition-colors", selected === type ? "bg-primary text-primary-foreground border-transparent" : "hover:bg-muted")}>{type}</button>)}</div></div><div className="bg-muted/40 rounded-xl p-4"><p className="font-display text-base font-semibold">Add {selected}</p><p className="text-muted-foreground mt-1 text-xs">Capture the details that make this investment meaningful.</p><div className="mt-4 grid gap-4 sm:grid-cols-2"><Field label="Name"><Input value={form.name ?? ""} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={selected === "Stocks" ? "e.g. HDFC Bank" : "Give it a name"} /></Field><NumberField label="Invested value" value={form.investedValue ?? 0} onChange={(v) => setForm({ ...form, investedValue: v })} money /><NumberField label="Current value" value={form.currentValue ?? 0} onChange={(v) => setForm({ ...form, currentValue: v })} money /><Field label="Start date"><Input type="date" value={form.startDate ?? ""} onChange={(e) => setForm({ ...form, startDate: e.target.value })} /></Field><NumberField label="Holding period (years)" value={form.holdingPeriod ?? 0} onChange={(v) => setForm({ ...form, holdingPeriod: v })} /><NumberField label="Actual return %" value={form.actualReturn ?? 0} onChange={(v) => setForm({ ...form, actualReturn: v })} /><NumberField label="Expected return %" value={form.expectedReturn ?? 10} onChange={(v) => setForm({ ...form, expectedReturn: v })} /><Field label="Risk"><Select value={form.risk ?? "Moderate"} options={["Low", "Moderate", "High"]} onChange={(v) => setForm({ ...form, risk: v })} /></Field><Field label="Liquidity"><Select value={form.liquidity ?? "Medium"} options={["High", "Medium", "Low"]} onChange={(v) => setForm({ ...form, liquidity: v })} /></Field><Field label="Linked goal"><Input value={form.linkedGoal ?? ""} onChange={(e) => setForm({ ...form, linkedGoal: e.target.value })} placeholder="Optional" /></Field><Field label="Ownership"><Input value={form.ownership ?? "Self"} onChange={(e) => setForm({ ...form, ownership: e.target.value })} /></Field><Field label="Tax treatment"><Input value={form.taxTreatment ?? ""} onChange={(e) => setForm({ ...form, taxTreatment: e.target.value })} placeholder="ELSS, equity LTCG..." /></Field></div><Button type="button" className="mt-4" onClick={add}><Plus className="size-4" /> Add investment</Button></div><div className="grid gap-3 sm:grid-cols-2">{draft.assets.map((asset) => <RecordCard key={asset.id} title={asset.name} subtitle={`${asset.type} · ${formatINRShort(asset.currentValue)} current`} onRemove={() => set("assets", draft.assets.filter((item) => item.id !== asset.id))}><p className="text-muted-foreground text-xs">Invested {formatINRShort(asset.investedValue)} · {asset.actualReturn}% actual return · {asset.risk} risk</p></RecordCard>)}</div></div>;}
+  return (
+    <div className="space-y-5">
+      {draft.familyMembers.length > 0 ?
+      <div className="grid gap-3 sm:grid-cols-2">
+          {draft.familyMembers.map((person) =>
+        <RecordCard key={person.id} title={person.name} subtitle={`${person.relation} · ${person.age} years · ${person.dependency} dependency`} onRemove={() => remove(person.id)} onEdit={() => startEdit(person)}>
+              <p className="text-muted-foreground text-xs">{person.needs || "No specific need added yet"}</p>
+            </RecordCard>
+        )}
+        </div> :
 
-function LiabilitiesStep({ draft, set }) {const [form, setForm] = useState({ type: "Home Loan", rateType: "Floating", startDate: "", endDate: "" });const add = () => {if (!form.provider?.trim()) return;const record = { id: `liability-${Date.now()}`, provider: form.provider, type: form.type ?? "Other", originalAmount: form.originalAmount ?? 0, outstandingAmount: form.outstandingAmount ?? 0, interestRate: form.interestRate ?? 0, emi: form.emi ?? 0, startDate: form.startDate ?? "", originalTenure: form.originalTenure ?? 0, remainingTenure: form.remainingTenure ?? 0, endDate: form.endDate ?? "", rateType: form.rateType ?? "Floating", prepaymentOption: form.prepaymentOption ?? false, prepaymentPenalty: form.prepaymentPenalty ?? 0 };set("liabilities", [...draft.liabilities, record]);setForm({ type: "Home Loan", rateType: "Floating", startDate: "", endDate: "" });};return <div className="space-y-6"><div className="grid gap-4 sm:grid-cols-2"><Field label="Provider"><Input value={form.provider ?? ""} onChange={(e) => setForm({ ...form, provider: e.target.value })} placeholder="Bank or lender" /></Field><Field label="Debt type"><Select value={form.type ?? "Home Loan"} options={["Home Loan", "Personal Loan", "Vehicle Loan", "Credit Card", "Education Loan", "Other"]} onChange={(v) => setForm({ ...form, type: v })} /></Field><NumberField label="Original amount" value={form.originalAmount ?? 0} onChange={(v) => setForm({ ...form, originalAmount: v })} money /><NumberField label="Outstanding amount" value={form.outstandingAmount ?? 0} onChange={(v) => setForm({ ...form, outstandingAmount: v })} money /><NumberField label="Interest rate %" value={form.interestRate ?? 0} onChange={(v) => setForm({ ...form, interestRate: v })} /><NumberField label="Monthly EMI" value={form.emi ?? 0} onChange={(v) => setForm({ ...form, emi: v })} money /><NumberField label="Original tenure (years)" value={form.originalTenure ?? 0} onChange={(v) => setForm({ ...form, originalTenure: v })} /><NumberField label="Remaining tenure (years)" value={form.remainingTenure ?? 0} onChange={(v) => setForm({ ...form, remainingTenure: v })} /><Field label="Rate type"><Select value={form.rateType ?? "Floating"} options={["Fixed", "Floating"]} onChange={(v) => setForm({ ...form, rateType: v })} /></Field><Field label="End date"><Input type="date" value={form.endDate ?? ""} onChange={(e) => setForm({ ...form, endDate: e.target.value })} /></Field></div><Button type="button" onClick={add}><Plus className="size-4" /> Add liability</Button><div className="grid gap-3 sm:grid-cols-2">{draft.liabilities.map((loan) => <RecordCard key={loan.id} title={loan.provider} subtitle={`${loan.type} · ${formatINRShort(loan.outstandingAmount)} outstanding`} onRemove={() => set("liabilities", draft.liabilities.filter((item) => item.id !== loan.id))}><p className="text-muted-foreground text-xs">{loan.interestRate}% {loan.rateType} · EMI {formatINR(loan.emi)} · {loan.remainingTenure} years left</p></RecordCard>)}</div><p className="bg-gold-soft text-gold-foreground rounded-xl p-4 text-xs">We'll later help you explore &quot;Should I invest more or repay debt?&quot; without giving final advice during onboarding.</p></div>;}
+      <EmptyState text="No family members added yet — add the people your plan should provide for." />
+      }
 
-function GoalsStep({ draft, set }) {const [form, setForm] = useState({ priority: "Medium", expectedReturn: 10, inflation: 6 });const add = () => {if (!form.name?.trim()) return;const record = { id: `goal-${Date.now()}`, name: form.name, currentAmount: form.currentAmount ?? 0, targetAmount: form.targetAmount ?? 0, targetYear: form.targetYear ?? new Date().getFullYear() + 10, duration: form.duration ?? 10, monthlyContribution: form.monthlyContribution ?? 0, expectedReturn: form.expectedReturn ?? 10, inflation: form.inflation ?? 6, priority: form.priority ?? "Medium", linkedInvestments: [], fundingSource: form.fundingSource ?? "Monthly contributions" };set("goals", [...draft.goals, record]);set("selectedGoals", [...new Set([...draft.selectedGoals, record.name])]);setForm({ priority: "Medium", expectedReturn: 10, inflation: 6 });};return <div className="space-y-6"><div className="grid gap-4 sm:grid-cols-2"><Field label="Goal type"><Select value={form.name ?? "Retirement"} options={goalTypes} onChange={(v) => setForm({ ...form, name: v })} /></Field><NumberField label="Current amount" value={form.currentAmount ?? 0} onChange={(v) => setForm({ ...form, currentAmount: v })} money /><NumberField label="Target amount" value={form.targetAmount ?? 0} onChange={(v) => setForm({ ...form, targetAmount: v })} money /><NumberField label="Target year" value={form.targetYear ?? new Date().getFullYear() + 10} onChange={(v) => setForm({ ...form, targetYear: v })} /><NumberField label="Monthly contribution" value={form.monthlyContribution ?? 0} onChange={(v) => setForm({ ...form, monthlyContribution: v })} money /><NumberField label="Expected return %" value={form.expectedReturn ?? 10} onChange={(v) => setForm({ ...form, expectedReturn: v })} /><NumberField label="Inflation assumption %" value={form.inflation ?? 6} onChange={(v) => setForm({ ...form, inflation: v })} /><Field label="Priority"><Select value={form.priority ?? "Medium"} options={["High", "Medium", "Low"]} onChange={(v) => setForm({ ...form, priority: v })} /></Field></div><Button type="button" onClick={add}><Plus className="size-4" /> Add goal</Button><div className="grid gap-3 sm:grid-cols-2">{draft.goals.map((goal) => <RecordCard key={goal.id} title={goal.name} subtitle={`${formatINRShort(goal.targetAmount)} target by ${goal.targetYear}`} onRemove={() => set("goals", draft.goals.filter((item) => item.id !== goal.id))}><p className="text-muted-foreground text-xs">{formatINR(goal.monthlyContribution)}/month · {goal.priority} priority · {goal.inflation}% inflation assumption</p></RecordCard>)}</div></div>;}
+      <div className="space-y-4 rounded-xl border border-dashed p-4">
+        <div className="flex items-center justify-between gap-2">
+          <p className="font-display text-base font-semibold">{editingId ? "Edit family member" : "Add a family member"}</p>
+          {editingId &&
+          <button type="button" onClick={cancelEdit} className="text-muted-foreground hover:text-foreground text-xs font-semibold">
+              Cancel edit
+            </button>
+          }
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Name"><Input value={member.name} onChange={(e) => setMember({ ...member, name: e.target.value })} placeholder="Add family member" /></Field>
+          <NumberField label="Age" value={member.age} onChange={(v) => setMember({ ...member, age: v })} />
+        </div>
+        <Field label="Relationship">
+          <PillGroup options={["Spouse", "Child", "Parent", "Other"]} value={member.relation} onChange={(v) => setMember({ ...member, relation: v })} />
+        </Field>
+        <Field label="Financial dependency">
+          <PillGroup options={["Full", "Partial", "None"]} value={member.dependency} onChange={(v) => setMember({ ...member, dependency: v })} />
+        </Field>
+        <Field label="Important financial needs"><Input value={member.needs} onChange={(e) => setMember({ ...member, needs: e.target.value })} placeholder="Education, care, home..." /></Field>
+        <Button type="button" variant="secondary" onClick={submit}><Plus className="size-4" /> {editingId ? "Save changes" : "Add family member"}</Button>
+      </div>
+    </div>);
 
-function ProtectionStep({ draft, set }) {const [form, setForm] = useState({ type: "Life", startDate: "", renewalDate: "" });const add = () => {if (!form.insurer?.trim()) return;const policy = { id: `policy-${Date.now()}`, insurer: form.insurer, type: form.type ?? "Life", sumAssured: form.sumAssured ?? 0, premium: form.premium ?? 0, term: form.term ?? 0, startDate: form.startDate ?? "", renewalDate: form.renewalDate ?? "", nominee: form.nominee ?? "", coveredMembers: form.coveredMembers ?? [] };set("insurancePolicies", [...draft.insurancePolicies, policy]);setForm({ type: "Life", startDate: "", renewalDate: "" });};return <div className="space-y-6"><div className="grid gap-4 sm:grid-cols-2"><Field label="Policy type"><Select value={form.type ?? "Life"} options={["Life", "Health", "Personal Accident"]} onChange={(v) => setForm({ ...form, type: v })} /></Field><Field label="Insurer"><Input value={form.insurer ?? ""} onChange={(e) => setForm({ ...form, insurer: e.target.value })} placeholder="Provider name" /></Field><NumberField label="Sum assured" value={form.sumAssured ?? 0} onChange={(v) => setForm({ ...form, sumAssured: v })} money /><NumberField label="Premium" value={form.premium ?? 0} onChange={(v) => setForm({ ...form, premium: v })} money /><NumberField label="Policy term (years)" value={form.term ?? 0} onChange={(v) => setForm({ ...form, term: v })} /><Field label="Nominee"><Input value={form.nominee ?? ""} onChange={(e) => setForm({ ...form, nominee: e.target.value })} /></Field><Field label="Renewal date"><Input type="date" value={form.renewalDate ?? ""} onChange={(e) => setForm({ ...form, renewalDate: e.target.value })} /></Field></div><Button type="button" onClick={add}><Plus className="size-4" /> Add policy</Button><div className="grid gap-3 sm:grid-cols-2">{draft.insurancePolicies.map((policy) => <RecordCard key={policy.id} title={policy.insurer} subtitle={`${policy.type} · ${formatINRShort(policy.sumAssured)} cover`} onRemove={() => set("insurancePolicies", draft.insurancePolicies.filter((item) => item.id !== policy.id))}><p className="text-muted-foreground text-xs">Premium {formatINR(policy.premium)} · Nominee {policy.nominee || "Not added"}</p></RecordCard>)}</div><div className="bg-secondary grid gap-4 rounded-xl p-4 sm:grid-cols-3"><FlowMetric label="Life cover" value={draft.lifeCover} /><FlowMetric label="Health cover" value={draft.healthCover} /><FlowMetric label="Emergency fund" value={draft.cashSavings} /></div></div>;}
+}
 
-function RiskStep({ draft, set }) {return <div className="space-y-6"><div className="bg-secondary rounded-xl p-5"><p className="font-display text-base font-semibold">My ₹10L portfolio falls to ₹8L. What would you do?</p><div className="mt-4 flex flex-wrap gap-2">{["sell", "hold", "buy"].map((choice) => <Choice key={choice} label={choice === "sell" ? "Sell" : choice === "hold" ? "Wait" : "Invest more"} active={draft.reactionToDrop === choice} onClick={() => set("reactionToDrop", choice)} />)}</div></div><Field label={`Investment horizon — ${draft.horizon} years`}><Slider value={[draft.horizon]} min={1} max={30} step={1} onValueChange={(v) => set("horizon", v[0] ?? 10)} /></Field><Field label={`Risk comfort — ${draft.riskAppetite} / 10`}><Slider value={[draft.riskAppetite]} min={1} max={10} step={1} onValueChange={(v) => set("riskAppetite", v[0] ?? 5)} /></Field><div className="grid gap-4 sm:grid-cols-2"><Field label="Liquidity preference"><Select value={draft.liquidityPreference} options={["High", "Medium", "Low"]} onChange={(v) => set("liquidityPreference", v)} /></Field><NumberField label="Monthly investment capacity" value={draft.monthlyInvestment} onChange={(v) => set("monthlyInvestment", v)} money /></div><p className="text-muted-foreground text-xs">This helps us understand your investment personality. It is not a recommendation or a score.</p></div>;}
+function CashflowStep({ draft, set }) {
+  const income = derivedIncome(draft);
+  const expenses = derivedExpenses(draft);
+  const surplus = income - expenses;
+  const expenseShare = income > 0 ? Math.min(100, expenses / income * 100) : 0;
+  const incomeFields = [["Salary", "salary"], ["Business", "businessIncome"], ["Rental", "rentalIncome"], ["Dividend", "dividendsIncome"], ["Interest", "interestIncome"], ["Other", "otherIncome"]];
+  const expenseFields = [["Household", "household"], ["Education", "schoolFees"], ["EMI", "emiExpenses"], ["Insurance", "insuranceExpenses"], ["Healthcare", "healthcareExpenses"], ["Lifestyle", "lifestyle"], ["Travel", "travelExpenses"], ["Other", "otherExpenses"]];
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-5 lg:grid-cols-2">
+        <MoneyGroup title="Income sources" fields={incomeFields} draft={draft} set={set} />
+        <MoneyGroup title="Monthly expenses" fields={expenseFields} draft={draft} set={set} />
+      </div>
 
-function FutureStep({ draft, set }) {const [form, setForm] = useState({ event: "Retirement", importance: "Medium" });const add = () => {if (!form.event) return;const event = { id: `event-${Date.now()}`, event: form.event, year: form.year ?? new Date().getFullYear() + 5, estimatedCost: form.estimatedCost ?? 0, importance: form.importance ?? "Medium" };set("futureEvents", [...draft.futureEvents, event]);set("lifeEvents", [...new Set([...draft.lifeEvents, event.event])]);setForm({ event: "Retirement", importance: "Medium" });};return <div className="space-y-6"><div className="grid gap-4 sm:grid-cols-2"><Field label="Life event"><Select value={form.event ?? "Retirement"} options={eventTypes} onChange={(v) => setForm({ ...form, event: v })} /></Field><NumberField label="Expected year" value={form.year ?? new Date().getFullYear() + 5} onChange={(v) => setForm({ ...form, year: v })} /><NumberField label="Estimated cost" value={form.estimatedCost ?? 0} onChange={(v) => setForm({ ...form, estimatedCost: v })} money /><Field label="Importance"><Select value={form.importance ?? "Medium"} options={["High", "Medium", "Low"]} onChange={(v) => setForm({ ...form, importance: v })} /></Field></div><Button type="button" onClick={add}><Plus className="size-4" /> Add future event</Button><div className="grid gap-3 sm:grid-cols-2">{draft.futureEvents.map((event) => <RecordCard key={event.id} title={event.event} subtitle={`${event.year} · ${event.importance} importance`} onRemove={() => set("futureEvents", draft.futureEvents.filter((item) => item.id !== event.id))}><p className="text-muted-foreground text-xs">Estimated cost {formatINRShort(event.estimatedCost)}</p></RecordCard>)}</div></div>;}
+      <div className="bg-secondary space-y-3 rounded-xl p-4">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <FlowMetric label="Monthly income" value={income} />
+          <FlowMetric label="Monthly expenses" value={expenses} />
+          <FlowMetric label="Future surplus" value={surplus} tone={surplus >= 0 ? "success" : "destructive"} />
+        </div>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+          <div className="h-full bg-primary transition-all duration-500" style={{ width: `${expenseShare}%` }} />
+        </div>
+        <p className="text-muted-foreground text-xs">
+          {Math.round(expenseShare)}% of your income goes to expenses — the rest becomes your future surplus.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function AssetsStep({ draft, set }) {
+  const emptyForm = { type: "Stocks", risk: "Moderate", liquidity: "Medium", ownership: "Self", startDate: "" };
+  const [editingId, setEditingId] = useState(null);
+  const [selected, setSelected] = useState("Stocks");
+  const [form, setForm] = useState(emptyForm);
+
+  const startEdit = (asset) => {
+    setEditingId(asset.id);
+    setSelected(asset.type);
+    setForm(asset);
+  };
+  const cancelEdit = () => {
+    setEditingId(null);
+    setSelected("Stocks");
+    setForm(emptyForm);
+  };
+  const submit = () => {
+    if (!form.name?.trim()) return;
+    const record = { id: editingId ?? `asset-${Date.now()}`, name: form.name, type: selected, investedValue: form.investedValue ?? 0, currentValue: form.currentValue ?? 0, startDate: form.startDate ?? "", holdingPeriod: form.holdingPeriod ?? 0, actualReturn: form.actualReturn ?? 0, expectedReturn: form.expectedReturn ?? 10, risk: form.risk ?? "Moderate", liquidity: form.liquidity ?? "Medium", taxTreatment: form.taxTreatment ?? "To review", incomeGenerated: form.incomeGenerated ?? 0, linkedGoal: form.linkedGoal ?? "", ownership: form.ownership ?? "Self", details: form.details ?? {} };
+    set("assets", editingId ?
+    draft.assets.map((a) => a.id === editingId ? record : a) :
+    [...draft.assets, record]);
+    cancelEdit();
+  };
+  const remove = (id) => {
+    set("assets", draft.assets.filter((item) => item.id !== id));
+    if (editingId === id) cancelEdit();
+  };
+  const invested = form.investedValue ?? 0;
+  const current = form.currentValue ?? 0;
+  const gain = current - invested;
+  const gainPct = invested > 0 ? gain / invested * 100 : 0;
+  return (
+    <div className="space-y-6">
+      {draft.assets.length > 0 ?
+      <div className="grid gap-3 sm:grid-cols-2">
+          {draft.assets.map((asset) =>
+        <RecordCard key={asset.id} title={asset.name} subtitle={`${asset.type} · ${formatINRShort(asset.currentValue)} current`} onRemove={() => remove(asset.id)} onEdit={() => startEdit(asset)}>
+              <p className="text-muted-foreground text-xs">Invested {formatINRShort(asset.investedValue)} · {asset.actualReturn}% actual return · {asset.risk} risk</p>
+            </RecordCard>
+        )}
+        </div> :
+
+      <EmptyState text="No investments added yet — add each holding one at a time below." />
+      }
+
+      <div className="bg-muted/40 space-y-5 rounded-xl p-4">
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <SectionLabel>Choose what you want to add</SectionLabel>
+            {editingId &&
+            <button type="button" onClick={cancelEdit} className="text-muted-foreground hover:text-foreground text-xs font-semibold">
+                Cancel edit
+              </button>
+            }
+          </div>
+          <div className="mt-2">
+            <PillGroup options={assetTypes} value={selected} onChange={(type) => {setSelected(type);setForm({ ...form, type });}} />
+          </div>
+        </div>
+
+        <div>
+          <p className="font-display text-base font-semibold">{editingId ? `Edit ${selected}` : `Add ${selected}`}</p>
+          <p className="text-muted-foreground mt-1 text-xs">Capture the details that make this investment meaningful.</p>
+        </div>
+
+        <div className="space-y-3">
+          <SectionLabel>Basics</SectionLabel>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Name"><Input value={form.name ?? ""} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={selected === "Stocks" ? "e.g. HDFC Bank" : "Give it a name"} /></Field>
+            <Field label="Start date"><Input type="date" value={form.startDate ?? ""} onChange={(e) => setForm({ ...form, startDate: e.target.value })} /></Field>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <SectionLabel>Value & performance</SectionLabel>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <NumberField label="Invested value" value={invested} onChange={(v) => setForm({ ...form, investedValue: v })} money />
+            <NumberField label="Current value" value={current} onChange={(v) => setForm({ ...form, currentValue: v })} money />
+            <NumberField label="Holding period (years)" value={form.holdingPeriod ?? 0} onChange={(v) => setForm({ ...form, holdingPeriod: v })} />
+            <NumberField label="Actual return %" value={form.actualReturn ?? 0} onChange={(v) => setForm({ ...form, actualReturn: v })} />
+            <NumberField label="Expected return %" value={form.expectedReturn ?? 10} onChange={(v) => setForm({ ...form, expectedReturn: v })} />
+          </div>
+          {(invested > 0 || current > 0) &&
+          <p className={cn("text-xs font-medium", gain >= 0 ? "text-success" : "text-destructive")}>
+              {gain >= 0 ? "Up" : "Down"} {formatINRShort(Math.abs(gain))} ({formatPct(gainPct)}) on {formatINRShort(invested)} invested
+            </p>
+          }
+        </div>
+
+        <div className="space-y-3">
+          <SectionLabel>Classification</SectionLabel>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Risk"><PillGroup options={["Low", "Moderate", "High"]} value={form.risk ?? "Moderate"} onChange={(v) => setForm({ ...form, risk: v })} /></Field>
+            <Field label="Liquidity"><PillGroup options={["High", "Medium", "Low"]} value={form.liquidity ?? "Medium"} onChange={(v) => setForm({ ...form, liquidity: v })} /></Field>
+            <Field label="Linked goal"><Input value={form.linkedGoal ?? ""} onChange={(e) => setForm({ ...form, linkedGoal: e.target.value })} placeholder="Optional" /></Field>
+            <Field label="Ownership"><Input value={form.ownership ?? "Self"} onChange={(e) => setForm({ ...form, ownership: e.target.value })} /></Field>
+            <Field label="Tax treatment"><Input value={form.taxTreatment ?? ""} onChange={(e) => setForm({ ...form, taxTreatment: e.target.value })} placeholder="ELSS, equity LTCG..." /></Field>
+          </div>
+        </div>
+
+        <Button type="button" onClick={submit}><Plus className="size-4" /> {editingId ? "Save changes" : "Add investment"}</Button>
+      </div>
+    </div>);
+
+}
+
+function LiabilitiesStep({ draft, set }) {
+  const emptyForm = { type: "Home Loan", rateType: "Floating", startDate: "", endDate: "" };
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyForm);
+
+  const startEdit = (loan) => {
+    setEditingId(loan.id);
+    setForm(loan);
+  };
+  const cancelEdit = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+  };
+  const submit = () => {
+    if (!form.provider?.trim()) return;
+    const record = { id: editingId ?? `liability-${Date.now()}`, provider: form.provider, type: form.type ?? "Other", originalAmount: form.originalAmount ?? 0, outstandingAmount: form.outstandingAmount ?? 0, interestRate: form.interestRate ?? 0, emi: form.emi ?? 0, startDate: form.startDate ?? "", originalTenure: form.originalTenure ?? 0, remainingTenure: form.remainingTenure ?? 0, endDate: form.endDate ?? "", rateType: form.rateType ?? "Floating", prepaymentOption: form.prepaymentOption ?? false, prepaymentPenalty: form.prepaymentPenalty ?? 0 };
+    set("liabilities", editingId ?
+    draft.liabilities.map((l) => l.id === editingId ? record : l) :
+    [...draft.liabilities, record]);
+    cancelEdit();
+  };
+  const remove = (id) => {
+    set("liabilities", draft.liabilities.filter((item) => item.id !== id));
+    if (editingId === id) cancelEdit();
+  };
+  const original = form.originalAmount ?? 0;
+  const outstanding = form.outstandingAmount ?? 0;
+  const repaidPct = original > 0 ? clamp((original - outstanding) / original * 100) : 0;
+  return (
+    <div className="space-y-6">
+      {draft.liabilities.length > 0 ?
+      <div className="grid gap-3 sm:grid-cols-2">
+          {draft.liabilities.map((loan) =>
+        <RecordCard key={loan.id} title={loan.provider} subtitle={`${loan.type} · ${formatINRShort(loan.outstandingAmount)} outstanding`} onRemove={() => remove(loan.id)} onEdit={() => startEdit(loan)}>
+              <p className="text-muted-foreground text-xs">{loan.interestRate}% {loan.rateType} · EMI {formatINR(loan.emi)} · {loan.remainingTenure} years left</p>
+            </RecordCard>
+        )}
+        </div> :
+
+      <EmptyState text="No liabilities added yet — add any loans or credit you're repaying." />
+      }
+
+      <div className="bg-muted/40 space-y-5 rounded-xl p-4">
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <SectionLabel>Debt type</SectionLabel>
+            {editingId &&
+            <button type="button" onClick={cancelEdit} className="text-muted-foreground hover:text-foreground text-xs font-semibold">
+                Cancel edit
+              </button>
+            }
+          </div>
+          <div className="mt-2">
+            <PillGroup options={["Home Loan", "Personal Loan", "Vehicle Loan", "Credit Card", "Education Loan", "Other"]} value={form.type ?? "Home Loan"} onChange={(v) => setForm({ ...form, type: v })} />
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Provider"><Input value={form.provider ?? ""} onChange={(e) => setForm({ ...form, provider: e.target.value })} placeholder="Bank or lender" /></Field>
+          <Field label="Rate type"><PillGroup options={["Fixed", "Floating"]} value={form.rateType ?? "Floating"} onChange={(v) => setForm({ ...form, rateType: v })} /></Field>
+        </div>
+
+        <div className="space-y-3">
+          <SectionLabel>Amounts & tenure</SectionLabel>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <NumberField label="Original amount" value={original} onChange={(v) => setForm({ ...form, originalAmount: v })} money />
+            <NumberField label="Outstanding amount" value={outstanding} onChange={(v) => setForm({ ...form, outstandingAmount: v })} money />
+            <NumberField label="Interest rate %" value={form.interestRate ?? 0} onChange={(v) => setForm({ ...form, interestRate: v })} />
+            <NumberField label="Monthly EMI" value={form.emi ?? 0} onChange={(v) => setForm({ ...form, emi: v })} money />
+            <NumberField label="Original tenure (years)" value={form.originalTenure ?? 0} onChange={(v) => setForm({ ...form, originalTenure: v })} />
+            <NumberField label="Remaining tenure (years)" value={form.remainingTenure ?? 0} onChange={(v) => setForm({ ...form, remainingTenure: v })} />
+          </div>
+          <Field label="End date"><Input type="date" value={form.endDate ?? ""} onChange={(e) => setForm({ ...form, endDate: e.target.value })} /></Field>
+          {original > 0 &&
+          <div className="space-y-1.5">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div className="bg-success h-full transition-all duration-500" style={{ width: `${repaidPct}%` }} />
+              </div>
+              <p className="text-muted-foreground text-xs">{Math.round(repaidPct)}% repaid so far</p>
+            </div>
+          }
+        </div>
+
+        <Button type="button" onClick={submit}><Plus className="size-4" /> {editingId ? "Save changes" : "Add liability"}</Button>
+      </div>
+
+      <p className="bg-gold-soft text-gold-foreground rounded-xl p-4 text-xs">We'll later help you explore &quot;Should I invest more or repay debt?&quot; without giving final advice during onboarding.</p>
+    </div>);
+
+}
+
+function GoalsStep({ draft, set }) {
+  const emptyForm = { priority: "Medium", expectedReturn: 10, inflation: 6 };
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyForm);
+
+  const startEdit = (goal) => {
+    setEditingId(goal.id);
+    setForm(goal);
+  };
+  const cancelEdit = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+  };
+  const submit = () => {
+    if (!form.name?.trim()) return;
+    const record = {
+      id: editingId ?? `goal-${Date.now()}`,
+      name: form.name,
+      icon: iconForGoalType(form.name),
+      saved: form.saved ?? 0,
+      target: form.target ?? 0,
+      targetYear: form.targetYear ?? new Date().getFullYear() + 10,
+      duration: form.duration ?? 10,
+      monthlyContribution: form.monthlyContribution ?? 0,
+      expectedReturn: form.expectedReturn ?? 10,
+      inflation: form.inflation ?? 6,
+      priority: form.priority ?? "Medium",
+      linkedInvestments: form.linkedInvestments ?? [],
+      fundingSource: form.fundingSource ?? "Monthly contributions"
+    };
+    set("goals", editingId ?
+    draft.goals.map((g) => g.id === editingId ? record : g) :
+    [...draft.goals, record]);
+    set("selectedGoals", [...new Set([...draft.selectedGoals, record.name])]);
+    cancelEdit();
+  };
+  const remove = (id) => {
+    set("goals", draft.goals.filter((item) => item.id !== id));
+    if (editingId === id) cancelEdit();
+  };
+
+  const saved = form.saved ?? 0;
+  const target = form.target ?? 0;
+  const progressPct = target > 0 ? clamp(saved / target * 100) : 0;
+  return (
+    <div className="space-y-6">
+      {draft.goals.length > 0 ?
+      <div className="grid gap-3 sm:grid-cols-2">
+          {draft.goals.map((goal) =>
+        <RecordCard key={goal.id} title={goal.name} subtitle={`${formatINRShort(goal.target)} target by ${goal.targetYear}`} onRemove={() => remove(goal.id)} onEdit={() => startEdit(goal)}>
+              <p className="text-muted-foreground text-xs">{formatINR(goal.monthlyContribution)}/month · {goal.priority} priority · {goal.inflation}% inflation assumption</p>
+            </RecordCard>
+        )}
+        </div> :
+
+      <EmptyState text="No goals yet — add the milestones you're saving toward, like retirement or your child's education." />
+      }
+
+      <div className="bg-muted/40 space-y-5 rounded-xl p-4">
+        <div className="flex items-center justify-between gap-2">
+          <p className="font-display text-base font-semibold">{editingId ? "Edit goal" : "Add a goal"}</p>
+          {editingId &&
+          <button type="button" onClick={cancelEdit} className="text-muted-foreground hover:text-foreground text-xs font-semibold">
+              Cancel edit
+            </button>
+          }
+        </div>
+
+        <div>
+          <SectionLabel>Goal type</SectionLabel>
+          <div className="mt-2">
+            <PillGroup options={goalTypes} value={form.name ?? "Retirement"} onChange={(v) => setForm({ ...form, name: v })} />
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <SectionLabel>Funding</SectionLabel>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <NumberField label="Current amount" value={saved} onChange={(v) => setForm({ ...form, saved: v })} money />
+            <NumberField label="Target amount" value={target} onChange={(v) => setForm({ ...form, target: v })} money />
+            <NumberField label="Monthly contribution" value={form.monthlyContribution ?? 0} onChange={(v) => setForm({ ...form, monthlyContribution: v })} money />
+            <NumberField label="Target year" value={form.targetYear ?? new Date().getFullYear() + 10} onChange={(v) => setForm({ ...form, targetYear: v })} />
+          </div>
+          {target > 0 &&
+          <div className="space-y-1.5">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div className="bg-primary h-full transition-all duration-500" style={{ width: `${progressPct}%` }} />
+              </div>
+              <p className="text-muted-foreground text-xs">{Math.round(progressPct)}% already saved toward this goal</p>
+            </div>
+          }
+        </div>
+
+        <div className="space-y-3">
+          <SectionLabel>Assumptions & priority</SectionLabel>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <NumberField label="Expected return %" value={form.expectedReturn ?? 10} onChange={(v) => setForm({ ...form, expectedReturn: v })} />
+            <NumberField label="Inflation assumption %" value={form.inflation ?? 6} onChange={(v) => setForm({ ...form, inflation: v })} />
+          </div>
+          <Field label="Priority"><PillGroup options={["High", "Medium", "Low"]} value={form.priority ?? "Medium"} onChange={(v) => setForm({ ...form, priority: v })} /></Field>
+        </div>
+
+        <Button type="button" onClick={submit}><Plus className="size-4" /> {editingId ? "Save changes" : "Add goal"}</Button>
+      </div>
+    </div>);
+
+}
+
+function ProtectionStep({ draft, set }) {
+  const emptyForm = { type: "Life", startDate: "", renewalDate: "" };
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyForm);
+
+  const startEdit = (policy) => {
+    setEditingId(policy.id);
+    setForm(policy);
+  };
+  const cancelEdit = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+  };
+  const submit = () => {
+    if (!form.insurer?.trim()) return;
+    const policy = { id: editingId ?? `policy-${Date.now()}`, insurer: form.insurer, type: form.type ?? "Life", sumAssured: form.sumAssured ?? 0, premium: form.premium ?? 0, term: form.term ?? 0, startDate: form.startDate ?? "", renewalDate: form.renewalDate ?? "", nominee: form.nominee ?? "", coveredMembers: form.coveredMembers ?? [] };
+    set("insurancePolicies", editingId ?
+    draft.insurancePolicies.map((p) => p.id === editingId ? policy : p) :
+    [...draft.insurancePolicies, policy]);
+    cancelEdit();
+  };
+  const remove = (id) => {
+    set("insurancePolicies", draft.insurancePolicies.filter((item) => item.id !== id));
+    if (editingId === id) cancelEdit();
+  };
+  return (
+    <div className="space-y-6">
+      {draft.insurancePolicies.length > 0 ?
+      <div className="grid gap-3 sm:grid-cols-2">
+          {draft.insurancePolicies.map((policy) =>
+        <RecordCard key={policy.id} title={policy.insurer} subtitle={`${policy.type} · ${formatINRShort(policy.sumAssured)} cover`} onRemove={() => remove(policy.id)} onEdit={() => startEdit(policy)}>
+              <p className="text-muted-foreground text-xs">Premium {formatINR(policy.premium)} · Nominee {policy.nominee || "Not added"}</p>
+            </RecordCard>
+        )}
+        </div> :
+
+      <EmptyState text="No policies added yet — add your life, health or accident cover." />
+      }
+
+      <div className="bg-muted/40 space-y-5 rounded-xl p-4">
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <SectionLabel>Policy type</SectionLabel>
+            {editingId &&
+            <button type="button" onClick={cancelEdit} className="text-muted-foreground hover:text-foreground text-xs font-semibold">
+                Cancel edit
+              </button>
+            }
+          </div>
+          <div className="mt-2">
+            <PillGroup options={["Life", "Health", "Personal Accident"]} value={form.type ?? "Life"} onChange={(v) => setForm({ ...form, type: v })} />
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Insurer"><Input value={form.insurer ?? ""} onChange={(e) => setForm({ ...form, insurer: e.target.value })} placeholder="Provider name" /></Field>
+          <Field label="Nominee"><Input value={form.nominee ?? ""} onChange={(e) => setForm({ ...form, nominee: e.target.value })} /></Field>
+          <NumberField label="Sum assured" value={form.sumAssured ?? 0} onChange={(v) => setForm({ ...form, sumAssured: v })} money />
+          <NumberField label="Premium" value={form.premium ?? 0} onChange={(v) => setForm({ ...form, premium: v })} money />
+          <NumberField label="Policy term (years)" value={form.term ?? 0} onChange={(v) => setForm({ ...form, term: v })} />
+          <Field label="Start date"><Input type="date" value={form.startDate ?? ""} onChange={(e) => setForm({ ...form, startDate: e.target.value })} /></Field>
+          <Field label="Renewal date"><Input type="date" value={form.renewalDate ?? ""} onChange={(e) => setForm({ ...form, renewalDate: e.target.value })} /></Field>
+        </div>
+
+        <Button type="button" onClick={submit}><Plus className="size-4" /> {editingId ? "Save changes" : "Add policy"}</Button>
+      </div>
+
+      <div className="bg-secondary grid gap-4 rounded-xl p-4 sm:grid-cols-3">
+        <FlowMetric label="Life cover" value={draft.lifeCover} />
+        <FlowMetric label="Health cover" value={draft.healthCover} />
+        <FlowMetric label="Emergency fund" value={draft.cashSavings} />
+      </div>
+    </div>);
+
+}
+
+/* Risk profiling is no longer part of the mandatory journey — it's asked as a
+   quick prompt on the dashboard instead (see risk-profile-prompt.jsx). */
+
+/* Future life events are no longer part of the mandatory journey — they're optional
+   and can be added later from the Life Events page on the dashboard. */
 
 function ReviewStep({ draft }) {const rows = [["ABOUT YOU", `${draft.name}, ${draft.age}`], ["FAMILY", `${draft.familyMembers.length} members`], ["CASHFLOW", `${formatINRShort(derivedIncome(draft))} monthly income`], ["ASSETS", `${draft.assets.length} detailed records`], ["LIABILITIES", `${draft.liabilities.length} liabilities`], ["GOALS", `${draft.goals.length} goals`], ["PROTECTION", `${draft.insurancePolicies.length} policies`], ["RISK", `${draft.riskAppetite}/10 risk comfort`], ["FUTURE", `${draft.futureEvents.length} events`]];return <div className="space-y-3">{rows.map(([label, value]) => <div key={label} className="bg-success-soft flex items-center gap-3 rounded-xl p-3"><Check className="text-success size-4" /><div><p className="text-success text-xs font-semibold">{label}</p><p className="text-muted-foreground mt-0.5 text-xs">{value}</p></div><span className="text-success/70 ml-auto text-xs">Ready</span></div>)}<div className="bg-secondary/60 mt-5 flex items-start gap-3 rounded-xl p-4"><Lock className="text-muted-foreground mt-0.5 size-4 shrink-0" /><p className="text-muted-foreground text-xs leading-relaxed">You're in control. This information is provided by you, used to personalise Wealth360, and can be edited later. No transaction happens automatically.</p></div></div>;}
 
-function MoneyGroup({ title, fields, draft, set }) {return <div><p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">{title}</p><div className="grid gap-4 sm:grid-cols-2">{fields.map(([label, key]) => <NumberField key={key} label={label} value={draft[key]} onChange={(v) => set(key, v)} money />)}</div></div>;}
-function RecordCard({ title, subtitle, children, onRemove }) {return <div className="bg-muted/50 flex items-start gap-3 rounded-xl p-4"><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{title}</p><p className="text-muted-foreground mt-1 text-xs">{subtitle}</p><div className="mt-2">{children}</div></div><button type="button" className="text-muted-foreground hover:text-destructive" aria-label={`Remove ${title}`} onClick={onRemove}><Trash2 className="size-4" /></button></div>;}
+function MoneyGroup({ title, fields, draft, set }) {return <div><p className="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase">{title}</p><div className="divide-y divide-border rounded-xl border">{fields.map(([label, key]) => <MoneyRow key={key} label={label} value={draft[key]} onChange={(v) => set(key, v)} />)}</div></div>;}
+function MoneyRow({ label, value, onChange }) {return <div className="flex items-center justify-between gap-3 px-4 py-2.5"><Label htmlFor={`money-${label}`} className="text-sm font-normal">{label}</Label><div className="relative w-32 shrink-0"><span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs">₹</span><Input id={`money-${label}`} type="number" className="num h-8 pl-6 text-right text-sm" value={value} onChange={(e) => onChange(Number(e.target.value) || 0)} /></div></div>;}
+function RecordCard({ title, subtitle, children, onRemove, onEdit }) {return <div className="bg-muted/50 flex items-start gap-3 rounded-xl p-4"><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{title}</p><p className="text-muted-foreground mt-1 text-xs">{subtitle}</p><div className="mt-2">{children}</div></div><div className="flex shrink-0 items-center gap-1">{onEdit && <button type="button" className="text-muted-foreground hover:text-primary" aria-label={`Edit ${title}`} onClick={onEdit}><Pencil className="size-4" /></button>}<button type="button" className="text-muted-foreground hover:text-destructive" aria-label={`Remove ${title}`} onClick={onRemove}><Trash2 className="size-4" /></button></div></div>;}
 function Field({ label, children }) {return <div className="space-y-2"><Label>{label}</Label>{children}</div>;}
 function NumberField({ label, value, onChange, money }) {return <Field label={money ? `${label} — ${formatINR(value)}` : label}><Input type="number" className="num" value={value} onChange={(e) => onChange(Number(e.target.value) || 0)} /></Field>;}
-function Select({ value, options, onChange }) {return <div className="relative"><select value={value} onChange={(e) => onChange(e.target.value)} className="border-input bg-background h-9 w-full appearance-none rounded-md border px-3 pr-9 text-sm outline-none focus:ring-1 focus:ring-ring">{options.map((option) => <option key={option} value={option}>{option.replaceAll("-", " ")}</option>)}</select><ChevronDown className="text-muted-foreground pointer-events-none absolute top-2.5 right-3 size-4" /></div>;}
 function Choice({ label, active, onClick }) {return <button type="button" onClick={onClick} className={cn("rounded-full border px-3 py-2 text-xs font-medium capitalize", active ? "bg-primary text-primary-foreground border-transparent" : "hover:bg-muted")}>{active && <Check className="mr-1 inline size-3" />}{label}</button>;}
-function FlowMetric({ label, value, tone }) {return <div><p className="text-muted-foreground text-[11px] font-medium uppercase">{label}</p><p className={cn("num mt-1 text-sm font-semibold", tone === "success" && "text-success", tone === "destructive" && "text-destructive")}>{Math.abs(value) > 1000 ? formatINRShort(value) : value}</p></div>;}
+function PillGroup({ options, value, onChange }) {return <div className="flex flex-wrap gap-2">{options.map((option) => <Choice key={option} label={option} active={value === option} onClick={() => onChange(option)} />)}</div>;}
+function SectionLabel({ children }) {return <p className="text-muted-foreground text-[11px] font-semibold tracking-wide uppercase">{children}</p>;}
+function EmptyState({ text }) {return <div className="rounded-xl border border-dashed p-6 text-center text-xs text-muted-foreground">{text}</div>;}
+function FlowMetric({ label, value, tone }) {return <div><p className="text-muted-foreground text-[11px] font-medium uppercase">{label}</p><p className={cn("num mt-1 text-sm font-semibold", tone === "success" && "text-success", tone === "destructive" && "text-destructive")}>{formatINRShort(value)}</p></div>;}

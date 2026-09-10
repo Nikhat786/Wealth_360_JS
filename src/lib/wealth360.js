@@ -114,6 +114,44 @@ export const targetAllocations = {
   Aggressive: { Equity: 32, "Mutual Funds": 34, Deposits: 8, Gold: 6, Retirement: 15, Cash: 5 }
 };
 
+/** Maps a recorded asset's onboarding `type` to a rebalancing bucket. Real Estate and
+ * Other Assets are intentionally excluded — illiquid, outside the liquid-rebalancing scope. */
+export const ASSET_TYPE_TO_BUCKET = {
+  "Stocks": "Equity",
+  "ETFs": "Equity",
+  "Mutual Funds": "Mutual Funds",
+  "FD/RD": "Deposits",
+  "Bonds": "Deposits",
+  "Gold/SGB": "Gold",
+  "EPF/PPF/NPS": "Retirement",
+  "Pension": "Retirement",
+  "Cash & Savings": "Cash"
+};
+
+export function riskProfileLabel(riskAppetite) {
+  if (riskAppetite <= 4) return "Conservative";
+  if (riskAppetite <= 7) return "Moderate";
+  return "Aggressive";
+}
+
+/** Groups recorded assets into rebalancing buckets, separating out illiquid holdings
+ * (Real Estate, Other Assets) that sit outside the liquid-rebalancing framework. */
+export function bucketAssets(assets) {
+  const totals = {};
+  let illiquidValue = 0;
+  for (const asset of assets) {
+    const bucket = ASSET_TYPE_TO_BUCKET[asset.type];
+    if (!bucket) {
+      illiquidValue += asset.currentValue;
+      continue;
+    }
+    totals[bucket] = (totals[bucket] || 0) + asset.currentValue;
+  }
+  return {
+    illiquidValue,
+    buckets: Object.entries(totals).map(([name, value]) => ({ name, value }))
+  };
+}
 
 
 
@@ -123,24 +161,32 @@ export const targetAllocations = {
 
 
 
-export function rebalancePlan(profile) {
-  const target = targetAllocations[profile];
-  const liquidTotal = allocation.reduce((s, a) => s + a.value, 0);
-  return Object.keys(target).map((name) => {
-    const current = allocation.find((a) => a.name === name);
-    const currentPct = current ? current.value / liquidTotal * 100 : 0;
+
+/** Compares live bucketed holdings (see bucketAssets) against a target model
+ * allocation for the given risk profile, sorted by largest drift first. */
+export function rebalancePlan(profile, liveBuckets = allocation) {
+  const target = targetAllocations[profile] ?? targetAllocations.Moderate;
+  const liquidTotal = liveBuckets.reduce((s, a) => s + a.value, 0);
+  const names = new Set([...Object.keys(target), ...liveBuckets.map((b) => b.name)]);
+  return Array.from(names).
+  map((name) => {
+    const current = liveBuckets.find((a) => a.name === name);
+    const currentValue = current?.value ?? 0;
+    const currentPct = liquidTotal > 0 ? currentValue / liquidTotal * 100 : 0;
     const targetPct = target[name] ?? 0;
-    const drift = currentPct - targetPct;
-    const amount = Math.abs(drift / 100 * liquidTotal);
+    const driftPct = currentPct - targetPct;
+    const amount = Math.abs(driftPct / 100 * liquidTotal);
     return {
       name,
+      currentValue,
       currentPct,
       targetPct,
-      driftPct: drift,
-      action: Math.abs(drift) < 3 ? "In band" : drift > 0 ? "Trim over time" : "Add on dips",
-      amount: Math.abs(drift) < 3 ? 0 : amount
+      driftPct,
+      action: Math.abs(driftPct) < 3 ? "In band" : driftPct > 0 ? "Trim over time" : "Add on dips",
+      amount: Math.abs(driftPct) < 3 ? 0 : amount
     };
-  });
+  }).
+  sort((a, b) => Math.abs(b.driftPct) - Math.abs(a.driftPct));
 }
 
 

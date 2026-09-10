@@ -9,6 +9,7 @@ import PortfolioPage from "./routes/portfolio";
 import DebtPage from "./routes/debt";
 import TransferPage from "./routes/transfer";
 import ScorePage from "./routes/score";
+import ProtectPage from "./routes/protect";
 import ProfilePage from "./routes/profile";
 import PlansPage from "./routes/plans";
 import OnboardingPage from "./routes/onboarding";
@@ -24,6 +25,8 @@ import WelcomePage from "./routes/welcome";
 import Wealth360LandingPage from "./routes/wealth360";
 import Wealth360ReviewPage from "./routes/wealth360.review";
 import WealthVerseBusinessPage from "./routes/wealthverse-business";
+import RmLoginPage from "./routes/rm.login";
+import RmDashboardPage from "./routes/rm.dashboard";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +51,7 @@ export default function App() {
           <Route path="/debt" element={<DebtPage />} />
           <Route path="/transfer" element={<TransferPage />} />
           <Route path="/score" element={<ScorePage />} />
+          <Route path="/protect" element={<ProtectPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/plans" element={<PlansPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
@@ -66,6 +70,8 @@ export default function App() {
           <Route path="/wealth360/analysis" element={<AnalysisPage />} />
           <Route path="/wealth360/dashboard" element={<IndexPage />} />
           <Route path="/wealthverse-business" element={<WealthVerseBusinessPage />} />
+          <Route path="/rm/login" element={<RmLoginPage />} />
+          <Route path="/rm/dashboard" element={<RmDashboardPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

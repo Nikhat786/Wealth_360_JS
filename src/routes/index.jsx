@@ -21,9 +21,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/wealth/app-shell";
 import { AttentionPanel } from "@/components/wealth/attention-panel";
+import { RiskProfilePrompt } from "@/components/wealth/risk-profile-prompt";
 import { StressMode } from "@/components/wealth/stress-mode";
 
-import { ScoreGauge } from "@/components/wealth/score-gauge";
 import { SectionHeader } from "@/components/wealth/section-header";
 import { StatTile } from "@/components/wealth/stat-tile";
 import { WealthMap, mapIcons } from "@/components/wealth/wealth-map";
@@ -31,14 +31,7 @@ import { SheruHeroCard } from "@/components/wealth/sheru-hero-card";
 import { derivedExpenses, derivedIncome, useApp } from "@/context/app-context";
 import { formatINR, formatINRShort } from "@/lib/format";
 import { projectGoal } from "@/lib/goal-math";
-import {
-  netWorthHistory,
-
-
-
-
-  user } from
-"@/lib/mock-data";
+import { netWorthHistory } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 
@@ -52,7 +45,6 @@ export default function Dashboard() {
     wealthContinuity,
     nextAction,
     stressMode,
-    setStressMode,
     totalAssets,
     netWorth,
     totalLiabilities
@@ -64,8 +56,6 @@ export default function Dashboard() {
   const expenses = derivedExpenses(answers);
   const surplus = income - expenses;
   const gain = totalAssets - totalInvested;
-
-  const firstName = answers.name.split(" ")[0]?.toUpperCase() || user.firstName.toUpperCase();
 
   const mapNodes = [
   {
@@ -105,76 +95,12 @@ export default function Dashboard() {
   return (
     <AppShell>
       <div className="space-y-8">
-        {/* Top Greeting Banner */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-bold tracking-widest text-primary uppercase">
-                GOOD EVENING, {firstName}
-              </span>
-              <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary uppercase">
-                Premium Platform
-              </span>
-            </div>
-            <h1 className="font-display mt-1 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
-              Your WealthVerse is evolving.
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Intelligent wealth operating system synthesizing investments, liabilities, family protection, and succession.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setStressMode(true)}
-              className="text-xs">
-              
-              Feeling overwhelmed?
-            </Button>
-            <Button asChild variant="outline" size="sm" className="text-xs">
-              <Link to="/insights">
-                View insights <ArrowRight className="ml-1 size-3.5" />
-              </Link>
-            </Button>
-          </div>
-        </div>
+        <RiskProfilePrompt />
 
         {/* ------------------------------------------------------------- */}
         {/* SHERU AI RELATIONSHIP MANAGER HERO CARD                       */}
         {/* ------------------------------------------------------------- */}
         <SheruHeroCard />
-
-        {/* Wealth Health Quick Gauge */}
-        <div className="surface-card flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-5">
-          <ScoreGauge
-            score={score.total}
-            grade={score.grade}
-            gradeLabel={score.gradeLabel}
-            size={82}
-            compact />
-          
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="text-[10px] font-semibold tracking-wide uppercase text-muted-foreground">
-                Financial Health Score
-              </p>
-              <span className="whitespace-nowrap rounded-full bg-gold-soft px-2 py-0.5 text-[10px] font-semibold text-gold-foreground">
-                {score.grade} · {score.gradeLabel}
-              </span>
-            </div>
-            <p className="mt-0.5 text-sm font-semibold">{score.total} / 100</p>
-            <p className="mt-0.5 hidden text-xs text-muted-foreground sm:block">
-              Calculated dynamically across 6 weighted pillars.
-            </p>
-          </div>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/score">
-              Understand your score <ArrowRight className="ml-1 size-3.5" />
-            </Link>
-          </Button>
-        </div>
 
         {/* Three Primary Scores */}
         <section>
@@ -339,10 +265,9 @@ export default function Dashboard() {
             map(({ goal, projection }) =>
             <Link
               key={goal.id}
-              to="/goals/$goalId"
-              params={{ goalId: goal.id }}
+              to={`/goals/${goal.id}`}
               className="surface-card hover:shadow-raised p-4 transition-shadow">
-              
+
                   <div className="flex items-start justify-between gap-2">
                     <p className="truncate text-sm font-semibold">{goal.name}</p>
                     <span

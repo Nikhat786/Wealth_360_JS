@@ -150,7 +150,7 @@ export function generateWealthIntelligence(inputs)
       priorityLevel: "High",
       severity: "high",
       rmTopic: "Term Life & Family Floater Review",
-      routeTo: "/score"
+      routeTo: "/protect"
     };
     advisoryItems.push(item);
     riskAlerts.push(`Life cover is short by ${formatINRShort(lifeCoverGap)} against income and liability commitments.`);
@@ -172,7 +172,7 @@ export function generateWealthIntelligence(inputs)
       title: "Top up Term Life Cover",
       subtitle: `Bridge ${formatINRShort(lifeCoverGap)} gap for ₹${Math.round(lifeCoverGap * 0.0014 / 12)}/mo`,
       action: "Review Protection",
-      route: "/score",
+      route: "/protect",
       tierRequired: "Basic",
       priority: "High"
     });

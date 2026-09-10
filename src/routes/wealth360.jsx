@@ -50,9 +50,8 @@ const features = [
 
 const navLinks = [
   { label: "Invest", to: "/portfolio" },
-  { label: "Protect", to: "/score" },
+  { label: "Protect", to: "/protect" },
   { label: "Plan", to: "/goals" },
-  { label: "About WealthVerse", to: "/wealthverse-business" },
 ];
 
 const trustBadges = [
@@ -239,7 +238,7 @@ export default function Wealth360Landing() {
                   asChild
                   className="rounded-full border-gray-300 px-6 text-gray-700 hover:bg-gray-50"
                 >
-                  <Link to="/wealthverse-business">
+                  <Link to="/onboarding">
                     <Play className="mr-1.5 size-4 fill-current" />
                     See how it works
                   </Link>

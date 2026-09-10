@@ -4,7 +4,6 @@ import {
   Bot,
 
 
-  CircleDollarSign,
   Compass,
 
   Crown,
@@ -46,12 +45,11 @@ const NAV_ITEMS = [
 { to: "/debt", label: "Debt Optimiser", icon: Percent },
 { to: "/goals", label: "Goals & FIRE", icon: Target },
 { to: "/life-events", label: "Life Events", icon: Zap, badge: "New" },
-{ to: "/score", label: "Protect", icon: ShieldCheck },
+{ to: "/protect", label: "Protect", icon: ShieldCheck },
 { to: "/transfer", label: "Transfer & Vault", icon: HeartHandshake },
 { to: "/coach", label: "SHERU AI RM", icon: Bot, badge: "AI" },
 { to: "/insights", label: "Insights", icon: Sparkles },
 { to: "/plans", label: "Plans", icon: Crown },
-{ to: "/wealthverse-business", label: "Business Model", icon: CircleDollarSign },
 { to: "/account-aggregator", label: "Account Aggregator", icon: Layers, badge: "Sync" }];
 
 
@@ -117,7 +115,7 @@ export function AppShell({
       {/* Desktop Deep Navy Left Navigation Sidebar                     */}
       {/* ------------------------------------------------------------- */}
       {!minimal &&
-      <aside className="hidden lg:flex w-64 shrink-0 flex-col border-r border-[#1a2d4c] bg-[#0c182b] text-white select-none">
+      <aside className="hidden lg:flex w-64 shrink-0 flex-col sticky top-0 h-screen border-r border-[#1a2d4c] bg-[#0c182b] text-white select-none">
           {/* Brand Header */}
           <div className="flex h-16 items-center gap-2.5 px-6 border-b border-[#1a2d4c]">
             <img

@@ -57,7 +57,7 @@ export function projectGoal(goal, monthly) {
     projected,
     gap,
     onTrack: projected >= goal.target * 0.98,
-    fundedPct: Math.min(100, goal.saved / goal.target * 100),
+    fundedPct: goal.target > 0 ? Math.min(100, goal.saved / goal.target * 100) : 100,
     requiredMonthly: requiredMonthly(goal.target, goal.saved, goal.expectedReturn, yearsLeft),
     series
   };

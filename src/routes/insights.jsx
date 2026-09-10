@@ -89,7 +89,7 @@ export default function InsightsPage() {
     impact: `A ₹${(lifeGap / 10000000).toFixed(2)} Cr unhedged income gap in the event of primary earner loss.`,
     suggestedAction: "Procure a pure term life top-up of ₹1.5 Cr with level premiums locked in at current age 36.",
     expectedOutcome: "Immediate 100% family income replacement and a +9 point elevation to Wealth Health.",
-    actionRoute: "/score",
+    actionRoute: "/protect",
     actionText: "Fix Protection Gap"
   },
   {

@@ -10,6 +10,12 @@ import {
 
 import { coachReply } from "@/lib/coach";
 import {
+  clearActivePan,
+  getActivePan,
+  getJourney,
+  saveJourney } from
+"@/lib/journeys";
+import {
   buildActions,
   defaultDocs,
   defaultNominations,
@@ -28,7 +34,6 @@ import {
 import { projectGoal } from "@/lib/goal-math";
 import {
   baseScoreInputs,
-  goals as baseGoals,
   idleCash,
   largestAssetSharePct,
   liabilities,
@@ -287,13 +292,14 @@ export const defaultAnswers = {
   monthlyInvestment: 88000,
   goalDetails: {},
   goals: [
-  { id: "demo-education-goal", name: "Child Education", currentAmount: 800000, targetAmount: 3500000, targetYear: 2034, duration: 8, monthlyContribution: 15000, expectedReturn: 10, inflation: 6, priority: "High", linkedInvestments: ["demo-mutual-funds"], fundingSource: "Monthly SIP" },
-  { id: "demo-retirement-goal", name: "Retirement", currentAmount: 1930400, targetAmount: 40000000, targetYear: 2050, duration: 24, monthlyContribution: 20000, expectedReturn: 10, inflation: 6, priority: "High", linkedInvestments: ["demo-retirement", "demo-mutual-funds"], fundingSource: "EPF and SIP" },
-  { id: "demo-travel-goal", name: "Travel", currentAmount: 200000, targetAmount: 800000, targetYear: 2028, duration: 2, monthlyContribution: 12000, expectedReturn: 7, inflation: 5, priority: "Medium", linkedInvestments: ["demo-fd"], fundingSource: "Monthly savings" },
-  { id: "demo-emergency-goal", name: "Emergency Fund", currentAmount: 450000, targetAmount: 800000, targetYear: 2027, duration: 1, monthlyContribution: 6600, expectedReturn: 5, inflation: 5, priority: "High", linkedInvestments: ["demo-fd"], fundingSource: "Cash and FD" }],
+  { id: "demo-education-goal", name: "Child Education", icon: "education", saved: 800000, target: 3500000, targetYear: 2034, duration: 8, monthlyContribution: 15000, expectedReturn: 10, inflation: 6, priority: "High", linkedInvestments: ["demo-mutual-funds"], fundingSource: "Monthly SIP", note: "Undergraduate fees, assumed 8% education inflation." },
+  { id: "demo-retirement-goal", name: "Retirement", icon: "retirement", saved: 1930400, target: 40000000, targetYear: 2050, duration: 24, monthlyContribution: 20000, expectedReturn: 10, inflation: 6, priority: "High", linkedInvestments: ["demo-retirement", "demo-mutual-funds"], fundingSource: "EPF and SIP", note: "EPF, NPS and equity SIPs all feed this goal." },
+  { id: "demo-travel-goal", name: "Travel", icon: "travel", saved: 200000, target: 800000, targetYear: 2028, duration: 2, monthlyContribution: 12000, expectedReturn: 7, inflation: 5, priority: "Medium", linkedInvestments: ["demo-fd"], fundingSource: "Monthly savings", note: "Three weeks with the family." },
+  { id: "demo-emergency-goal", name: "Emergency Fund", icon: "shield", saved: 450000, target: 800000, targetYear: 2027, duration: 1, monthlyContribution: 6600, expectedReturn: 5, inflation: 5, priority: "High", linkedInvestments: ["demo-fd"], fundingSource: "Cash and FD", note: "Parked in a liquid fund for instant access." }],
 
   nomineesOnRecord: "some",
   hasWill: false,
+  riskProfileCompleted: false,
   riskAppetite: 7,
   horizon: 15,
   reactionToDrop: "buy",
@@ -493,15 +499,17 @@ export function synthesizeAAProfile(baseAnswers) {
     mobile,
     email,
     pan,
-    annualIncome: 3200000,
-    monthlyTakeHome: 250000,
-    salary: 250000,
+    // Account Aggregator can surface holdings, loans & policies, but not income or
+    // goals — those aren't held by any FIP, so they're left at 0 for manual entry.
+    annualIncome: 0,
+    monthlyTakeHome: 0,
+    salary: 0,
     businessIncome: 0,
-    annualBonus: 200000,
-    rentalIncome: 20000,
-    dividendsIncome: 8000,
-    interestIncome: 12000,
-    otherIncome: 10000,
+    annualBonus: 0,
+    rentalIncome: 0,
+    dividendsIncome: 0,
+    interestIncome: 0,
+    otherIncome: 0,
     household: 45000,
     schoolFees: 15000,
     emiExpenses: 60000,
@@ -538,8 +546,9 @@ export function synthesizeAAProfile(baseAnswers) {
     dependents: 3,
     familyMembers: defaultAnswers.familyMembers,
     familyPriorities: defaultAnswers.familyPriorities,
-    selectedGoals: ["Retirement", "Aarav's Education", "Emergency Fund", "Europe Vacation"],
-    goalDetails: defaultAnswers.goalDetails,
+    // Goals are personal aspirations, not FIP-held data — start empty and add manually.
+    selectedGoals: [],
+    goalDetails: {},
     assets: [
     {
       id: "asset-aa-1",
@@ -744,49 +753,7 @@ export function synthesizeAAProfile(baseAnswers) {
       coveredMembers: ["Self", "Priya Mehta", "Aanya Mehta", "Kabir Mehta"]
     }],
 
-    goals: [
-    {
-      id: "goal-aa-1",
-      name: "Retirement",
-      currentAmount: 3000000,
-      targetAmount: 30000000,
-      targetYear: 2048,
-      duration: 22,
-      monthlyContribution: 55000,
-      expectedReturn: 12,
-      inflation: 6,
-      priority: "High",
-      linkedInvestments: ["asset-aa-2", "asset-aa-3", "asset-aa-5"],
-      fundingSource: "Monthly SIPs & PF"
-    },
-    {
-      id: "goal-aa-2",
-      name: "Aarav's Higher Education Abroad",
-      currentAmount: 800000,
-      targetAmount: 8000000,
-      targetYear: 2035,
-      duration: 9,
-      monthlyContribution: 25000,
-      expectedReturn: 11,
-      inflation: 7,
-      priority: "High",
-      linkedInvestments: ["asset-aa-3"],
-      fundingSource: "Equity Mutual Funds"
-    },
-    {
-      id: "goal-aa-3",
-      name: "Emergency Fund Buffer",
-      currentAmount: 1200000,
-      targetAmount: 1500000,
-      targetYear: 2026,
-      duration: 1,
-      monthlyContribution: 8000,
-      expectedReturn: 6.5,
-      inflation: 5,
-      priority: "High",
-      linkedInvestments: ["asset-aa-1", "asset-aa-4"],
-      fundingSource: "Savings & Fixed Deposits"
-    }],
+    goals: [],
 
     futureEvents: [
     {
@@ -817,14 +784,22 @@ export function AppProvider({ children }) {
 
     () => {
       if (typeof window === "undefined") return "not_started";
+      const savedJourney = getJourney(getActivePan());
+      if (savedJourney?.onboardingStatus) return savedJourney.onboardingStatus;
       const stored = window.localStorage.getItem("wealth360-onboarding-status");
       return stored === "completed" || stored === "in_progress" ? stored : "not_started";
     });
   const onboardingComplete = onboardingStatus === "completed";
-  const [answers, setAnswers] = useState(defaultAnswers);
+  const [answers, setAnswers] = useState(() => {
+    if (typeof window === "undefined") return defaultAnswers;
+    const savedJourney = getJourney(getActivePan());
+    if (!savedJourney) return defaultAnswers;
+    const { onboardingStatus: _status, updatedAt: _updatedAt, ...rest } = savedJourney;
+    return { ...defaultAnswers, ...rest };
+  });
   const [whatIf, setWhatIfState] = useState({});
   const [contributions, setContributions] = useState(() =>
-  Object.fromEntries(baseGoals.map((g) => [g.id, g.monthlyContribution]))
+  Object.fromEntries((answers.goals || []).map((g) => [g.id, g.monthlyContribution]))
   );
   const [messages, setMessages] = useState([]);
   const [booking, setBooking] = useState(null);
@@ -868,6 +843,27 @@ export function AppProvider({ children }) {
     }
   }, []);
 
+  // RM (Relationship Manager) staff session — separate from the client's own session.
+  // Gates internal-only screens (business/revenue model, RM dashboard) that clients must never see.
+  const [isRmSession, setIsRmSession] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("wealth360-rm-session") === "true";
+  });
+
+  const loginAsRm = useCallback(() => {
+    setIsRmSession(true);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("wealth360-rm-session", "true");
+    }
+  }, []);
+
+  const logoutRm = useCallback(() => {
+    setIsRmSession(false);
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("wealth360-rm-session");
+    }
+  }, []);
+
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const [upgradeFeature, setUpgradeFeature] = useState("Premium Feature");
   const [upgradeRecommendedPlan, setUpgradeRecommendedPlan] = useState("Premium");
@@ -902,13 +898,21 @@ export function AppProvider({ children }) {
     window.localStorage.setItem("wealth360-onboarding-status", onboardingStatus);
   }, [onboardingStatus]);
 
+  // Persist the in-progress/completed journey under its PAN so it survives
+  // reloads and can be looked back up by that PAN later.
+  useEffect(() => {
+    if (onboardingStatus === "not_started") return;
+    if (!answers?.pan) return;
+    saveJourney(answers.pan, answers, onboardingStatus);
+  }, [answers, onboardingStatus]);
+
   const goals = useMemo(
     () =>
-    baseGoals.map((g) => ({
+    (answers.goals || []).map((g) => ({
       ...g,
       monthlyContribution: contributions[g.id] ?? g.monthlyContribution
     })),
-    [contributions]
+    [answers.goals, contributions]
   );
 
   const projections = useMemo(
@@ -934,9 +938,12 @@ export function AppProvider({ children }) {
   const scoreInputs = useMemo(() => {
     const income = derivedIncome(answers);
     const expenses = derivedExpenses(answers);
-    const onTrack = projections.filter((x) => x.p.onTrack).length / projections.length * 100;
-    const funded =
-    goals.reduce((s, g) => s + Math.min(1, g.saved / g.target), 0) / goals.length * 100;
+    const onTrack = projections.length > 0 ?
+    projections.filter((x) => x.p.onTrack).length / projections.length * 100 :
+    100;
+    const funded = goals.length > 0 ?
+    goals.reduce((s, g) => s + Math.min(1, g.target > 0 ? g.saved / g.target : 1), 0) / goals.length * 100 :
+    100;
     return {
       ...baseScoreInputs,
       monthlyIncome: income,
@@ -1087,6 +1094,8 @@ export function AppProvider({ children }) {
   const nextBestActions = sheruIntelligence.nextBestActions;
   const dashboardRecommendations = sheruIntelligence.dashboardRecommendations;
 
+  const startOnboarding = useCallback(() => setOnboardingStatus("in_progress"), []);
+
   const connectAccountAggregator = useCallback(
     (customData) => {
       setAccountAggregatorStatus("connected");
@@ -1097,6 +1106,57 @@ export function AppProvider({ children }) {
     },
     []
   );
+
+  const addGoal = useCallback((goal) => {
+    const record = { ...goal, id: goal.id || `goal-${Date.now()}` };
+    setAnswers((prev) => ({ ...prev, goals: [...(prev.goals || []), record] }));
+    return record.id;
+  }, []);
+
+  const updateGoal = useCallback((goalId, patch) => {
+    setAnswers((prev) => ({
+      ...prev,
+      goals: (prev.goals || []).map((g) => g.id === goalId ? { ...g, ...patch } : g)
+    }));
+  }, []);
+
+  const removeGoal = useCallback((goalId) => {
+    setAnswers((prev) => ({ ...prev, goals: (prev.goals || []).filter((g) => g.id !== goalId) }));
+    setContributions((prev) => {
+      const next = { ...prev };
+      delete next[goalId];
+      return next;
+    });
+  }, []);
+
+  const addFutureEvent = useCallback((event) => {
+    const record = { ...event, id: event.id || `event-${Date.now()}` };
+    setAnswers((prev) => ({
+      ...prev,
+      futureEvents: [...(prev.futureEvents || []), record],
+      lifeEvents: [...new Set([...(prev.lifeEvents || []), record.event])]
+    }));
+    return record.id;
+  }, []);
+
+  const updateFutureEvent = useCallback((eventId, patch) => {
+    setAnswers((prev) => ({
+      ...prev,
+      futureEvents: (prev.futureEvents || []).map((e) => e.id === eventId ? { ...e, ...patch } : e)
+    }));
+  }, []);
+
+  const removeFutureEvent = useCallback((eventId) => {
+    setAnswers((prev) => ({ ...prev, futureEvents: (prev.futureEvents || []).filter((e) => e.id !== eventId) }));
+  }, []);
+
+  const updateRiskProfile = useCallback((patch) => {
+    setAnswers((prev) => ({ ...prev, ...patch, riskProfileCompleted: true }));
+  }, []);
+
+  const dismissRiskPrompt = useCallback(() => {
+    setAnswers((prev) => ({ ...prev, riskProfileCompleted: true }));
+  }, []);
 
   const togglePlannedLifeEvent = useCallback((eventId) => {
     setPlannedLifeEvents((prev) =>
@@ -1176,7 +1236,7 @@ export function AppProvider({ children }) {
     onboardingStatus,
     onboardingComplete,
     answers,
-    startOnboarding: () => setOnboardingStatus("in_progress"),
+    startOnboarding,
     saveOnboardingDraft: (a) => {
       setAnswers(a);
       setOnboardingStatus("in_progress");
@@ -1189,6 +1249,7 @@ export function AppProvider({ children }) {
     resetOnboarding: () => {
       setAnswers(defaultAnswers);
       setOnboardingStatus("not_started");
+      clearActivePan();
     },
     scoreInputs,
     score,
@@ -1198,11 +1259,20 @@ export function AppProvider({ children }) {
     whatIfScore,
     whatIfActive: Object.keys(whatIf).length > 0,
     goals,
+    addGoal,
+    updateGoal,
+    removeGoal,
+    futureEvents: answers.futureEvents || [],
+    addFutureEvent,
+    updateFutureEvent,
+    removeFutureEvent,
+    updateRiskProfile,
+    dismissRiskPrompt,
     contributions,
     setContribution: (goalId, amount) =>
     setContributions((prev) => ({ ...prev, [goalId]: amount })),
     resetContributions: () =>
-    setContributions(Object.fromEntries(baseGoals.map((g) => [g.id, g.monthlyContribution]))),
+    setContributions(Object.fromEntries((answers.goals || []).map((g) => [g.id, g.monthlyContribution]))),
     goalsOffTrack,
     goalsShortfall,
 
@@ -1270,6 +1340,9 @@ export function AppProvider({ children }) {
     // WealthVerse extensions
     subscriptionTier,
     setSubscriptionTier,
+    isRmSession,
+    loginAsRm,
+    logoutRm,
     accountAggregatorStatus,
     setAccountAggregatorStatus,
     connectAccountAggregator,

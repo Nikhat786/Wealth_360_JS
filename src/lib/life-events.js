@@ -32,6 +32,10 @@
 
 
 
+/** Free-form categories for a personal, undated future-event log (separate from the
+ * deterministic LIFE_EVENTS_CATALOG simulator below). */
+export const CUSTOM_EVENT_TYPES = ["Baby", "Marriage", "Home Purchase", "Job Change", "Career Break", "Education", "Travel", "Business", "Relocation", "Retirement", "Custom"];
+
 export const LIFE_EVENTS_CATALOG = [
 {
   id: "event-marriage",

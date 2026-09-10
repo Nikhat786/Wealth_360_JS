@@ -1,5 +1,6 @@
-import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, RotateCcw } from "lucide-react";
+import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, Pencil, RotateCcw, Trash2 } from "lucide-react";
 import {
   CartesianGrid,
   Line,
@@ -15,6 +16,7 @@ import { Slider } from "@/components/ui/slider";
 import { AppShell } from "@/components/wealth/app-shell";
 import { EmptyState } from "@/components/wealth/empty-state";
 import { goalIcons } from "@/components/wealth/goal-card";
+import { GoalFormDialog } from "@/components/wealth/goal-form-dialog";
 import { ProgressRing } from "@/components/wealth/progress-ring";
 import { SectionHeader } from "@/components/wealth/section-header";
 import { StatTile } from "@/components/wealth/stat-tile";
@@ -43,7 +45,9 @@ function GoalNotFound() {
 
 export default function GoalDetail() {
   const { goalId } = useParams();
-  const { goals, contributions, setContribution } = useApp();
+  const navigate = useNavigate();
+  const { goals, contributions, setContribution, updateGoal, removeGoal } = useApp();
+  const [editOpen, setEditOpen] = useState(false);
   const goal = goals.find((g) => g.id === goalId);
   if (!goal) return <GoalNotFound />;
 
@@ -54,14 +58,29 @@ export default function GoalDetail() {
 
   const series = p.series;
 
+  const handleDelete = () => {
+    removeGoal(goal.id);
+    void navigate("/goals");
+  };
+
   return (
     <AppShell>
       <div className="space-y-8">
-        <Button asChild variant="ghost" size="sm" className="-ml-2">
-          <Link to="/goals">
-            <ArrowLeft className="mr-1.5 size-4" /> All goals
-          </Link>
-        </Button>
+        <div className="flex items-center justify-between">
+          <Button asChild variant="ghost" size="sm" className="-ml-2">
+            <Link to="/goals">
+              <ArrowLeft className="mr-1.5 size-4" /> All goals
+            </Link>
+          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+              <Pencil className="mr-1.5 size-3.5" /> Edit
+            </Button>
+            <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={handleDelete}>
+              <Trash2 className="mr-1.5 size-3.5" /> Delete
+            </Button>
+          </div>
+        </div>
 
         <div className="flex items-start gap-4">
           <span className="bg-secondary text-secondary-foreground flex size-12 shrink-0 items-center justify-center rounded-2xl">
@@ -70,9 +89,15 @@ export default function GoalDetail() {
           <SectionHeader
             as="h1"
             title={goal.name}
-            description={`${goal.priority} priority · target ${goal.targetYear} · ${goal.note}`} />
-          
+            description={`${goal.priority} priority · target ${goal.targetYear}${goal.note ? ` · ${goal.note}` : ""}`} />
+
         </div>
+
+        <GoalFormDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          initialGoal={goal}
+          onSubmit={(patch) => updateGoal(goal.id, patch)} />
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatTile tone="navy" label="Target" value={formatINRShort(goal.target)} />
