@@ -1,0 +1,197 @@
+{
+  "ageBrackets": [
+    { "id": "18-25", "min": 0, "max": 25 },
+    { "id": "26-35", "min": 26, "max": 35 },
+    { "id": "36-45", "min": 36, "max": 45 },
+    { "id": "46-60", "min": 46, "max": 60 },
+    { "id": "60+", "min": 61, "max": 120 }
+  ],
+  "incomeBrackets": [
+    { "id": "<5L", "min": 0, "max": 500000 },
+    { "id": "5L-15L", "min": 500001, "max": 1500000 },
+    { "id": "15L-30L", "min": 1500001, "max": 3000000 },
+    { "id": "30L+", "min": 3000001, "max": 9999999999 }
+  ],
+  "configurations": [
+    {
+      "ageBracket": "18-25",
+      "incomeBracket": "<5L",
+      "focusArea": "Build Foundations",
+      "focusDescription": "Focus on building an emergency fund and learning disciplined investing.",
+      "recommendedGoals": ["Emergency Fund", "Skill Upgrade"],
+      "recommendedProducts": ["Liquid Funds", "Index Funds"],
+      "insights": ["Start small SIPs early to leverage compounding.", "Build a 3-month emergency reserve."]
+    },
+    {
+      "ageBracket": "18-25",
+      "incomeBracket": "5L-15L",
+      "focusArea": "Aggressive Growth",
+      "focusDescription": "Leverage early career surplus to build aggressive long-term equity portfolios.",
+      "recommendedGoals": ["Emergency Fund", "Travel", "Wealth Creation"],
+      "recommendedProducts": ["Flexi-Cap Funds", "Small-Cap Funds", "Health Insurance"],
+      "insights": ["Maximize tax saving through ELSS.", "Avoid high-cost lifestyle inflation."]
+    },
+    {
+      "ageBracket": "18-25",
+      "incomeBracket": "15L-30L",
+      "focusArea": "Accelerated Wealth Creation",
+      "focusDescription": "High early-stage surplus allows for rapid asset accumulation.",
+      "recommendedGoals": ["Wealth Creation", "House Downpayment"],
+      "recommendedProducts": ["Direct Equity", "Mid/Small-Cap Funds", "Term Insurance"],
+      "insights": ["Keep debt to a minimum.", "Explore direct equity for higher returns."]
+    },
+    {
+      "ageBracket": "18-25",
+      "incomeBracket": "30L+",
+      "focusArea": "Early Financial Independence",
+      "focusDescription": "Optimizing extreme surplus for early FIRE (Financial Independence, Retire Early).",
+      "recommendedGoals": ["FIRE Target", "Global Investments"],
+      "recommendedProducts": ["PMS", "Global Funds", "Direct Equity"],
+      "insights": ["Explore global equity diversification.", "Set a firm timeline for FIRE."]
+    },
+    {
+      "ageBracket": "26-35",
+      "incomeBracket": "<5L",
+      "focusArea": "Stability & Protection",
+      "focusDescription": "Balancing essential expenses with fundamental family protection.",
+      "recommendedGoals": ["Emergency Fund", "Health Cover"],
+      "recommendedProducts": ["Health Insurance", "Term Insurance", "Index Funds"],
+      "insights": ["Ensure adequate health cover for dependents.", "Avoid unsecured debt."]
+    },
+    {
+      "ageBracket": "26-35",
+      "incomeBracket": "5L-15L",
+      "focusArea": "Family Milestones",
+      "focusDescription": "Planning for home ownership, children, and long-term security.",
+      "recommendedGoals": ["House Downpayment", "Child Education", "Retirement"],
+      "recommendedProducts": ["Large & Midcap Funds", "Term Insurance", "PPF"],
+      "insights": ["Start an education SIP as early as possible.", "Scale up term cover with liabilities."]
+    },
+    {
+      "ageBracket": "26-35",
+      "incomeBracket": "15L-30L",
+      "focusArea": "Growth & Milestones",
+      "focusDescription": "Accelerating family milestone funding while compounding aggressively.",
+      "recommendedGoals": ["Child Education", "Home Upgrade", "Retirement"],
+      "recommendedProducts": ["Flexi-Cap Funds", "NPS", "Direct Equity"],
+      "insights": ["Maximize 80CCD(1B) through NPS.", "Balance EMI burdens with equity SIPs."]
+    },
+    {
+      "ageBracket": "26-35",
+      "incomeBracket": "30L+",
+      "focusArea": "Wealth Acceleration",
+      "focusDescription": "Rapid asset accumulation and alternative investment exposure.",
+      "recommendedGoals": ["Early Retirement", "Real Estate Investment"],
+      "recommendedProducts": ["PMS", "AIF", "Global Feeder Funds"],
+      "insights": ["Consider AIFs and structured products.", "Ensure robust estate planning basics."]
+    },
+    {
+      "ageBracket": "36-45",
+      "incomeBracket": "<5L",
+      "focusArea": "Debt Management",
+      "focusDescription": "Clearing expensive debt and securing fundamental retirement foundations.",
+      "recommendedGoals": ["Debt Elimination", "Retirement"],
+      "recommendedProducts": ["Debt Funds", "Index Funds"],
+      "insights": ["Prioritize clearing high-interest personal loans.", "Consolidate debt if needed."]
+    },
+    {
+      "ageBracket": "36-45",
+      "incomeBracket": "5L-15L",
+      "focusArea": "Core Accumulation",
+      "focusDescription": "Catching up on retirement savings while funding mid-life expenses.",
+      "recommendedGoals": ["Retirement", "Child Higher Education"],
+      "recommendedProducts": ["Balanced Advantage Funds", "NPS", "Term Insurance"],
+      "insights": ["Review life cover against current income.", "Increase SIPs with every salary hike."]
+    },
+    {
+      "ageBracket": "36-45",
+      "incomeBracket": "15L-30L",
+      "focusArea": "Peak Earning Optimization",
+      "focusDescription": "Maximizing tax efficiency and diversifying the core portfolio.",
+      "recommendedGoals": ["Retirement Wealth", "Child Foreign Education"],
+      "recommendedProducts": ["Direct Indexing", "NPS", "Real Estate"],
+      "insights": ["Aggressively prepay high-interest home loans.", "Harvest long-term capital gains tax-efficiently."]
+    },
+    {
+      "ageBracket": "36-45",
+      "incomeBracket": "30L+",
+      "focusArea": "Portfolio Diversification",
+      "focusDescription": "Building legacy wealth, alternative assets, and ensuring multi-generational continuity.",
+      "recommendedGoals": ["Wealth Preservation", "Legacy Planning"],
+      "recommendedProducts": ["AIF", "Commercial Real Estate", "PMS"],
+      "insights": ["Establish a clear Will and nomination strategy.", "Diversify away from concentrated employer stock."]
+    },
+    {
+      "ageBracket": "46-60",
+      "incomeBracket": "<5L",
+      "focusArea": "Retirement Readiness",
+      "focusDescription": "Securing capital and maximizing safe yields.",
+      "recommendedGoals": ["Debt Free Retirement", "Healthcare Buffer"],
+      "recommendedProducts": ["Senior Citizen Savings Scheme", "Post Office MIS"],
+      "insights": ["Shift focus from growth to capital preservation.", "Top-up health insurance."]
+    },
+    {
+      "ageBracket": "46-60",
+      "incomeBracket": "5L-15L",
+      "focusArea": "Transition Planning",
+      "focusDescription": "Derisking the portfolio as retirement approaches.",
+      "recommendedGoals": ["Retirement Corpus", "Debt Clearance"],
+      "recommendedProducts": ["Target Maturity Funds", "Balanced Funds", "FDs"],
+      "insights": ["Gradually shift equity gains into safe debt instruments.", "Ensure zero debt before retirement age."]
+    },
+    {
+      "ageBracket": "46-60",
+      "incomeBracket": "15L-30L",
+      "focusArea": "Pre-Retirement Consolidation",
+      "focusDescription": "Consolidating assets, optimizing tax on withdrawal, and estate planning.",
+      "recommendedGoals": ["Wealth Transfer", "Retirement Income Strategy"],
+      "recommendedProducts": ["SWP (Systematic Withdrawal Plans)", "Debt Mutual Funds"],
+      "insights": ["Setup tax-efficient withdrawal strategies.", "Complete comprehensive estate planning."]
+    },
+    {
+      "ageBracket": "46-60",
+      "incomeBracket": "30L+",
+      "focusArea": "Legacy & Philanthropy",
+      "focusDescription": "Structuring family wealth transfer and preserving capital.",
+      "recommendedGoals": ["Estate Planning", "Philanthropy", "Wealth Preservation"],
+      "recommendedProducts": ["Family Trusts", "Tax-Free Bonds", "Conservative AIFs"],
+      "insights": ["Formalize family trust structures.", "Review multi-generational succession plans."]
+    },
+    {
+      "ageBracket": "60+",
+      "incomeBracket": "<5L",
+      "focusArea": "Capital Preservation",
+      "focusDescription": "Generating safe, reliable monthly income.",
+      "recommendedGoals": ["Monthly Income", "Health Security"],
+      "recommendedProducts": ["SCSS", "Annuities"],
+      "insights": ["Prioritize safety and liquidity.", "Ensure nominees are updated."]
+    },
+    {
+      "ageBracket": "60+",
+      "incomeBracket": "5L-15L",
+      "focusArea": "Income Generation",
+      "focusDescription": "Balancing inflation with safe withdrawal strategies.",
+      "recommendedGoals": ["Inflation Protected Income", "Legacy"],
+      "recommendedProducts": ["SWP from Hybrid Funds", "Tax-Free Bonds"],
+      "insights": ["Use SWPs for tax-efficient regular income.", "Keep a liquid emergency healthcare fund."]
+    },
+    {
+      "ageBracket": "60+",
+      "incomeBracket": "15L-30L",
+      "focusArea": "Wealth Transfer",
+      "focusDescription": "Managing tax-efficient inheritance and capital protection.",
+      "recommendedGoals": ["Estate Transfer", "Asset Consolidation"],
+      "recommendedProducts": ["Debt Funds", "Direct Bonds"],
+      "insights": ["Simplify your portfolio for easy management.", "Ensure seamless access for heirs."]
+    },
+    {
+      "ageBracket": "60+",
+      "incomeBracket": "30L+",
+      "focusArea": "Family Office & Legacy",
+      "focusDescription": "Multi-generational wealth management and institutional governance.",
+      "recommendedGoals": ["Multi-Generational Continuity", "Capital Preservation"],
+      "recommendedProducts": ["Private Wealth Desk", "Trust Structures"],
+      "insights": ["Review family office governance.", "Monitor cross-border tax implications for heirs."]
+    }
+  ]
+}
