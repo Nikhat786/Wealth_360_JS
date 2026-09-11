@@ -118,7 +118,11 @@ export function AppShell({
       {!minimal &&
         <aside className="hidden lg:flex w-64 shrink-0 flex-col sticky top-0 h-screen border-r border-[#1a2d4c] bg-[#0c182b] text-white select-none">
           {/* Brand Header */}
-          <div className="flex h-16 items-center gap-2.5 px-6 border-b border-[#1a2d4c]">
+          <Link
+            to="/wealth360"
+            className="flex h-16 items-center gap-2.5 px-6 border-b border-[#1a2d4c] transition-opacity hover:opacity-90"
+            title="Go to WealthVerse Home"
+          >
             <img
               src={mark}
               alt="Mirae Asset WealthVerse"
@@ -135,7 +139,7 @@ export function AppShell({
                 Personal Wealth Operating System
               </p>
             </div>
-          </div>
+          </Link>
 
 
           {/* Sidebar Navigation Items */}
@@ -223,7 +227,7 @@ export function AppShell({
             }
 
             <Link
-              to={minimal ? "/wealth360" : "/"}
+              to="/wealth360"
               className="flex items-center gap-2.5 lg:hidden">
 
               <img
@@ -342,12 +346,16 @@ export function AppShell({
 
           <div className="relative flex w-72 max-w-xs flex-col bg-[#0c182b] text-white p-5 shadow-2xl">
             <div className="flex items-center justify-between border-b border-[#1a2d4c] pb-4">
-              <div className="flex items-center gap-2">
+              <Link
+                to="/wealth360"
+                onClick={handleNavClick}
+                className="flex items-center gap-2 transition-opacity hover:opacity-90"
+              >
                 <img src={mark} alt="Mirae Asset WealthVerse" className="size-7" />
                 <span className="font-display font-bold text-white">
                   Mirae Asset <span className="text-gold">WealthVerse</span>
                 </span>
-              </div>
+              </Link>
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}

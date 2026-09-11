@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { ArrowRight, ShieldCheck, UserRound } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -25,10 +25,12 @@ export default function RmLoginPage() {
     <div className="bg-secondary/40 flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="flex flex-col items-center gap-2 text-center">
-          <img src={mark} alt="Mirae Asset WealthVerse" className="size-10" />
-          <p className="font-display text-lg font-bold">
-            Mirae Asset <span className="text-primary">WealthVerse</span>
-          </p>
+          <Link to="/wealth360" className="flex flex-col items-center gap-2 text-center transition-opacity hover:opacity-90" title="Go to WealthVerse Home">
+            <img src={mark} alt="Mirae Asset WealthVerse" className="size-10" />
+            <p className="font-display text-lg font-bold">
+              Mirae Asset <span className="text-primary">WealthVerse</span>
+            </p>
+          </Link>
           <span className="text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide">
             <ShieldCheck className="size-3.5" /> Relationship Manager Portal
           </span>

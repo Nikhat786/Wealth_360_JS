@@ -146,7 +146,7 @@ export default function RmDashboardPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-white/95 px-4 backdrop-blur-md sm:px-6">
-        <div className="flex items-center gap-2.5">
+        <Link to="/wealth360" className="flex items-center gap-2.5 transition-opacity hover:opacity-90" title="Go to WealthVerse Home">
           <img src={mark} alt="Mirae Asset WealthVerse" className="size-7" />
           <div>
             <p className="font-display text-sm font-bold">
@@ -154,7 +154,7 @@ export default function RmDashboardPage() {
             </p>
             <p className="text-muted-foreground text-[10px] uppercase tracking-wide">RM Portal</p>
           </div>
-        </div>
+        </Link>
         <div className="flex items-center gap-2">
           <Button asChild variant="outline" size="sm">
             <Link to="/wealthverse-business">
