@@ -140,7 +140,7 @@ export default function RmDashboardPage() {
 
   const handleLogout = () => {
     logoutRm();
-    void navigate("/rm/login");
+    navigate("/wealth360");
   };
 
   return (

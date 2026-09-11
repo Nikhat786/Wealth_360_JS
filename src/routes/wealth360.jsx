@@ -940,15 +940,15 @@ export default function Wealth360Landing() {
                   type="button"
                   onClick={() => setActiveFilter(f.id)}
                   className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold transition-all cursor-pointer ${isActive
-                      ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-[1.02]"
-                      : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-100/60"
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-[1.02]"
+                    : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-100/60"
                     }`}
                 >
                   <span>{f.label}</span>
                   <span
                     className={`rounded-full px-1.5 py-0.2 text-[10px] ${isActive
-                        ? "bg-white/20 text-white"
-                        : "bg-gray-100 text-gray-500"
+                      ? "bg-white/20 text-white"
+                      : "bg-gray-100 text-gray-500"
                       }`}
                   >
                     {f.count}
@@ -967,8 +967,8 @@ export default function Wealth360Landing() {
                   key={feature.id}
                   to={feature.to}
                   className={`group relative flex flex-col justify-between rounded-2xl border p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-md ${feature.isFeatured
-                      ? "border-amber-300 bg-gradient-to-br from-amber-50/80 via-orange-50/40 to-white shadow-amber-500/10"
-                      : "border-gray-200/80 bg-white hover:border-primary/40 hover:bg-primary/[0.02]"
+                    ? "border-amber-300 bg-gradient-to-br from-amber-50/80 via-orange-50/40 to-white shadow-amber-500/10"
+                    : "border-gray-200/80 bg-white hover:border-primary/40 hover:bg-primary/[0.02]"
                     }`}
                 >
                   <div>

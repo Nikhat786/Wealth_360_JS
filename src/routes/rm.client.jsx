@@ -961,9 +961,8 @@ function ShareDashboardModal({ open, onOpenChange, client, outreachLog }) {
                   size="sm"
                   variant={copied ? "default" : "outline"}
                   onClick={handleCopy}
-                  className={`shrink-0 text-xs transition-all ${
-                    copied ? "bg-emerald-600 text-white" : ""
-                  }`}
+                  className={`shrink-0 text-xs transition-all ${copied ? "bg-emerald-600 text-white" : ""
+                    }`}
                 >
                   {copied ? (
                     <>
