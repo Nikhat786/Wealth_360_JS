@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/sharekhan",
+      "destination": "https://mcpuat.sharekhan.com/api/v1/chat/completions"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
