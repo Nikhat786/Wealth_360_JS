@@ -51,7 +51,7 @@ import { lifeStage } from "@/lib/wealth360";
 import { cn } from "@/lib/utils";
 
 
-const chapters = ["About You", "Family", "Cashflow", "What You Own", "What You Owe", "Goals", "Protect"];
+const chapters = ["About You", "Family", "Cashflow", "What You Own", "What You Owe", "Protect", "Goals"];
 const assetTypes = ["Cash & Savings", "FD/RD", "Stocks", "Mutual Funds", "ETFs", "Bonds", "Gold/SGB", "Real Estate", "EPF/PPF/NPS", "Pension", "Other Assets"];
 const goalTypes = ["Child Education", "Retirement", "Home", "Emergency Fund", "Travel", "Marriage", "Financial Independence", "Business", "Career Break", "Wealth Creation", "Parents", "Custom"];
 const GOAL_TYPE_ICONS = { "Retirement": "retirement", "Child Education": "education", "Home": "home", "Emergency Fund": "shield", "Travel": "travel" };
@@ -107,6 +107,14 @@ export default function Onboarding() {
   useEffect(() => {
     startOnboarding();
   }, [startOnboarding]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      if (document.documentElement) document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    }
+  }, [chapter]);
 
   // Simulation timer
   useEffect(() => {
@@ -195,8 +203,8 @@ export default function Onboarding() {
           {chapter === 2 && <CashflowStep draft={draft} set={set} />}
           {chapter === 3 && <AssetsStep draft={draft} set={set} />}
           {chapter === 4 && <LiabilitiesStep draft={draft} set={set} />}
-          {chapter === 5 && <GoalsStep draft={draft} set={set} />}
-          {chapter === 6 && <ProtectionStep draft={draft} set={set} />}
+          {chapter === 5 && <ProtectionStep draft={draft} set={set} />}
+          {chapter === 6 && <GoalsStep draft={draft} set={set} />}
         </div>
 
         {chapter > 0 && (
@@ -586,8 +594,8 @@ function titleFor(chapter) {
   "Where does your money come from and where does it go?",
   "Let's map what you've already built.",
   "Every wealth journey has two sides.",
-  "Your wealth should have a purpose.",
-  "What could protect your family?"][
+  "What could protect your family?",
+  "Your wealth should have a purpose."][
   chapter];
 }
 function descriptionFor(chapter) {
@@ -597,8 +605,8 @@ function descriptionFor(chapter) {
   "We'll show the flow of money, not a score. The analysis comes later.",
   "Add investments one at a time so the details remain meaningful.",
   "Understanding debt helps us decide whether your next rupee should go toward investing, saving or repayment.",
-  "Choose the milestones that deserve a place in your plan. You can refine them later.",
-  "We'll compare what you already have against what your family may need."][
+  "We'll compare what you already have against what your family may need.",
+  "Choose the milestones that deserve a place in your plan. You can refine them later."][
   chapter];
 }
 

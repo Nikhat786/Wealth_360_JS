@@ -7,7 +7,7 @@ import { derivedExpenses, derivedIncome, useApp } from "@/context/app-context";
 import { formatINRShort } from "@/lib/format";
 
 
-const sections = ["ABOUT YOU", "FAMILY", "CASHFLOW", "INVESTMENTS", "LIABILITIES", "GOALS", "PROTECTION", "RISK"];
+const sections = ["ABOUT YOU", "FAMILY", "CASHFLOW", "INVESTMENTS", "LIABILITIES", "PROTECTION", "GOALS", "RISK"];
 
 export default function Wealth360Review() {
   const { answers, completeOnboarding, totalAssets, totalLiabilities } = useApp();
@@ -37,8 +37,8 @@ export default function Wealth360Review() {
           <Summary label="Cashflow" value={`${formatINRShort(monthlyIncome)} monthly income`} detail={`${formatINRShort(monthlySurplus)} monthly surplus`} />
           <Summary label="Investments" value={`${formatINRShort(totalAssets)} total assets`} detail={`${answers?.assets?.length || 6} demo holdings`} />
           <Summary label="Liabilities" value={`${formatINRShort(totalLiabilities)} outstanding`} detail={`${answers?.liabilities?.length || 3} demo liabilities`} />
-          <Summary label="Goals" value={`${answers?.goals?.length || 3} active goals`} detail="Retirement, education and emergency fund" />
           <Summary label="Protection" value={`${formatINRShort(answers?.lifeCover ?? 0)} life cover`} detail={`${formatINRShort(answers?.healthCover ?? 0)} health cover`} />
+          <Summary label="Goals" value={`${answers?.goals?.length || 3} active goals`} detail="Retirement, education and emergency fund" />
           <Summary label="Risk" value="Moderate" detail={`${answers?.horizon ?? 15}-year investment horizon`} />
         </div>
         <div className="surface-card flex items-start gap-3 p-5"><Lock className="text-muted-foreground mt-0.5 size-4 shrink-0" /><div><p className="text-sm font-semibold">You're in control of your information.</p><p className="text-muted-foreground mt-2 text-xs leading-relaxed">This information was provided by you and is used to personalise Wealth360. You can edit it later. No transaction happens automatically, and recommendations are subject to market risk. A production version can connect Account Aggregator with consent.</p></div></div>

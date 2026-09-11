@@ -1,26 +1,25 @@
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import {
+  ArrowLeft,
   ArrowRight,
   BadgeDollarSign,
   BarChart3,
-
-
+  Building2,
   Coins,
   CreditCard,
-
+  Lock,
+  LogOut,
   PieChart,
   Scale,
-
+  ShieldCheck,
   Sparkles,
   TrendingUp,
   Users
-} from
-  "lucide-react";
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { AppShell } from "@/components/wealth/app-shell";
 import { useApp } from "@/context/app-context";
-
+import mark from "@/assets/wealth360-mark.png";
 
 const FIVE_REVENUE_STREAMS = [
   {
@@ -72,8 +71,8 @@ const FIVE_REVENUE_STREAMS = [
     icon: Scale,
     description: "High-ticket fee splits with vetted legal and chartered accounting partner firms for Digital Will drafting, estate notarization, CA tax filing, and private family trust setup.",
     drivers: "Wealth Continuity Score and Family Vault readiness checks identifying succession vacuums in mature households."
-  }];
-
+  }
+];
 
 const STRATEGIC_KPIS = [
   {
@@ -103,8 +102,8 @@ const STRATEGIC_KPIS = [
     detail: "Low organic acquisition cost through Mirae Asset core combined with high compounding LTV.",
     growth: "Top Decile FinTech",
     icon: Users
-  }];
-
+  }
+];
 
 const BENEFIT_MATRIX = [
   {
@@ -131,22 +130,76 @@ const BENEFIT_MATRIX = [
     module: "Digital Will & Family Wealth Vault",
     clientBenefit: "Complete peace of mind knowing succession is documented and loved ones can access funds seamlessly.",
     companyBenefit: "Intergenerational asset retention — preserves client capital on Mirae Asset across wealth transfer events."
-  }];
-
+  }
+];
 
 export default function WealthVerseBusinessPage() {
-  const { isRmSession } = useApp();
+  const { isRmSession, logoutRm } = useApp();
+  const navigate = useNavigate();
+
+  // Internal-only screen: gated strictly by RM session
   if (!isRmSession) return <Navigate to="/rm/login" replace />;
 
+  const handleLogout = () => {
+    logoutRm();
+    navigate("/rm/login");
+  };
+
   return (
-    <AppShell>
-      <div className="mx-auto max-w-6xl space-y-10 py-6 sm:py-10">
-        {/* Executive Header */}
+    <div className="min-h-screen bg-[#f8fafc] text-foreground">
+      {/* ----------------------------------------------------------------- */}
+      {/* Dedicated RM Portal Header (Independent from Customer AppShell)   */}
+      {/* ----------------------------------------------------------------- */}
+      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-white/95 px-4 backdrop-blur-md sm:px-6">
+        <Link
+          to="/rm/dashboard"
+          className="flex items-center gap-2.5 transition-opacity hover:opacity-90"
+          title="Go to RM Dashboard"
+        >
+          <img src={mark} alt="Mirae Asset WealthVerse" className="size-7" />
+          <div>
+            <p className="font-display text-sm font-bold">
+              Mirae Asset <span className="text-primary">WealthVerse</span>
+            </p>
+            <p className="text-muted-foreground text-[10px] uppercase tracking-wide font-medium">
+              RM Portal · Revenue Architecture
+            </p>
+          </div>
+        </Link>
+
+        <div className="flex items-center gap-2.5">
+          <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-700">
+            <Lock className="size-3" /> Internal RM Only
+          </span>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/rm/dashboard">
+              <ArrowLeft className="mr-1.5 size-3.5" /> RM Dashboard
+            </Link>
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleLogout}>
+            <LogOut className="mr-1.5 size-3.5" /> Log out
+          </Button>
+        </div>
+      </header>
+
+      {/* ----------------------------------------------------------------- */}
+      {/* Main Content: Dedicated Business Architecture Dossier            */}
+      {/* ----------------------------------------------------------------- */}
+      <main className="mx-auto max-w-6xl space-y-10 px-4 py-8 sm:px-6">
+        {/* Back breadcrumb */}
+        <Link
+          to="/rm/dashboard"
+          className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-xs font-medium transition-colors"
+        >
+          <ArrowLeft className="size-3.5" /> Back to book of business
+        </Link>
+
+        {/* Executive Strategic Banner */}
         <div className="rounded-3xl bg-gradient-to-br from-[#0c192e] via-[#0f2444] to-[#081224] p-8 text-white shadow-2xl sm:p-12 relative overflow-hidden">
           <span className="pointer-events-none absolute -top-24 -right-24 size-96 rounded-full bg-[var(--color-primary)]/20 blur-3xl" />
           <div className="relative z-10 max-w-3xl space-y-4">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1 text-xs font-semibold tracking-wider text-gold uppercase backdrop-blur-md">
-              <Sparkles className="size-3.5" /> Business & Monetization Architecture
+              <Sparkles className="size-3.5" /> Internal Strategic Architecture · Confidential
             </span>
             <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-5xl text-white">
               WealthVerse Multi-Stream Revenue Operating Model
@@ -156,13 +209,8 @@ export default function WealthVerseBusinessPage() {
             </p>
             <div className="pt-2 flex flex-wrap gap-3">
               <Button asChild className="bg-primary text-primary-foreground font-semibold">
-                <Link to="/plans">
-                  Explore Subscription Plans <ArrowRight className="ml-1.5 size-4" />
-                </Link>
-              </Button>
-              <Button variant="outline" asChild className="border-white/20 bg-white/5 text-white hover:bg-white/15">
                 <Link to="/rm/dashboard">
-                  Back to RM Dashboard
+                  <Building2 className="mr-1.5 size-4" /> View Book of Business
                 </Link>
               </Button>
             </div>
@@ -201,8 +249,8 @@ export default function WealthVerseBusinessPage() {
                   <p className="text-[11px] text-muted-foreground leading-relaxed">
                     {kpi.detail}
                   </p>
-                </div>);
-
+                </div>
+              );
             })}
           </div>
         </div>
@@ -224,8 +272,8 @@ export default function WealthVerseBusinessPage() {
               return (
                 <div
                   key={stream.streamNumber}
-                  className="surface-card rounded-2xl border p-5 shadow-sm space-y-3 flex flex-col justify-between">
-
+                  className="surface-card rounded-2xl border p-5 shadow-sm space-y-3 flex flex-col justify-between"
+                >
                   <div className="space-y-2.5">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2">
@@ -261,8 +309,8 @@ export default function WealthVerseBusinessPage() {
                       <p className="text-[11px] text-muted-foreground mt-0.5">{stream.drivers}</p>
                     </div>
                   </div>
-                </div>);
-
+                </div>
+              );
             })}
           </div>
         </div>
@@ -291,7 +339,7 @@ export default function WealthVerseBusinessPage() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {BENEFIT_MATRIX.map((row, i) =>
+                {BENEFIT_MATRIX.map((row, i) => (
                   <tr key={i} className="hover:bg-muted/20">
                     <td className="p-3.5 font-bold text-foreground">{row.module}</td>
                     <td className="p-3.5 text-muted-foreground leading-relaxed">
@@ -303,29 +351,29 @@ export default function WealthVerseBusinessPage() {
                       {row.companyBenefit}
                     </td>
                   </tr>
-                )}
+                ))}
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* Conclusion / Navigation */}
+        {/* Return to RM Operations */}
         <div className="rounded-3xl border border-primary/20 bg-primary/5 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <h3 className="font-display text-lg font-bold text-foreground">
-              Ready to experience the client journey?
+              Return to Client Relationship Management
             </h3>
             <p className="text-xs text-muted-foreground mt-1 max-w-xl">
-              Explore how Sheru AI and human relationship managers collaborate across retail, professional, and HNI tiers.
+              Access your client roster, pending call requests, portfolio diagnostics, and Sheru RM Copilot talking points.
             </p>
           </div>
           <Button asChild size="lg" className="bg-primary text-primary-foreground font-semibold shrink-0">
-            <Link to="/">
-              Open Live WealthVerse <ArrowRight className="ml-1 size-4" />
+            <Link to="/rm/dashboard">
+              Open RM Dashboard <ArrowRight className="ml-1.5 size-4" />
             </Link>
           </Button>
         </div>
-      </div>
-    </AppShell>);
-
+      </main>
+    </div>
+  );
 }

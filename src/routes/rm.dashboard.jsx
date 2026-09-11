@@ -157,7 +157,7 @@ export default function RmDashboardPage() {
         </Link>
         <div className="flex items-center gap-2">
           <Button asChild variant="outline" size="sm">
-            <Link to="/wealthverse-business">
+            <Link to="/rm/revenue-model">
               <BarChart3 className="mr-1.5 size-3.5" /> Revenue Model
             </Link>
           </Button>
@@ -176,7 +176,7 @@ export default function RmDashboardPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard icon={Users} label="Clients managed" value={roster.length} />
           <StatCard icon={PhoneCall} label="Pending call requests" value={pendingCalls.length} tone={pendingCalls.length > 0 ? "alert" : "default"} />
           <StatCard
@@ -187,7 +187,7 @@ export default function RmDashboardPage() {
             tone={bookGrowthPct < 0 ? "alert" : "default"} />
 
           <StatCard icon={Gauge} label="Avg. wealth score" value={`${avgScore}/100`} />
-          <StatCard icon={AlertTriangle} label="Clients at risk" value={atRiskClients.length} tone={atRiskClients.length > 0 ? "alert" : "default"} />
+          {/* <StatCard icon={AlertTriangle} label="Clients at risk" value={atRiskClients.length} tone={atRiskClients.length > 0 ? "alert" : "default"} /> */}
         </div>
 
         {/* Book analytics */}

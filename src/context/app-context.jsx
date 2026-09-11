@@ -1362,6 +1362,28 @@ export function AppProvider({ children }) {
       setOnboardingStatus("not_started");
       clearActivePan();
     },
+    logoutCustomer: () => {
+      try {
+        if (typeof window !== "undefined") {
+          window.localStorage.clear();
+          window.sessionStorage.clear();
+        }
+      } catch (err) {
+        console.error("Failed to clear storage on logout:", err);
+      }
+      setAnswers(defaultAnswers);
+      setOnboardingStatus("not_started");
+      setSubscriptionTierState("Basic");
+      clearActivePan();
+      setBooking(null);
+      setMessages([]);
+      setCoachOpen(false);
+      setActiveRmClient(null);
+      setWhatIfState({});
+      if (typeof window !== "undefined") {
+        window.location.href = "/wealth360";
+      }
+    },
     scoreInputs,
     score,
     whatIf,

@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { BadgeCheck, CalendarCheck, Headset, RefreshCw, Star } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { BadgeCheck, CalendarCheck, Headset, LogOut, RefreshCw, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/wealth/app-shell";
@@ -10,7 +10,12 @@ import { rm, user } from "@/lib/mock-data";
 
 
 export default function ProfilePage() {
-  const { answers, resetOnboarding, setRmOpen, booking, score, canAccessRM, rmType } = useApp();
+  const { answers, resetOnboarding, logoutCustomer, setRmOpen, booking, score, canAccessRM, rmType } = useApp();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logoutCustomer();
+  };
 
   return (
     <AppShell>
@@ -27,9 +32,17 @@ export default function ProfilePage() {
             </p>
             <p className="text-navy-foreground/75 text-sm">{user.email} · {answers.mobile || user.phone}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button variant="outline" size="sm" asChild className="border-white/20 bg-white/10 text-white hover:bg-white/20">
               <Link to="/plans">Manage Plan</Link>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              className="border-red-400/40 bg-red-500/15 text-red-200 hover:bg-red-500/30 hover:text-white transition-colors gap-1.5"
+            >
+              <LogOut className="size-3.5" /> Log out
             </Button>
           </div>
         </div>
@@ -120,6 +133,29 @@ export default function ProfilePage() {
               </div>
             </div>
           }
+        </div>
+
+        {/* Session & Local Storage Management */}
+        <div className="surface-card space-y-3 p-6 border border-destructive/25 bg-destructive/[0.02] rounded-2xl">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <p className="font-semibold text-sm text-foreground flex items-center gap-2">
+                <LogOut className="size-4 text-destructive" />
+                Sign Out & Clear Local Storage
+              </p>
+              <p className="text-muted-foreground text-xs mt-1 max-w-xl leading-relaxed">
+                Clears all stored PAN profiles, customized cashflow figures, Account Aggregator links, what-if simulations, and active session tokens from this device.
+              </p>
+            </div>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleLogout}
+              className="shrink-0 gap-1.5 shadow-sm"
+            >
+              <LogOut className="size-3.5" /> Log out & Clear Storage
+            </Button>
+          </div>
         </div>
       </div>
     </AppShell>);

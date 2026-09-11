@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppProvider } from "@/context/app-context";
-
+import { ScrollToTop } from "@/components/wealth/scroll-to-top";
 
 import IndexPage from "./routes/index";
 import PortfolioPage from "./routes/portfolio";
@@ -35,6 +35,7 @@ function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppProvider>
+        <ScrollToTop />
         <Outlet />
       </AppProvider>
     </QueryClientProvider>
@@ -70,10 +71,11 @@ export default function App() {
           <Route path="/wealth360/review" element={<Wealth360ReviewPage />} />
           <Route path="/wealth360/analysis" element={<AnalysisPage />} />
           <Route path="/wealth360/dashboard" element={<IndexPage />} />
-          <Route path="/wealthverse-business" element={<WealthVerseBusinessPage />} />
           <Route path="/rm/login" element={<RmLoginPage />} />
           <Route path="/rm/dashboard" element={<RmDashboardPage />} />
           <Route path="/rm/client/:clientId" element={<RmClientPage />} />
+          <Route path="/rm/revenue-model" element={<WealthVerseBusinessPage />} />
+          <Route path="/wealthverse-business" element={<WealthVerseBusinessPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

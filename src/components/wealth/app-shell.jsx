@@ -13,6 +13,7 @@ import {
   HeartHandshake,
   Layers,
   LayoutDashboard,
+  LogOut,
   Menu,
 
   Percent,
@@ -67,11 +68,16 @@ export function AppShell({
     onboardingComplete,
     subscriptionTier,
     canAccessRM,
-    rmType
+    rmType,
+    logoutCustomer
   } = useApp();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleLogout = () => {
+    logoutCustomer();
+  };
 
   useEffect(() => {
     const publicPath =
@@ -82,11 +88,10 @@ export function AppShell({
       pathname === "/wealth360/journey" ||
       pathname === "/wealth360/analysis" ||
       pathname === "/account-aggregator" ||
-      pathname === "/plans" ||
-      pathname === "/wealthverse-business";
+      pathname === "/plans";
 
     if (!minimal && !onboardingComplete && !publicPath) {
-      void navigate("/wealth360/journey");
+      void navigate("/wealth360");
     }
   }, [minimal, navigate, onboardingComplete, pathname]);
 
@@ -98,8 +103,7 @@ export function AppShell({
     pathname === "/wealth360/journey" ||
     pathname === "/wealth360/analysis" ||
     pathname === "/account-aggregator" ||
-    pathname === "/plans" ||
-    pathname === "/wealthverse-business";
+    pathname === "/plans";
 
   if (!minimal && !onboardingComplete && !publicPath) {
     return <div className="min-h-screen bg-background" aria-hidden="true" />;
@@ -203,6 +207,19 @@ export function AppShell({
                 </div>
               </div>
             </Link>
+          </div>
+
+          {/* Sidebar Bottom Action: Log out & Clear Storage */}
+          <div className="px-4 py-2 border-t border-[#1a2d4c]/60 bg-[#070e1a]">
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex w-full items-center gap-2 rounded-xl px-2 py-1.5 text-xs text-white/50 hover:text-red-300 hover:bg-white/5 transition-colors"
+              title="Log out & clear local storage"
+            >
+              <LogOut className="size-3.5" />
+              <span>Log out & reset session</span>
+            </button>
           </div>
         </aside>
       }
@@ -317,6 +334,20 @@ export function AppShell({
                 {user.firstName[0]}
               </Link>
             }
+
+            {/* Customer Sign Out */}
+            {!minimal && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleLogout}
+                className="size-9 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                title="Log out & clear local storage"
+                aria-label="Log out"
+              >
+                <LogOut className="size-4" />
+              </Button>
+            )}
           </div>
         </header>
 
@@ -412,6 +443,21 @@ export function AppShell({
                 </Button>
               </div>
             }
+
+            {/* Mobile Drawer Logout */}
+            <div className="border-t border-[#1a2d4c] pt-3 mt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleLogout();
+                }}
+                className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+              >
+                <LogOut className="size-4" />
+                <span>Log out & Clear Storage</span>
+              </button>
+            </div>
           </div>
         </div>
       }
