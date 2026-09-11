@@ -15,6 +15,9 @@ export default defineConfig({
     },
   },
   server: {
+    watch: {
+      ignored: ["**/*.mp4"],
+    },
     proxy: {
       // Proxy /api/sharekhan → Sharekhan LLM endpoint (avoids browser CORS)
       "/api/sharekhan": {

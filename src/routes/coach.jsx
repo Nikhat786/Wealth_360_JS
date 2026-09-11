@@ -61,15 +61,15 @@ export default function CoachPage() {
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary uppercase">
                 <Bot className="size-3.5" /> Advisory Engine
               </span>
-              <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                AI Wealth Model
+              <span className="rounded-full bg-emerald-500/10 text-emerald-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                Guardrailed to Dashboard
               </span>
             </div>
             <h1 className="font-display mt-1 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               SHERU · AI Wealth Guide
             </h1>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Continuous advisory analyzing Income, Expenses, Debt, Protection, Tax & Goals.
+              Dedicated AI Relationship Manager guardrailed strictly to your Wealth 360 dashboard data.
             </p>
           </div>
 
@@ -98,7 +98,7 @@ export default function CoachPage() {
                 Hi Rahul, I&apos;m SHERU.
               </h2>
               <p className="mx-auto max-w-md text-xs text-muted-foreground leading-relaxed">
-                I continuously analyze your complete financial universe. Ask me about retirement shortfalls, loan prepayment vs investing, family protection gaps, or tax strategies.
+                I am guardrailed strictly to your personal Wealth 360 dashboard. Ask me about your Wealth Health score, retirement roadmap, loan prepayment vs investing, protection gaps, or tax strategies.
               </p>
             </div> :
 
@@ -174,7 +174,7 @@ export default function CoachPage() {
                 if (!isTyping) submit();
               }
             }}
-            placeholder={isTyping ? "SHERU is thinking…" : "Ask SHERU anything — loans, tax, retirement, protection…\n(Shift + Enter for new line)"}
+            placeholder={isTyping ? "SHERU is thinking…" : "Ask SHERU about your dashboard — score, loans, tax, retirement, protection…\n(Shift + Enter for new line)"}
             aria-label="Message SHERU"
             style={{
               resize: "none",

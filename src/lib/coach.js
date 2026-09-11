@@ -1,4 +1,5 @@
 import { formatINR, formatINRShort } from "./format";
+import { getGuardrailRefusal, validateDashboardScope } from "./sheru-api";
 
 
 
@@ -175,23 +176,29 @@ const rules = [
 
 
 export function coachReply(question, context) {
+  // Enforce strict Wealth 360 Dashboard guardrail
+  const scopeCheck = validateDashboardScope(question);
+  if (!scopeCheck.inScope) {
+    return getGuardrailRefusal(question);
+  }
+
   for (const rule of rules) {
     if (rule.match.test(question)) return rule.reply(context);
   }
 
   return {
-    text: `Hi Rahul — I'm Sheru, your AI Relationship Manager. I continuously monitor your WealthVerse across Income, Investments, Debt, Protection, and Succession:`,
+    text: `Hi Rahul — I'm Sheru, your AI Relationship Manager. I continuously monitor your Wealth 360 dashboard across Income, Investments, Debt, Protection, and Succession:`,
     bullets: [
-    `What changed: Wealth Health score is ${context.score} (${context.grade}) with net worth at ${formatINRShort(context.netWorth)}.`,
-    "Why it matters: We found 3 priority areas (term protection, debt optimization, tax headroom) that can compound your financial life.",
-    "What should happen next: Ask me about any specific pillar, or click 'Ask RM To Review' to connect with Priya Menon.",
-    "Expected impact: Addressing your top 2 recommendations can raise your score by up to 14 points."],
-
+      `What changed: Wealth Health score is ${context.score} (${context.grade}) with net worth at ${formatINRShort(context.netWorth)}.`,
+      "Why it matters: We found 3 priority areas (term protection, debt optimization, tax headroom) that can compound your financial life.",
+      "What should happen next: Ask me about any specific pillar, or click 'Talk to RM' to connect with your Relationship Manager.",
+      "Expected impact: Addressing your top 2 recommendations can raise your score by up to 14 points."
+    ],
     followUps: [
-    "Am I on track for retirement?",
-    "Should I repay my loan or invest?",
-    "How much insurance do I need?",
-    "What is my FIRE timeline?"]
-
+      "Am I on track for retirement?",
+      "Should I repay my loan or invest?",
+      "How much insurance do I need?",
+      "What is my FIRE timeline?"
+    ]
   };
 }

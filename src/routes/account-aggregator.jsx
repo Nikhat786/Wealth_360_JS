@@ -65,6 +65,7 @@ export default function AccountAggregatorPage() {
   "loans",
   "fd"]
   );
+  const [consentAgreed, setConsentAgreed] = useState(true);
   const [fetchProgress, setFetchProgress] = useState(0);
 
   // Auto-progress simulation for Step 3
@@ -197,11 +198,11 @@ export default function AccountAggregatorPage() {
               </Button>
               <Button
               size="lg"
-              className="gap-2"
+              className="gap-2 bg-primary text-primary-foreground font-semibold"
               disabled={pan.length < 10}
               onClick={() => setStep(2)}>
               
-                Proceed to Consents <ArrowRight className="size-4" />
+                Proceed to Customer Consent <ArrowRight className="size-4" />
               </Button>
             </div>
           </div>
@@ -211,15 +212,38 @@ export default function AccountAggregatorPage() {
         {step === 2 &&
         <div className="surface-card space-y-6 p-6 sm:p-10">
             <div className="space-y-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-3 py-1 text-xs font-semibold text-gold-foreground">
-                <ShieldCheck className="size-3.5" /> Granular Permissions
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-600">
+                <ShieldCheck className="size-3.5" /> RBI Electronic Consent Artifact
               </span>
               <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-                Choose what to aggregate into WealthVerse.
+                Customer Consent Authorization
               </h1>
               <p className="text-sm text-muted-foreground">
-                Select the financial categories you want to include in your consolidated view. You retain full control to revoke consent anytime.
+                Authorize Mirae Asset Sharekhan (FIU) to fetch verified financial records for PAN <strong>{pan}</strong>. Choose categories to include in your consolidated 360° dashboard.
               </p>
+            </div>
+
+            {/* PAN & FIU Authorization Card */}
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-muted/40 p-3.5 border text-xs">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Customer Identifier</span>
+                <span className="font-mono text-sm font-bold text-foreground">{pan}</span>
+              </div>
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Requester Entity (FIU)</span>
+                <span className="font-semibold text-foreground">Mirae Asset Sharekhan</span>
+                <span className="text-muted-foreground text-[10px] block">Reg: FIU-2024-MAS-0089</span>
+              </div>
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Consent Purpose</span>
+                <span className="font-semibold text-foreground">Wealth 360 Diagnostics</span>
+              </div>
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Security Guarantee</span>
+                <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold">
+                  <Lock className="size-3" /> Read-Only (Encrypted)
+                </span>
+              </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
@@ -257,17 +281,30 @@ export default function AccountAggregatorPage() {
             })}
             </div>
 
+            {/* Explicit Customer Agreement Checkbox */}
+            <label className="flex items-start gap-3 cursor-pointer rounded-xl border border-primary/30 bg-primary/[0.04] p-4 text-xs">
+              <input
+                type="checkbox"
+                checked={consentAgreed}
+                onChange={(e) => setConsentAgreed(e.target.checked)}
+                className="mt-0.5 size-4 rounded text-primary focus:ring-primary cursor-pointer"
+              />
+              <span className="text-foreground leading-relaxed">
+                <strong>Customer Declaration:</strong> I hereby grant explicit electronic consent to <strong>Mirae Asset Sharekhan (FIU)</strong> to request and fetch my financial records from the selected Financial Information Providers (FIPs) for PAN <strong>{pan}</strong> via the RBI-regulated Account Aggregator framework. I understand this consent is strictly for portfolio analysis and is revocable by me at any time.
+              </span>
+            </label>
+
             <div className="flex items-center justify-between border-t pt-6">
               <Button variant="outline" onClick={() => setStep(1)}>
-                <ArrowLeft className="mr-1.5 size-4" /> Back
+                <ArrowLeft className="mr-1.5 size-4" /> Back to PAN
               </Button>
               <Button
               size="lg"
-              className="gap-2"
-              disabled={selectedConsents.length === 0}
+              className="gap-2 bg-primary text-primary-foreground font-semibold"
+              disabled={selectedConsents.length === 0 || !consentAgreed}
               onClick={() => setStep(3)}>
               
-                Fetch Financial Universe ({selectedConsents.length}) <ArrowRight className="size-4" />
+                Authorize Consent & Fetch via AA ({selectedConsents.length}) <ArrowRight className="size-4" />
               </Button>
             </div>
           </div>

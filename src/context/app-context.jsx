@@ -10,7 +10,7 @@ import {
   "react";
 
 import { coachReply } from "@/lib/coach";
-import { callSheruLLM } from "@/lib/sheru-api";
+import { callSheruLLM, getGuardrailRefusal, validateDashboardScope } from "@/lib/sheru-api";
 import {
   clearActivePan,
   getActivePan,
@@ -1178,6 +1178,7 @@ export function AppProvider({ children }) {
 
   const coachContext = useMemo(
     () => ({
+      clientName: answers.name || "Rahul Mehta",
       score: score.total,
       grade: score.grade,
       pillars: score.pillars,
@@ -1198,7 +1199,12 @@ export function AppProvider({ children }) {
       taxHeadroom,
       idleSurplus,
       topAction: actions[0]?.title ?? null,
-      netWorth: totalAssetsVal - totalLiabVal
+      netWorth: totalAssetsVal - totalLiabVal,
+      assetsSummary: answers.assets?.map((a) => `${a.name || a.type}: ₹${(a.currentValue / 100000).toFixed(1)}L`).join(", "),
+      liabilitiesSummary: answers.liabilities?.map((l) => `${l.name || l.type}: ₹${(l.outstanding / 100000).toFixed(1)}L`).join(", "),
+      goalsSummary: answers.goals?.map((g) => `${g.name}: ₹${(g.saved / 100000).toFixed(1)}L of ₹${(g.target / 100000).toFixed(1)}L (${g.targetYear})`).join("; "),
+      hasWill: answers.hasWill ? "Registered" : "Missing",
+      riskProfile
     }),
     [
       actions,
@@ -1212,12 +1218,13 @@ export function AppProvider({ children }) {
       idleSurplus,
       nominations_summary,
       protection,
+      riskProfile,
       score,
       taxHeadroom,
       transferReadiness,
       totalAssetsVal,
-      totalLiabVal]
-
+      totalLiabVal
+    ]
   );
 
   const sendMessage = useCallback(
@@ -1229,6 +1236,24 @@ export function AppProvider({ children }) {
       const userMsg = { id: nextId(), role: "user", text: trimmed };
       setMessages((prev) => [...prev, userMsg]);
       setIsTyping(true);
+
+      // Enforce strict guardrail: Sheru only answers queries within the Wealth 360 dashboard context
+      const guardrailCheck = validateDashboardScope(trimmed);
+      if (!guardrailCheck.inScope) {
+        setIsTyping(false);
+        const refusal = getGuardrailRefusal(trimmed);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: nextId(),
+            role: "assistant",
+            text: refusal.text,
+            bullets: refusal.bullets,
+            followUps: refusal.followUps
+          }
+        ]);
+        return;
+      }
 
       // Build conversation history for multi-turn context (user + assistant pairs only)
       let llmReplyText = null;

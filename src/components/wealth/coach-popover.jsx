@@ -82,7 +82,7 @@ export function CoachPopover() {
                   Hi, I&apos;m SHERU.
                 </p>
                 <p className="text-xs text-muted-foreground max-w-xs mx-auto leading-relaxed">
-                  I continuously analyze your income, liabilities, protection, and retirement goals. Ask me what to do next.
+                  I am guardrailed strictly to your Wealth 360 dashboard. Ask me about your Wealth Health score, portfolio, liabilities, protection, or retirement goals.
                 </p>
               </div> :
 
@@ -118,7 +118,7 @@ export function CoachPopover() {
             <Input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder="Ask SHERU anything..."
+            placeholder="Ask SHERU about your dashboard..."
             aria-label="Ask SHERU"
             className="text-xs" />
           

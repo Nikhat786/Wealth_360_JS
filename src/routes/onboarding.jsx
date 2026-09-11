@@ -6,10 +6,14 @@ import {
   Check,
   CheckCircle2,
   CreditCard,
+  FileText,
   HeartHandshake,
+  Landmark,
+  Layers,
   Loader2,
   Lock,
   Pencil,
+  PieChart,
   Plus,
   Shield,
   ShieldCheck,
@@ -74,6 +78,8 @@ export default function Onboarding() {
   const [aaSuccessNotice, setAaSuccessNotice] = useState(false);
   const [panFetched, setPanFetched] = useState(false);
   const [panInput, setPanInput] = useState(draft.pan || "ABCDE1234F");
+  const [consentModalOpen, setConsentModalOpen] = useState(false);
+  const [consentAgreed, setConsentAgreed] = useState(true);
 
   const navigate = useNavigate();
   const set = (key, value) =>
@@ -116,11 +122,11 @@ export default function Onboarding() {
 
   const handleStartPanFetch = () => {
     if (panInput.length !== 10) return;
-    setSimIndex(0);
-    setAaState("simulating");
+    setConsentModalOpen(true);
   };
 
   const handleConsentApproved = () => {
+    setConsentModalOpen(false);
     setSimIndex(0);
     setAaState("simulating");
   };
@@ -252,6 +258,156 @@ export default function Onboarding() {
             }
           </DialogContent>
         </Dialog>
+
+        {/* Customer AA Consent Dialog */}
+        <Dialog open={consentModalOpen} onOpenChange={setConsentModalOpen}>
+          <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-lg">
+            <DialogHeader>
+              <div className="flex items-center gap-2 text-emerald-600">
+                <ShieldCheck className="size-5" />
+                <span className="text-xs font-bold uppercase tracking-wider">
+                  RBI Account Aggregator Framework
+                </span>
+              </div>
+              <DialogTitle className="font-display text-xl font-bold">
+                Customer Consent Authorization
+              </DialogTitle>
+              <DialogDescription className="text-xs">
+                Authorize Mirae Asset Sharekhan (FIU) to fetch verified financial data for your PAN.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 pt-1">
+              {/* PAN & FIU Meta Card */}
+              <div className="flex items-center justify-between rounded-xl bg-muted/50 p-3.5 border text-xs">
+                <div>
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground">Linking PAN</p>
+                  <p className="font-mono text-base font-bold text-foreground tracking-wider">{panInput}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground">Requester (FIU)</p>
+                  <p className="font-semibold text-foreground">Mirae Asset Sharekhan</p>
+                  <p className="text-[10px] text-muted-foreground">Reg: FIU-2024-MAS-0089</p>
+                </div>
+              </div>
+
+              {/* Data Scope to be Fetched */}
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">
+                  Financial Data Categories to be Fetched
+                </p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex items-center gap-2.5 rounded-lg border bg-card p-2.5">
+                    <Landmark className="size-4 text-primary shrink-0" />
+                    <div>
+                      <p className="font-semibold">Bank Accounts & FDs</p>
+                      <p className="text-[10px] text-muted-foreground">HDFC, ICICI, SBI balances</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5 rounded-lg border bg-card p-2.5">
+                    <PieChart className="size-4 text-primary shrink-0" />
+                    <div>
+                      <p className="font-semibold">Mutual Funds</p>
+                      <p className="text-[10px] text-muted-foreground">CAMS & KFintech CAS</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5 rounded-lg border bg-card p-2.5">
+                    <Layers className="size-4 text-primary shrink-0" />
+                    <div>
+                      <p className="font-semibold">Demat & Equities</p>
+                      <p className="text-[10px] text-muted-foreground">CDSL & NSDL holdings</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5 rounded-lg border bg-card p-2.5">
+                    <CreditCard className="size-4 text-primary shrink-0" />
+                    <div>
+                      <p className="font-semibold">Loans & Mortgages</p>
+                      <p className="text-[10px] text-muted-foreground">CIBIL & Experian bureau</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5 rounded-lg border bg-card p-2.5">
+                    <ShieldCheck className="size-4 text-primary shrink-0" />
+                    <div>
+                      <p className="font-semibold">Insurance Policies</p>
+                      <p className="text-[10px] text-muted-foreground">Life & Health covers</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5 rounded-lg border bg-card p-2.5">
+                    <FileText className="size-4 text-primary shrink-0" />
+                    <div>
+                      <p className="font-semibold">EPFO & NPS</p>
+                      <p className="text-[10px] text-muted-foreground">UAN passbook & CRA</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Consent Terms & Purpose */}
+              <div className="rounded-xl border border-border/80 bg-slate-50/80 p-3.5 space-y-2 text-xs">
+                <div className="flex items-start gap-2">
+                  <Lock className="size-3.5 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <span className="font-semibold text-foreground">Consent Purpose:</span>
+                    <span className="text-muted-foreground ml-1">Comprehensive 360° Portfolio Aggregation, Net Worth Verification, and Wealth Health Diagnostic Scoring.</span>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="size-3.5 text-emerald-600 mt-0.5 shrink-0" />
+                  <div>
+                    <span className="font-semibold text-foreground">Security Guarantee:</span>
+                    <span className="text-muted-foreground ml-1">100% Read-Only access. Zero transaction or debit permissions. Encrypted with 256-bit bank-grade security. Revocable anytime.</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Explicit Customer Agreement Checkbox */}
+              <label className="flex items-start gap-3 cursor-pointer rounded-xl border border-primary/30 bg-primary/[0.04] p-3 text-xs">
+                <input
+                  type="checkbox"
+                  checked={consentAgreed}
+                  onChange={(e) => setConsentAgreed(e.target.checked)}
+                  className="mt-0.5 size-4 rounded text-primary focus:ring-primary cursor-pointer"
+                />
+                <span className="text-foreground leading-relaxed">
+                  <strong>Customer Declaration:</strong> I hereby give my explicit electronic consent to <strong>Mirae Asset Sharekhan (FIU)</strong> to request and fetch my financial records via licensed Account Aggregators (Sahamati / Setu / Finvu) for PAN <strong>{panInput}</strong>. I understand this consent is strictly for portfolio analysis and is revocable by me at any time.
+                </span>
+              </label>
+
+              {/* Modal Buttons */}
+              <div className="flex items-center justify-between gap-2 border-t pt-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setConsentModalOpen(false);
+                    setChapter(1);
+                  }}
+                  className="text-xs text-muted-foreground"
+                >
+                  Skip to Manual Entry
+                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setConsentModalOpen(false)}
+                    className="text-xs"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="bg-primary text-primary-foreground font-semibold gap-1.5 text-xs shadow-sm"
+                    disabled={!consentAgreed}
+                    onClick={handleConsentApproved}
+                  >
+                    <CheckCircle2 className="size-3.5" /> Authorize & Fetch via AA
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppShell>
   );
@@ -340,9 +496,12 @@ function PanEntryStep({ panInput, setPanInput, onFetch, panFetched, draft, onCon
           disabled={panInput.length !== 10}
           onClick={onFetch}
         >
-          <Sparkles className="size-4" />
-          Start My Journey
+          <ShieldCheck className="size-4" />
+          Fetch via Account Aggregator
         </Button>
+        <p className="text-[11px] text-muted-foreground text-center">
+          Requires customer authorization & electronic consent before fetching.
+        </p>
       </div>
 
       <div className="flex flex-wrap justify-center gap-4 text-[11px] text-muted-foreground">
