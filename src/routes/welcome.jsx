@@ -13,8 +13,9 @@ import {
   Sparkles,
   Sprout,
   Target,
-  Users } from
-"lucide-react";
+  Users
+} from
+  "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { AppShell } from "@/components/wealth/app-shell";
@@ -22,22 +23,22 @@ import { useApp } from "@/context/app-context";
 
 
 const pillars = [
-{ key: "KNOW", icon: Compass, text: "See every rupee, loan, goal and policy in one map." },
-{ key: "GROW", icon: Sprout, text: "Invest with purpose — allocation, tax and debt together." },
-{ key: "PROTECT", icon: ShieldCheck, text: "Cover the people who depend on your income." },
-{ key: "PLAN", icon: Target, text: "Model retirement, education and every life event." },
-{ key: "TRANSFER", icon: Users, text: "Nomination, will and continuity for your family." }];
+  { key: "KNOW", icon: Compass, text: "See every rupee, loan, goal and policy in one map." },
+  { key: "GROW", icon: Sprout, text: "Invest with purpose — allocation, tax and debt together." },
+  { key: "PROTECT", icon: ShieldCheck, text: "Cover the people who depend on your income." },
+  { key: "PLAN", icon: Target, text: "Model retirement, education and every life event." },
+  { key: "TRANSFER", icon: Users, text: "Nomination, will and continuity for your family." }];
 
 
 const benefits = [
-{ icon: Target, label: "Goal-based investing & FIRE" },
-{ icon: Landmark, label: "Net-worth tracking & AA Sync" },
-{ icon: Gauge, label: "Wealth Health Score" },
-{ icon: BadgeIndianRupee, label: "Cashflow & liability management" },
-{ icon: ShieldCheck, label: "Protection analysis" },
-{ icon: Receipt, label: "Tax optimisation opportunities" },
-{ icon: HeartHandshake, label: "Wealth transfer planning" },
-{ icon: Sparkles, label: "Sheru AI Relationship Manager" }];
+  { icon: Target, label: "Goal-based investing & FIRE" },
+  { icon: Landmark, label: "Net-worth tracking & AA Sync" },
+  { icon: Gauge, label: "Wealth Health Score" },
+  { icon: BadgeIndianRupee, label: "Cashflow & liability management" },
+  { icon: ShieldCheck, label: "Protection analysis" },
+  { icon: Receipt, label: "Tax optimisation opportunities" },
+  { icon: HeartHandshake, label: "Wealth transfer planning" },
+  { icon: Sparkles, label: "Sheru AI Relationship Manager" }];
 
 
 export default function Welcome() {
@@ -50,7 +51,7 @@ export default function Welcome() {
           <span className="bg-gold/15 absolute -top-24 -right-24 size-72 rounded-full blur-3xl" />
           <div className="relative max-w-3xl">
             <span className="bg-white/10 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium">
-              <Sparkles className="size-3.5" /> m.Stock WealthVerse
+              <Sparkles className="size-3.5" /> Mirae Asset WealthVerse
             </span>
             <h1 className="font-display mt-5 text-3xl leading-tight font-semibold sm:text-5xl">
               Grow. Protect. Transfer.
@@ -69,12 +70,12 @@ export default function Welcome() {
                 </Link>
               </Button>
               {canAccessRM &&
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white/25 bg-white/5 text-navy-foreground hover:bg-white/15"
-                onClick={() => setRmOpen(true)}>
-                
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white/25 bg-white/5 text-navy-foreground hover:bg-white/15"
+                  onClick={() => setRmOpen(true)}>
+
                   <Headset className="mr-1.5 size-4" /> Connect with RM
                 </Button>
               }
@@ -86,7 +87,7 @@ export default function Welcome() {
           <h2 className="text-lg font-semibold sm:text-xl">Four pillars, one financial life</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {pillars.map((p, i) =>
-            <div key={p.key} className="surface-card p-5">
+              <div key={p.key} className="surface-card p-5">
                 <div className="flex items-center gap-2">
                   <span className="bg-secondary text-secondary-foreground flex size-9 items-center justify-center rounded-xl">
                     <p.icon className="size-4.5" />
@@ -104,7 +105,7 @@ export default function Welcome() {
           <h2 className="text-lg font-semibold sm:text-xl">What you get</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {benefits.map((b) =>
-            <div key={b.label} className="surface-card flex items-center gap-3 p-4">
+              <div key={b.label} className="surface-card flex items-center gap-3 p-4">
                 <span className="bg-gold-soft text-gold-foreground flex size-9 shrink-0 items-center justify-center rounded-lg">
                   <b.icon className="size-4" />
                 </span>

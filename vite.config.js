@@ -14,4 +14,15 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      // Proxy /api/sharekhan → Sharekhan LLM endpoint (avoids browser CORS)
+      "/api/sharekhan": {
+        target: "https://mcpuat.sharekhan.com",
+        changeOrigin: true,
+        secure: true,
+        rewrite: () => "/api/v1/chat/completions",
+      },
+    },
+  },
 });

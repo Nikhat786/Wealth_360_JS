@@ -25,8 +25,9 @@ import {
 
 
   X,
-  Zap } from
-"lucide-react";
+  Zap
+} from
+  "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -39,18 +40,18 @@ import mark from "@/assets/wealth360-mark.png";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-{ to: "/", label: "Dashboard", icon: LayoutDashboard },
-{ to: "/know", label: "Know", icon: Compass },
-{ to: "/portfolio", label: "Grow", icon: Sprout },
-{ to: "/debt", label: "Debt Optimiser", icon: Percent },
-{ to: "/goals", label: "Goals & FIRE", icon: Target },
-{ to: "/life-events", label: "Life Events", icon: Zap, badge: "New" },
-{ to: "/protect", label: "Protect", icon: ShieldCheck },
-{ to: "/transfer", label: "Transfer & Vault", icon: HeartHandshake },
-{ to: "/coach", label: "SHERU AI RM", icon: Bot, badge: "AI" },
-{ to: "/insights", label: "Insights", icon: Sparkles },
-{ to: "/plans", label: "Plans", icon: Crown },
-{ to: "/account-aggregator", label: "Account Aggregator", icon: Layers, badge: "Sync" }];
+  { to: "/", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/know", label: "Know", icon: Compass },
+  { to: "/portfolio", label: "Grow", icon: Sprout },
+  { to: "/debt", label: "Debt Optimiser", icon: Percent },
+  { to: "/goals", label: "Goals & FIRE", icon: Target },
+  { to: "/life-events", label: "Life Events", icon: Zap, badge: "New" },
+  { to: "/protect", label: "Protect", icon: ShieldCheck },
+  { to: "/transfer", label: "Transfer & Vault", icon: HeartHandshake },
+  { to: "/coach", label: "SHERU AI RM", icon: Bot, badge: "AI" },
+  { to: "/insights", label: "Insights", icon: Sparkles },
+  { to: "/plans", label: "Plans", icon: Crown },
+  { to: "/account-aggregator", label: "Account Aggregator", icon: Layers, badge: "Sync" }];
 
 
 export function AppShell({
@@ -74,6 +75,22 @@ export function AppShell({
 
   useEffect(() => {
     const publicPath =
+      pathname === "/wealth360" ||
+      pathname === "/welcome" ||
+      pathname === "/onboarding" ||
+      pathname === "/analysis" ||
+      pathname === "/wealth360/journey" ||
+      pathname === "/wealth360/analysis" ||
+      pathname === "/account-aggregator" ||
+      pathname === "/plans" ||
+      pathname === "/wealthverse-business";
+
+    if (!minimal && !onboardingComplete && !publicPath) {
+      void navigate("/wealth360/journey");
+    }
+  }, [minimal, navigate, onboardingComplete, pathname]);
+
+  const publicPath =
     pathname === "/wealth360" ||
     pathname === "/welcome" ||
     pathname === "/onboarding" ||
@@ -83,22 +100,6 @@ export function AppShell({
     pathname === "/account-aggregator" ||
     pathname === "/plans" ||
     pathname === "/wealthverse-business";
-
-    if (!minimal && !onboardingComplete && !publicPath) {
-      void navigate("/wealth360/journey");
-    }
-  }, [minimal, navigate, onboardingComplete, pathname]);
-
-  const publicPath =
-  pathname === "/wealth360" ||
-  pathname === "/welcome" ||
-  pathname === "/onboarding" ||
-  pathname === "/analysis" ||
-  pathname === "/wealth360/journey" ||
-  pathname === "/wealth360/analysis" ||
-  pathname === "/account-aggregator" ||
-  pathname === "/plans" ||
-  pathname === "/wealthverse-business";
 
   if (!minimal && !onboardingComplete && !publicPath) {
     return <div className="min-h-screen bg-background" aria-hidden="true" />;
@@ -115,19 +116,19 @@ export function AppShell({
       {/* Desktop Deep Navy Left Navigation Sidebar                     */}
       {/* ------------------------------------------------------------- */}
       {!minimal &&
-      <aside className="hidden lg:flex w-64 shrink-0 flex-col sticky top-0 h-screen border-r border-[#1a2d4c] bg-[#0c182b] text-white select-none">
+        <aside className="hidden lg:flex w-64 shrink-0 flex-col sticky top-0 h-screen border-r border-[#1a2d4c] bg-[#0c182b] text-white select-none">
           {/* Brand Header */}
           <div className="flex h-16 items-center gap-2.5 px-6 border-b border-[#1a2d4c]">
             <img
-            src={mark}
-            alt="m.Stock WealthVerse"
-            width={512}
-            height={512}
-            className="size-8" />
-          
+              src={mark}
+              alt="Mirae Asset WealthVerse"
+              width={512}
+              height={512}
+              className="size-8" />
+
             <div className="min-w-0">
               <span className="font-display text-base font-bold tracking-tight text-white">
-                m.Stock
+                Mirae Asset
                 <span className="ml-1 text-gold font-semibold">WealthVerse</span>
               </span>
               <p className="text-[10px] text-white/50 truncate tracking-wide">
@@ -140,52 +141,52 @@ export function AppShell({
           {/* Sidebar Navigation Items */}
           <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
             {NAV_ITEMS.map((item) => {
-            const active =
-            item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={cn(
-                  "group flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all",
-                  active ?
-                  "bg-primary text-white shadow-md shadow-primary/25" :
-                  "text-white/70 hover:bg-white/10 hover:text-white"
-                )}>
-                
+              const active =
+                item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={cn(
+                    "group flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all",
+                    active ?
+                      "bg-primary text-white shadow-md shadow-primary/25" :
+                      "text-white/70 hover:bg-white/10 hover:text-white"
+                  )}>
+
                   <div className="flex items-center gap-3">
                     <Icon
-                    className={cn(
-                      "size-4 shrink-0",
-                      active ? "text-white" : "text-white/60 group-hover:text-gold"
-                    )} />
-                  
+                      className={cn(
+                        "size-4 shrink-0",
+                        active ? "text-white" : "text-white/60 group-hover:text-gold"
+                      )} />
+
                     <span>{item.label}</span>
                   </div>
                   {item.badge &&
-                <span
-                  className={cn(
-                    "rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider",
-                    active ?
-                    "bg-white/20 text-white" :
-                    "bg-gold/20 text-gold border border-gold/30"
-                  )}>
-                  
+                    <span
+                      className={cn(
+                        "rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider",
+                        active ?
+                          "bg-white/20 text-white" :
+                          "bg-gold/20 text-gold border border-gold/30"
+                      )}>
+
                       {item.badge}
                     </span>
-                }
+                  }
                 </Link>);
 
-          })}
+            })}
           </nav>
 
           {/* Sheru AI Assistant Quick Banner at bottom of sidebar */}
           <div className="p-4 border-t border-[#1a2d4c] bg-[#091322]">
             <Link
-            to="/coach"
-            className="block rounded-2xl border border-white/10 bg-white/5 p-3 hover:bg-white/10 transition-all">
-            
+              to="/coach"
+              className="block rounded-2xl border border-white/10 bg-white/5 p-3 hover:bg-white/10 transition-all">
+
               <div className="flex items-center gap-2">
                 <span className="flex size-7 items-center justify-center rounded-lg bg-gold/20 text-gold">
                   <Bot className="size-4" />
@@ -209,12 +210,12 @@ export function AppShell({
           {/* Mobile hamburger & brand */}
           <div className="flex items-center gap-3">
             {!minimal &&
-            <button
-              type="button"
-              className="lg:hidden rounded-lg p-2 text-foreground hover:bg-muted"
-              onClick={() => setMobileMenuOpen(true)}
-              aria-label="Open Navigation">
-              
+              <button
+                type="button"
+                className="lg:hidden rounded-lg p-2 text-foreground hover:bg-muted"
+                onClick={() => setMobileMenuOpen(true)}
+                aria-label="Open Navigation">
+
                 <Menu className="size-5" />
               </button>
             }
@@ -222,16 +223,16 @@ export function AppShell({
             <Link
               to={minimal ? "/wealth360" : "/"}
               className="flex items-center gap-2.5 lg:hidden">
-              
+
               <img
                 src={mark}
-                alt="m.Stock WealthVerse"
+                alt="Mirae Asset WealthVerse"
                 width={512}
                 height={512}
                 className="size-7" />
-              
+
               <span className="font-display text-sm font-bold tracking-tight text-foreground">
-                m.Stock
+                Mirae Asset
                 <span className="ml-1 text-primary">WealthVerse</span>
               </span>
             </Link>
@@ -251,10 +252,10 @@ export function AppShell({
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Score pill */}
             {!minimal &&
-            <Link
-              to="/score"
-              className="hidden sm:flex items-center gap-1.5 rounded-full bg-gold-soft px-3 py-1.5 text-xs font-semibold text-gold-foreground transition-transform hover:scale-105">
-              
+              <Link
+                to="/score"
+                className="hidden sm:flex items-center gap-1.5 rounded-full bg-gold-soft px-3 py-1.5 text-xs font-semibold text-gold-foreground transition-transform hover:scale-105">
+
                 <Gauge className="size-3.5" />
                 <span>Score {score.total} · {score.grade}</span>
               </Link>
@@ -262,11 +263,11 @@ export function AppShell({
 
             {/* Membership Tier Badge */}
             {!minimal &&
-            <Link
-              to="/plans"
-              className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors"
-              title="Manage WealthVerse Subscription Tier">
-              
+              <Link
+                to="/plans"
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors"
+                title="Manage WealthVerse Subscription Tier">
+
                 <Crown className="size-3 text-gold" />
                 <span>{subscriptionTier}</span>
               </Link>
@@ -274,12 +275,12 @@ export function AppShell({
 
             {/* Fast Track AA Link */}
             {!minimal &&
-            <Button
-              variant="outline"
-              size="sm"
-              asChild
-              className="hidden md:flex gap-1.5 border-primary/30 text-primary hover:bg-primary/5">
-              
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="hidden md:flex gap-1.5 border-primary/30 text-primary hover:bg-primary/5">
+
                 <Link to="/account-aggregator">
                   <Layers className="size-3.5" /> Fast-Track AA
                 </Link>
@@ -288,11 +289,11 @@ export function AppShell({
 
             {/* Talk to RM - Gated by Subscription Tier (Hidden for Basic) */}
             {canAccessRM &&
-            <Button
-              onClick={() => setRmOpen(true)}
-              className="gap-2 bg-primary font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
-              size="sm">
-              
+              <Button
+                onClick={() => setRmOpen(true)}
+                className="gap-2 bg-primary font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
+                size="sm">
+
                 <Headset className="size-4" />
                 <span className="hidden sm:inline">
                   {rmType === "shared" ? "Shared RM" : rmType === "dedicated" ? "Dedicated RM" : "Private Desk"}
@@ -302,11 +303,11 @@ export function AppShell({
 
             {/* Profile Avatar */}
             {!minimal &&
-            <Link
-              to="/profile"
-              className="flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-[#0c182b] to-primary font-display text-sm font-bold text-white shadow-sm transition-transform hover:scale-105"
-              aria-label="Profile">
-              
+              <Link
+                to="/profile"
+                className="flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-[#0c182b] to-primary font-display text-sm font-bold text-white shadow-sm transition-transform hover:scale-105"
+                aria-label="Profile">
+
                 {user.firstName[0]}
               </Link>
             }
@@ -332,73 +333,73 @@ export function AppShell({
       {/* Mobile Drawer Navigation                                      */}
       {/* ------------------------------------------------------------- */}
       {mobileMenuOpen &&
-      <div className="fixed inset-0 z-50 flex lg:hidden">
+        <div className="fixed inset-0 z-50 flex lg:hidden">
           <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-          onClick={() => setMobileMenuOpen(false)} />
-        
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setMobileMenuOpen(false)} />
+
           <div className="relative flex w-72 max-w-xs flex-col bg-[#0c182b] text-white p-5 shadow-2xl">
             <div className="flex items-center justify-between border-b border-[#1a2d4c] pb-4">
               <div className="flex items-center gap-2">
-                <img src={mark} alt="m.Stock WealthVerse" className="size-7" />
+                <img src={mark} alt="Mirae Asset WealthVerse" className="size-7" />
                 <span className="font-display font-bold text-white">
-                  m.Stock <span className="text-gold">WealthVerse</span>
+                  Mirae Asset <span className="text-gold">WealthVerse</span>
                 </span>
               </div>
               <button
-              type="button"
-              onClick={() => setMobileMenuOpen(false)}
-              className="rounded-lg p-1.5 text-white/60 hover:text-white">
-              
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="rounded-lg p-1.5 text-white/60 hover:text-white">
+
                 <X className="size-5" />
               </button>
             </div>
 
             <div className="mt-4 flex-1 overflow-y-auto space-y-1">
               {NAV_ITEMS.map((item) => {
-              const active =
-              item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  onClick={handleNavClick}
-                  className={cn(
-                    "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-semibold",
-                    active ?
-                    "bg-primary text-white" :
-                    "text-white/70 hover:bg-white/10 hover:text-white"
-                  )}>
-                  
+                const active =
+                  item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={handleNavClick}
+                    className={cn(
+                      "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-semibold",
+                      active ?
+                        "bg-primary text-white" :
+                        "text-white/70 hover:bg-white/10 hover:text-white"
+                    )}>
+
                     <div className="flex items-center gap-3">
                       <Icon className="size-4" />
                       <span>{item.label}</span>
                     </div>
                     {item.badge &&
-                  <span className="rounded-md bg-gold/20 px-1.5 py-0.5 text-[9px] font-bold text-gold">
+                      <span className="rounded-md bg-gold/20 px-1.5 py-0.5 text-[9px] font-bold text-gold">
                         {item.badge}
                       </span>
-                  }
+                    }
                   </Link>);
 
-            })}
+              })}
             </div>
 
             {canAccessRM &&
-          <div className="border-t border-[#1a2d4c] pt-4 space-y-2">
+              <div className="border-t border-[#1a2d4c] pt-4 space-y-2">
                 <Button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setRmOpen(true);
-              }}
-              className="w-full bg-primary">
-              
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setRmOpen(true);
+                  }}
+                  className="w-full bg-primary">
+
                   <Headset className="mr-2 size-4" />
                   {rmType === "shared" ? "Talk to Shared RM" : rmType === "dedicated" ? "Talk to Dedicated RM" : "Private Desk"}
                 </Button>
               </div>
-          }
+            }
           </div>
         </div>
       }

@@ -6,7 +6,7 @@
 
 /*
  * Wealth360 design system.
- * Deep navy surfaces + warm gold accent, m.Stock inspired.
+ * Deep navy surfaces + warm gold accent, Mirae Asset inspired.
  * All colours are oklch semantic tokens. Never hardcode colours in components.
  */
 
@@ -242,4 +242,20 @@
 @utility num {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
+}
+
+/* SHERU typing indicator bounce */
+@keyframes sheru-bounce {
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }

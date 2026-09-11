@@ -19,7 +19,7 @@ function NotFoundComponent() {
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
-            
+
             Go home
           </Link>
         </div>
@@ -51,13 +51,13 @@ function ErrorComponent({ error, reset }) {
               reset();
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
-            
+
             Try again
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent">
-            
+
             Go home
           </a>
         </div>
@@ -69,31 +69,31 @@ function ErrorComponent({ error, reset }) {
 export const Route = createRootRouteWithContext()({
   head: () => ({
     meta: [
-    { charSet: "utf-8" },
-    { name: "viewport", content: "width=device-width, initial-scale=1" },
-    { title: "m.Stock WealthVerse — Personal Wealth Operating System" },
-    {
-      name: "description",
-      content:
-      "Grow. Protect. Transfer. Your complete financial life, in one intelligent universe."
-    },
-    { name: "author", content: "m.Stock WealthVerse" },
-    { property: "og:title", content: "m.Stock WealthVerse" },
-    {
-      property: "og:description",
-      content:
-      "Grow. Protect. Transfer. Your complete financial life, in one intelligent universe."
-    },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:site", content: "@Lovable" }],
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: "Mirae Asset WealthVerse — Personal Wealth Operating System" },
+      {
+        name: "description",
+        content:
+          "Grow. Protect. Transfer. Your complete financial life, in one intelligent universe."
+      },
+      { name: "author", content: "Mirae Asset WealthVerse" },
+      { property: "og:title", content: "Mirae Asset WealthVerse" },
+      {
+        property: "og:description",
+        content:
+          "Grow. Protect. Transfer. Your complete financial life, in one intelligent universe."
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@Lovable" }],
 
     links: [
-    {
-      rel: "stylesheet",
-      href: appCss
-    },
-    { rel: "icon", href: "/favicon.ico", type: "image/x-icon" }]
+      {
+        rel: "stylesheet",
+        href: appCss
+      },
+      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" }]
 
   }),
   shellComponent: RootShell,

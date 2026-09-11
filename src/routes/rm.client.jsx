@@ -15,8 +15,9 @@ import {
   Sparkles,
   Target,
   TrendingDown,
-  TrendingUp } from
-"lucide-react";
+  TrendingUp
+} from
+  "lucide-react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 import { Button } from "@/components/ui/button";
@@ -25,8 +26,9 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle } from
-"@/components/ui/dialog";
+  DialogTitle
+} from
+  "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useApp } from "@/context/app-context";
 import { formatINR, formatINRShort, formatPct, formatPlainPct } from "@/lib/format";
@@ -35,12 +37,12 @@ import { cn } from "@/lib/utils";
 import mark from "@/assets/wealth360-mark.png";
 
 const palette = [
-"var(--color-primary)",
-"var(--color-gold)",
-"var(--color-success)",
-"var(--color-chart-4, #7c93b8)",
-"var(--color-chart-5, #c8b273)",
-"var(--color-muted-foreground)"];
+  "var(--color-primary)",
+  "var(--color-gold)",
+  "var(--color-success)",
+  "var(--color-chart-4, #7c93b8)",
+  "var(--color-chart-5, #c8b273)",
+  "var(--color-muted-foreground)"];
 
 /** Builds the list of report cards this client has available, derived from their existing data. */
 function buildClientReports(client, outreachLog) {
@@ -49,60 +51,60 @@ function buildClientReports(client, outreachLog) {
   const activityCount = (client.activityLog?.length ?? 0) + outreachLog.length;
 
   return [
-  {
-    id: "portfolio",
-    title: "Portfolio Statement",
-    icon: BadgeIndianRupee,
-    period: "As of today",
-    summary: allocation.length > 0 ?
-    `${allocation.length} holdings · ${formatINRShort(client.aum || 0)} AUM` :
-    "No holdings on file yet",
-    available: allocation.length > 0
-  },
-  {
-    id: "wealth-score",
-    title: "Wealth Score Report",
-    icon: Gauge,
-    period: "Updated today",
-    summary: Array.isArray(client.scoreBreakdown) ?
-    `Overall score ${client.wealthScore ?? "—"}/100 across ${client.scoreBreakdown.length} pillars` :
-    "Score not yet computed",
-    available: Array.isArray(client.scoreBreakdown) && client.scoreBreakdown.length > 0
-  },
-  {
-    id: "goals",
-    title: "Goal Progress Report",
-    icon: Target,
-    period: "Quarterly",
-    summary: goals.length > 0 ? `${goals.length} tracked goal${goals.length > 1 ? "s" : ""}` : "No goals defined yet",
-    available: goals.length > 0
-  },
-  {
-    id: "protection",
-    title: "Protection & Insurance Review",
-    icon: ShieldCheck,
-    period: "Annual",
-    summary: client.insurance?.hasWill ? "Will on file" : "Will missing",
-    available: Boolean(client.insurance)
-  },
-  {
-    id: "opportunities",
-    title: "Advisory Opportunity Report",
-    icon: Sparkles,
-    period: "This month",
-    summary: (client.upsell?.length ?? 0) > 0 ?
-    `${client.upsell.length} opportunit${client.upsell.length > 1 ? "ies" : "y"} identified` :
-    "No open opportunities",
-    available: (client.upsell?.length ?? 0) > 0
-  },
-  {
-    id: "activity",
-    title: "Relationship Activity Report",
-    icon: Clock,
-    period: "Last 6 months",
-    summary: `${activityCount} logged interaction${activityCount === 1 ? "" : "s"}`,
-    available: activityCount > 0
-  }];
+    {
+      id: "portfolio",
+      title: "Portfolio Statement",
+      icon: BadgeIndianRupee,
+      period: "As of today",
+      summary: allocation.length > 0 ?
+        `${allocation.length} holdings · ${formatINRShort(client.aum || 0)} AUM` :
+        "No holdings on file yet",
+      available: allocation.length > 0
+    },
+    {
+      id: "wealth-score",
+      title: "Wealth Score Report",
+      icon: Gauge,
+      period: "Updated today",
+      summary: Array.isArray(client.scoreBreakdown) ?
+        `Overall score ${client.wealthScore ?? "—"}/100 across ${client.scoreBreakdown.length} pillars` :
+        "Score not yet computed",
+      available: Array.isArray(client.scoreBreakdown) && client.scoreBreakdown.length > 0
+    },
+    {
+      id: "goals",
+      title: "Goal Progress Report",
+      icon: Target,
+      period: "Quarterly",
+      summary: goals.length > 0 ? `${goals.length} tracked goal${goals.length > 1 ? "s" : ""}` : "No goals defined yet",
+      available: goals.length > 0
+    },
+    {
+      id: "protection",
+      title: "Protection & Insurance Review",
+      icon: ShieldCheck,
+      period: "Annual",
+      summary: client.insurance?.hasWill ? "Will on file" : "Will missing",
+      available: Boolean(client.insurance)
+    },
+    {
+      id: "opportunities",
+      title: "Advisory Opportunity Report",
+      icon: Sparkles,
+      period: "This month",
+      summary: (client.upsell?.length ?? 0) > 0 ?
+        `${client.upsell.length} opportunit${client.upsell.length > 1 ? "ies" : "y"} identified` :
+        "No open opportunities",
+      available: (client.upsell?.length ?? 0) > 0
+    },
+    {
+      id: "activity",
+      title: "Relationship Activity Report",
+      icon: Clock,
+      period: "Last 6 months",
+      summary: `${activityCount} logged interaction${activityCount === 1 ? "" : "s"}`,
+      available: activityCount > 0
+    }];
 
 }
 
@@ -205,10 +207,10 @@ export default function RmClientPage() {
     <div className="min-h-screen bg-[#f8fafc]">
       <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-white/95 px-4 backdrop-blur-md sm:px-6">
         <div className="flex items-center gap-2.5">
-          <img src={mark} alt="m.Stock WealthVerse" className="size-7" />
+          <img src={mark} alt="Mirae Asset WealthVerse" className="size-7" />
           <div>
             <p className="font-display text-sm font-bold">
-              m.Stock <span className="text-primary">WealthVerse</span>
+              Mirae Asset <span className="text-primary">WealthVerse</span>
             </p>
             <p className="text-muted-foreground text-[10px] uppercase tracking-wide">RM Portal</p>
           </div>
@@ -237,14 +239,14 @@ export default function RmClientPage() {
                 {client.tier}
               </span>
               {callPending &&
-              <span className="bg-destructive/10 text-destructive rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                <span className="bg-destructive/10 text-destructive rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">
                   Call requested
                 </span>
               }
             </div>
             <div className="text-muted-foreground mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
               {client.relationshipYears != null &&
-              <span>{client.relationshipYears} yr relationship</span>
+                <span>{client.relationshipYears} yr relationship</span>
               }
               {client.phone && <span className="flex items-center gap-1"><Phone className="size-3" /> {client.phone}</span>}
               {client.email && <span className="flex items-center gap-1"><Mail className="size-3" /> {client.email}</span>}
@@ -253,7 +255,7 @@ export default function RmClientPage() {
           </div>
           <div className="flex shrink-0 gap-2">
             {callPending &&
-            <Button size="sm" onClick={() => setContacted(true)}>
+              <Button size="sm" onClick={() => setContacted(true)}>
                 <Phone className="mr-1.5 size-3.5" /> Mark contacted
               </Button>
             }
@@ -280,12 +282,12 @@ export default function RmClientPage() {
           </p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {reports.map((r) =>
-            <div
-              key={r.id}
-              className={cn(
-                "flex flex-col justify-between gap-3 rounded-xl border p-3.5",
-                r.available ? "bg-muted/40" : "bg-muted/20 opacity-60"
-              )}>
+              <div
+                key={r.id}
+                className={cn(
+                  "flex flex-col justify-between gap-3 rounded-xl border p-3.5",
+                  r.available ? "bg-muted/40" : "bg-muted/20 opacity-60"
+                )}>
 
                 <div className="flex items-start gap-2.5">
                   <span className="bg-secondary text-secondary-foreground flex size-8 shrink-0 items-center justify-center rounded-lg">
@@ -313,30 +315,30 @@ export default function RmClientPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Wealth score breakdown */}
           {Array.isArray(client.scoreBreakdown) &&
-          <section className="surface-card space-y-3 p-5">
+            <section className="surface-card space-y-3 p-5">
               <p className="font-display text-sm font-semibold">Wealth score breakdown</p>
               <div className="space-y-2.5">
                 {client.scoreBreakdown.map((p) =>
-              <div key={p.key ?? p.label}>
+                  <div key={p.key ?? p.label}>
                     <div className="mb-1 flex items-center justify-between text-xs">
                       <span className="font-medium">{p.label}</span>
                       <span className="num text-muted-foreground">{p.score}/100</span>
                     </div>
                     <div className="bg-muted h-1.5 w-full overflow-hidden rounded-full">
                       <div
-                    className={cn("h-full rounded-full", p.score >= 70 ? "bg-success" : p.score >= 45 ? "bg-gold" : "bg-destructive")}
-                    style={{ width: `${Math.min(100, Math.max(0, p.score))}%` }} />
+                        className={cn("h-full rounded-full", p.score >= 70 ? "bg-success" : p.score >= 45 ? "bg-gold" : "bg-destructive")}
+                        style={{ width: `${Math.min(100, Math.max(0, p.score))}%` }} />
 
                     </div>
                   </div>
-              )}
+                )}
               </div>
             </section>
           }
 
           {/* Asset allocation */}
           {allocation.length > 0 &&
-          <section className="surface-card p-5">
+            <section className="surface-card p-5">
               <p className="font-display text-sm font-semibold">Asset allocation</p>
               <div className="mt-2 h-48">
                 <ResponsiveContainer width="100%" height="100%">
@@ -353,7 +355,7 @@ export default function RmClientPage() {
               </div>
               <ul className="mt-2 space-y-1.5">
                 {allocation.map((a, i) =>
-              <li key={a.name} className="flex items-center justify-between text-xs">
+                  <li key={a.name} className="flex items-center justify-between text-xs">
                     <span className="flex items-center gap-2">
                       <span className="size-2 rounded-full" style={{ background: palette[i % palette.length] }} />
                       {a.name}
@@ -362,7 +364,7 @@ export default function RmClientPage() {
                       {formatINRShort(a.value)} · {formatPlainPct(totalAllocation > 0 ? a.value / totalAllocation * 100 : 0)}
                     </span>
                   </li>
-              )}
+                )}
               </ul>
             </section>
           }
@@ -370,7 +372,7 @@ export default function RmClientPage() {
 
         {/* Goals */}
         {Array.isArray(client.goals) && client.goals.length > 0 &&
-        <section className="surface-card space-y-3 p-5">
+          <section className="surface-card space-y-3 p-5">
             <p className="font-display flex items-center gap-1.5 text-sm font-semibold"><Target className="size-4" /> Goal progress</p>
             <div className="grid gap-3 sm:grid-cols-2">
               {client.goals.map((g, i) => {
@@ -398,7 +400,7 @@ export default function RmClientPage() {
 
         {/* Protection & insurance */}
         {client.insurance &&
-        <section className="surface-card space-y-3 p-5">
+          <section className="surface-card space-y-3 p-5">
             <p className="font-display flex items-center gap-1.5 text-sm font-semibold">
               {client.insurance.hasWill ? <ShieldCheck className="size-4" /> : <ShieldAlert className="size-4" />} Protection & insurance
             </p>
@@ -417,25 +419,25 @@ export default function RmClientPage() {
               </div>
             </div>
             {client.insurance.note &&
-            <p className="text-muted-foreground text-xs leading-relaxed">{client.insurance.note}</p>
+              <p className="text-muted-foreground text-xs leading-relaxed">{client.insurance.note}</p>
             }
           </section>
         }
 
         {/* Upsell opportunities */}
         {Array.isArray(client.upsell) && client.upsell.length > 0 &&
-        <section className="surface-card space-y-3 p-5">
+          <section className="surface-card space-y-3 p-5">
             <p className="text-primary flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide">
               <Sparkles className="size-3.5" /> Suggested upsell for this client
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               {client.upsell.map((u, i) =>
-            <div key={i} className="bg-muted/40 rounded-xl border p-3.5">
+                <div key={i} className="bg-muted/40 rounded-xl border p-3.5">
                   <p className="text-sm font-semibold">{u.title}</p>
                   <p className="text-muted-foreground mt-1 text-xs leading-relaxed">{u.detail}</p>
                   <p className="text-primary mt-2 text-xs font-semibold">{u.potential}</p>
                 </div>
-            )}
+              )}
             </div>
           </section>
         }
@@ -456,7 +458,7 @@ export default function RmClientPage() {
           </div>
           <ul className="space-y-2.5 border-t pt-4 text-xs">
             {[...outreachLog, ...client.activityLog ?? []].map((a, i) =>
-            <li key={i} className="flex gap-3">
+              <li key={i} className="flex gap-3">
                 <span className="text-muted-foreground w-20 shrink-0">{a.date}</span>
                 <span>{a.note}</span>
               </li>
@@ -468,7 +470,7 @@ export default function RmClientPage() {
       <Dialog open={Boolean(openReport)} onOpenChange={(o) => !o && setOpenReportId(null)}>
         <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
           {openReport &&
-          <>
+            <>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <openReport.icon className="size-4" /> {openReport.title}
@@ -495,7 +497,7 @@ function ReportBody({ client, report, outreachLog, totalAllocation }) {
           <p className="text-sm">Total AUM: <span className="num font-semibold">{formatINR(client.aum || 0)}</span></p>
           <ul className="divide-y text-xs">
             {(client.assetAllocation ?? []).map((a) =>
-            <li key={a.name} className="flex items-center justify-between py-2">
+              <li key={a.name} className="flex items-center justify-between py-2">
                 <span>{a.name}</span>
                 <span className="num text-muted-foreground">
                   {formatINR(a.value)} · {formatPlainPct(totalAllocation > 0 ? a.value / totalAllocation * 100 : 0)}
@@ -510,15 +512,15 @@ function ReportBody({ client, report, outreachLog, totalAllocation }) {
         <div className="space-y-2.5">
           <p className="text-sm">Overall score: <span className="num font-semibold">{client.wealthScore ?? "—"}/100</span></p>
           {(client.scoreBreakdown ?? []).map((p) =>
-          <div key={p.key ?? p.label}>
+            <div key={p.key ?? p.label}>
               <div className="mb-1 flex items-center justify-between text-xs">
                 <span className="font-medium">{p.label}</span>
                 <span className="num text-muted-foreground">{p.score}/100</span>
               </div>
               <div className="bg-muted h-1.5 w-full overflow-hidden rounded-full">
                 <div
-                className={cn("h-full rounded-full", p.score >= 70 ? "bg-success" : p.score >= 45 ? "bg-gold" : "bg-destructive")}
-                style={{ width: `${Math.min(100, Math.max(0, p.score))}%` }} />
+                  className={cn("h-full rounded-full", p.score >= 70 ? "bg-success" : p.score >= 45 ? "bg-gold" : "bg-destructive")}
+                  style={{ width: `${Math.min(100, Math.max(0, p.score))}%` }} />
 
               </div>
             </div>
@@ -570,7 +572,7 @@ function ReportBody({ client, report, outreachLog, totalAllocation }) {
       return (
         <ul className="space-y-2.5 text-xs">
           {(client.upsell ?? []).map((u, i) =>
-          <li key={i} className="bg-muted/40 rounded-xl border p-3">
+            <li key={i} className="bg-muted/40 rounded-xl border p-3">
               <p className="text-sm font-semibold">{u.title}</p>
               <p className="text-muted-foreground mt-1 leading-relaxed">{u.detail}</p>
               <p className="text-primary mt-1.5 font-semibold">{u.potential}</p>
@@ -582,7 +584,7 @@ function ReportBody({ client, report, outreachLog, totalAllocation }) {
       return (
         <ul className="space-y-2.5 text-xs">
           {[...outreachLog, ...client.activityLog ?? []].map((a, i) =>
-          <li key={i} className="flex gap-3">
+            <li key={i} className="flex gap-3">
               <span className="text-muted-foreground w-20 shrink-0">{a.date}</span>
               <span>{a.note}</span>
             </li>

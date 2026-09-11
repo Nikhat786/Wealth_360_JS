@@ -1,9 +1,8 @@
 
 import { Bot, Headset, Send, Trash2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { AppShell } from "@/components/wealth/app-shell";
 import { ChatBubble } from "@/components/wealth/chat-bubble";
 
@@ -11,9 +10,21 @@ import { useApp } from "@/context/app-context";
 
 
 export default function CoachPage() {
-  const { messages, sendMessage, clearChat, score, setRmOpen, canAccessRM } = useApp();
+  const { messages, sendMessage, clearChat, score, setRmOpen, canAccessRM, isTyping } = useApp();
   const [draft, setDraft] = useState("");
-  const endRef = useRef(null);
+  const endRef     = useRef(null);
+  const textareaRef = useRef(null);
+
+  // Auto-resize textarea to fit content (min 1 row, max 8 rows)
+  const autoResize = useCallback(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    ta.style.height = "auto";
+    const lineH  = parseInt(getComputedStyle(ta).lineHeight, 10) || 20;
+    const maxH   = lineH * 8;
+    ta.style.height = Math.min(ta.scrollHeight, maxH) + "px";
+    ta.style.overflowY = ta.scrollHeight > maxH ? "auto" : "hidden";
+  }, []);
 
   const prompts = [
   "What is my biggest wealth blindspot?",
@@ -29,11 +40,16 @@ export default function CoachPage() {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages.length]);
 
-  const submit = (text = draft) => {
+  const submit = useCallback((text = draft) => {
     if (!text.trim()) return;
     sendMessage(text);
     setDraft("");
-  };
+    // reset textarea height
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.overflowY = "hidden";
+    }
+  }, [draft, sendMessage]);
 
   return (
     <AppShell>
@@ -90,6 +106,35 @@ export default function CoachPage() {
           <ChatBubble key={m.id} message={m} onFollowUp={submit} />
           )
           }
+
+          {/* Typing indicator — shown while LLM is responding */}
+          {isTyping &&
+          <div className="flex items-end gap-2">
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#0c182b] to-primary text-white">
+                <Bot className="size-3.5" />
+              </span>
+              <div className="surface-card rounded-2xl rounded-bl-sm px-4 py-3 text-sm text-muted-foreground border shadow-sm">
+                <span className="flex items-center gap-1">
+                  <span className="text-xs font-medium text-primary mr-1">SHERU</span>
+                  <span style={{ display: "inline-flex", gap: "3px", alignItems: "center" }}>
+                    {[0, 150, 300].map((delay) => (
+                      <span
+                        key={delay}
+                        style={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: "50%",
+                          background: "currentColor",
+                          animation: `sheru-bounce 1s ${delay}ms infinite ease-in-out`
+                        }}
+                      />
+                    ))}
+                  </span>
+                </span>
+              </div>
+            </div>
+          }
+
           <div ref={endRef} />
         </div>
 
@@ -106,25 +151,57 @@ export default function CoachPage() {
           )}
         </div>
 
-        {/* Sticky Input Bar */}
-        <form
-          className="sticky bottom-20 flex gap-2 rounded-2xl border bg-card p-2 shadow-lg lg:bottom-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            submit();
-          }}>
-          
-          <Input
+        {/* ── Smart multi-line chat input ── */}
+        <div className="sticky bottom-20 flex items-end gap-2 rounded-2xl border bg-card p-2 shadow-lg lg:bottom-4 transition-all">
+          <textarea
+            ref={textareaRef}
+            rows={1}
             value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder="Ask SHERU about your retirement, loans, tax, or protection..."
+            disabled={isTyping}
+            onChange={(e) => {
+              setDraft(e.target.value);
+              autoResize();
+            }}
+            onKeyDown={(e) => {
+              // Shift+Enter → insert newline (default behaviour, just resize)
+              if (e.key === "Enter" && e.shiftKey) {
+                setTimeout(autoResize, 0);
+                return;
+              }
+              // Plain Enter → send
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                if (!isTyping) submit();
+              }
+            }}
+            placeholder={isTyping ? "SHERU is thinking…" : "Ask SHERU anything — loans, tax, retirement, protection…\n(Shift + Enter for new line)"}
             aria-label="Message SHERU"
-            className="border-0 bg-transparent focus-visible:ring-0 text-sm" />
-          
-          <Button type="submit" size="icon" className="bg-primary text-primary-foreground shrink-0" aria-label="Send">
-            <Send className="size-4" />
-          </Button>
-        </form>
+            style={{
+              resize: "none",
+              overflowY: "hidden",
+              minHeight: "2.25rem",
+              lineHeight: "1.5rem",
+            }}
+            className="flex-1 bg-transparent text-sm leading-6 placeholder:text-muted-foreground/60 focus:outline-none disabled:opacity-60 px-2 py-1.5" />
+
+          {/* Character hint */}
+          <div className="flex shrink-0 flex-col items-center gap-1 self-end">
+            {draft.length > 0 && !isTyping && (
+              <span className="text-[10px] text-muted-foreground/50 num">
+                {draft.length}
+              </span>
+            )}
+            <Button
+              type="button"
+              size="icon"
+              disabled={isTyping || !draft.trim()}
+              onClick={() => submit()}
+              className="bg-primary text-primary-foreground shrink-0 disabled:opacity-40 transition-all"
+              aria-label="Send">
+              <Send className="size-4" />
+            </Button>
+          </div>
+        </div>
       </div>
     </AppShell>);
 

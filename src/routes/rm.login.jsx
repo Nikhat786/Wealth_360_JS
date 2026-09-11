@@ -25,9 +25,9 @@ export default function RmLoginPage() {
     <div className="bg-secondary/40 flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="flex flex-col items-center gap-2 text-center">
-          <img src={mark} alt="m.Stock WealthVerse" className="size-10" />
+          <img src={mark} alt="Mirae Asset WealthVerse" className="size-10" />
           <p className="font-display text-lg font-bold">
-            m.Stock <span className="text-primary">WealthVerse</span>
+            Mirae Asset <span className="text-primary">WealthVerse</span>
           </p>
           <span className="text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide">
             <ShieldCheck className="size-3.5" /> Relationship Manager Portal

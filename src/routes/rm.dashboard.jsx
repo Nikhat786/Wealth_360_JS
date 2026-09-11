@@ -16,8 +16,9 @@ import {
   Sparkles,
   TrendingDown,
   TrendingUp,
-  Users } from
-"lucide-react";
+  Users
+} from
+  "lucide-react";
 import { Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 
 import { Button } from "@/components/ui/button";
@@ -29,9 +30,9 @@ import mark from "@/assets/wealth360-mark.png";
 
 const TIERS = ["All", "UHNI", "HNI"];
 const SORTS = [
-{ id: "aum", label: "AUM (highest)" },
-{ id: "score", label: "Wealth score (lowest first)" },
-{ id: "performance", label: "30d performance (worst first)" }];
+  { id: "aum", label: "AUM (highest)" },
+  { id: "score", label: "Wealth score (lowest first)" },
+  { id: "performance", label: "30d performance (worst first)" }];
 
 const TIER_COLORS = {
   UHNI: "var(--color-gold)",
@@ -75,9 +76,9 @@ export default function RmDashboardPage() {
   const atRiskClients = roster.filter((c) => (c.wealthScore ?? 100) < 55 || (c.performance30d ?? 0) < 0);
 
   const topOpportunities = roster.
-  flatMap((c) => (c.upsell ?? []).map((u) => ({ ...u, clientId: c.id, clientName: c.name, tier: c.tier }))).
-  sort((a, b) => (b.tier === "UHNI") - (a.tier === "UHNI")).
-  slice(0, 4);
+    flatMap((c) => (c.upsell ?? []).map((u) => ({ ...u, clientId: c.id, clientName: c.name, tier: c.tier }))).
+    sort((a, b) => (b.tier === "UHNI") - (a.tier === "UHNI")).
+    slice(0, 4);
 
   const protectionGaps = roster.filter(
     (c) => c.insurance && (!c.insurance.hasWill || (c.insurance.lifeCover ?? 0) === 0)
@@ -93,8 +94,8 @@ export default function RmDashboardPage() {
     return Array.from(totals, ([label, value]) => ({ label, value }));
   }, [roster]);
   const bookGrowthPct = bookTrend.length > 1 && bookTrend[0].value > 0 ?
-  (bookTrend[bookTrend.length - 1].value - bookTrend[0].value) / bookTrend[0].value * 100 :
-  0;
+    (bookTrend[bookTrend.length - 1].value - bookTrend[0].value) / bookTrend[0].value * 100 :
+    0;
 
   const tierMix = useMemo(() => {
     const byTier = new Map();
@@ -108,18 +109,18 @@ export default function RmDashboardPage() {
   }, [roster]);
 
   const recentActivity = useMemo(() =>
-  roster.
-  map((c) => ({
-    id: c.id,
-    name: c.name,
-    tier: c.tier,
-    note: c.activityLog?.[0]?.note ?? c.lastActivity ?? "No recent activity",
-    date: c.activityLog?.[0]?.date ?? c.lastActivity ?? "",
-    rank: recencyRank(c.lastActivity || c.activityLog?.[0]?.date || "")
-  })).
-  sort((a, b) => a.rank - b.rank).
-  slice(0, 6),
-  [roster]);
+    roster.
+      map((c) => ({
+        id: c.id,
+        name: c.name,
+        tier: c.tier,
+        note: c.activityLog?.[0]?.note ?? c.lastActivity ?? "No recent activity",
+        date: c.activityLog?.[0]?.date ?? c.lastActivity ?? "",
+        rank: recencyRank(c.lastActivity || c.activityLog?.[0]?.date || "")
+      })).
+      sort((a, b) => a.rank - b.rank).
+      slice(0, 6),
+    [roster]);
 
   const visibleRoster = useMemo(() => {
     let list = tierFilter === "All" ? roster : roster.filter((c) => c.tier === tierFilter);
@@ -145,10 +146,10 @@ export default function RmDashboardPage() {
     <div className="min-h-screen bg-[#f8fafc]">
       <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-white/95 px-4 backdrop-blur-md sm:px-6">
         <div className="flex items-center gap-2.5">
-          <img src={mark} alt="m.Stock WealthVerse" className="size-7" />
+          <img src={mark} alt="Mirae Asset WealthVerse" className="size-7" />
           <div>
             <p className="font-display text-sm font-bold">
-              m.Stock <span className="text-primary">WealthVerse</span>
+              Mirae Asset <span className="text-primary">WealthVerse</span>
             </p>
             <p className="text-muted-foreground text-[10px] uppercase tracking-wide">RM Portal</p>
           </div>
@@ -196,32 +197,32 @@ export default function RmDashboardPage() {
                 <TrendingUp className="size-4" /> Book AUM trend
               </p>
               {bookTrend.length > 1 &&
-              <span className={cn("num text-xs font-semibold", bookGrowthPct >= 0 ? "text-success" : "text-destructive")}>
+                <span className={cn("num text-xs font-semibold", bookGrowthPct >= 0 ? "text-success" : "text-destructive")}>
                   {formatPct(bookGrowthPct)} over 6 months
                 </span>
               }
             </div>
             {bookTrend.length > 1 ?
-            <div className="h-40">
+              <div className="h-40">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={bookTrend}>
                     <XAxis dataKey="label" axisLine={false} tickLine={false} fontSize={10} stroke="var(--color-muted-foreground)" />
                     <Tooltip
-                    formatter={(v) => formatINR(Number(v))}
-                    contentStyle={{ borderRadius: 12, border: "1px solid var(--color-border)", background: "var(--color-card)", fontSize: 12 }} />
+                      formatter={(v) => formatINR(Number(v))}
+                      contentStyle={{ borderRadius: 12, border: "1px solid var(--color-border)", background: "var(--color-card)", fontSize: 12 }} />
 
                     <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke={bookGrowthPct >= 0 ? "var(--color-success)" : "var(--color-destructive)"}
-                    strokeWidth={2}
-                    dot={false} />
+                      type="monotone"
+                      dataKey="value"
+                      stroke={bookGrowthPct >= 0 ? "var(--color-success)" : "var(--color-destructive)"}
+                      strokeWidth={2}
+                      dot={false} />
 
                   </LineChart>
                 </ResponsiveContainer>
               </div> :
 
-            <p className="text-muted-foreground py-8 text-center text-xs">Not enough history yet.</p>
+              <p className="text-muted-foreground py-8 text-center text-xs">Not enough history yet.</p>
             }
           </section>
 
@@ -244,7 +245,7 @@ export default function RmDashboardPage() {
             </div>
             <ul className="space-y-1.5">
               {tierMix.map((t) =>
-              <li key={t.name} className="flex items-center justify-between text-xs">
+                <li key={t.name} className="flex items-center justify-between text-xs">
                   <span className="flex items-center gap-2">
                     <span className="size-2 rounded-full" style={{ background: TIER_COLORS[t.name] ?? FALLBACK_TIER_COLOR }} />
                     {t.name} · {t.count} client{t.count > 1 ? "s" : ""}
@@ -258,17 +259,17 @@ export default function RmDashboardPage() {
 
         {/* Call requests */}
         {pendingCalls.length > 0 &&
-        <section className="surface-card border-destructive/20 space-y-3 p-5">
+          <section className="surface-card border-destructive/20 space-y-3 p-5">
             <p className="text-destructive text-xs font-semibold uppercase tracking-wide">
               {pendingCalls.length} client{pendingCalls.length > 1 ? "s" : ""} waiting on a call back
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               {pendingCalls.map((c) =>
-            <div key={c.id} className="flex items-center justify-between gap-3 rounded-xl border p-3.5">
+                <div key={c.id} className="flex items-center justify-between gap-3 rounded-xl border p-3.5">
                   <button
-                type="button"
-                onClick={() => navigate(`/rm/client/${c.id}`)}
-                className="min-w-0 text-left">
+                    type="button"
+                    onClick={() => navigate(`/rm/client/${c.id}`)}
+                    className="min-w-0 text-left">
 
                     <p className="truncate text-sm font-semibold hover:underline">{c.name}</p>
                     <p className="text-muted-foreground text-xs">{c.tier} · {c.lastActivity}</p>
@@ -277,30 +278,30 @@ export default function RmDashboardPage() {
                     <Phone className="mr-1.5 size-3.5" /> Mark contacted
                   </Button>
                 </div>
-            )}
+              )}
             </div>
           </section>
         }
 
         {/* Top upsell opportunities across the book */}
         {topOpportunities.length > 0 &&
-        <section className="surface-card space-y-3 p-5">
+          <section className="surface-card space-y-3 p-5">
             <p className="text-primary flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide">
               <Sparkles className="size-3.5" /> Top upsell opportunities across your book
             </p>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {topOpportunities.map((o, i) =>
-            <Link
-              key={i}
-              to={`/rm/client/${o.clientId}`}
-              className="bg-muted/40 hover:bg-muted/70 block rounded-xl border p-3.5 transition-colors">
+                <Link
+                  key={i}
+                  to={`/rm/client/${o.clientId}`}
+                  className="bg-muted/40 hover:bg-muted/70 block rounded-xl border p-3.5 transition-colors">
 
                   <p className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wide">{o.clientName}</p>
                   <p className="mt-1 text-sm font-semibold">{o.title}</p>
                   <p className="text-muted-foreground mt-1 text-xs leading-relaxed">{o.detail}</p>
                   <p className="text-primary mt-2 text-xs font-semibold">{o.potential}</p>
                 </Link>
-            )}
+              )}
             </div>
           </section>
         }
@@ -313,7 +314,7 @@ export default function RmDashboardPage() {
             </p>
             <ul className="space-y-2.5">
               {recentActivity.map((a) =>
-              <li key={a.id}>
+                <li key={a.id}>
                   <Link to={`/rm/client/${a.id}`} className="hover:bg-muted/50 -mx-1.5 flex items-start gap-3 rounded-lg px-1.5 py-1 transition-colors">
                     <span className="text-muted-foreground w-16 shrink-0 pt-0.5 text-[10px] uppercase">{a.date}</span>
                     <span className="min-w-0 flex-1 text-xs">
@@ -331,26 +332,26 @@ export default function RmDashboardPage() {
               <ShieldAlert className="size-4" /> Protection gaps to close
             </p>
             {protectionGaps.length === 0 ?
-            <p className="text-muted-foreground py-6 text-center text-xs">No open protection gaps — great work.</p> :
+              <p className="text-muted-foreground py-6 text-center text-xs">No open protection gaps — great work.</p> :
 
-            <ul className="space-y-2">
-              {protectionGaps.map((c) =>
-              <li key={c.id}>
-                  <Link
-                  to={`/rm/client/${c.id}`}
-                  className="bg-muted/40 hover:bg-muted/70 flex items-center justify-between gap-3 rounded-xl border p-3 transition-colors">
+              <ul className="space-y-2">
+                {protectionGaps.map((c) =>
+                  <li key={c.id}>
+                    <Link
+                      to={`/rm/client/${c.id}`}
+                      className="bg-muted/40 hover:bg-muted/70 flex items-center justify-between gap-3 rounded-xl border p-3 transition-colors">
 
-                    <span className="min-w-0">
-                      <span className="block truncate text-xs font-semibold">{c.name}</span>
-                      <span className="text-muted-foreground block truncate text-[11px]">
-                        {!c.insurance.hasWill ? "No will on file" : "No life cover on record"}
+                      <span className="min-w-0">
+                        <span className="block truncate text-xs font-semibold">{c.name}</span>
+                        <span className="text-muted-foreground block truncate text-[11px]">
+                          {!c.insurance.hasWill ? "No will on file" : "No life cover on record"}
+                        </span>
                       </span>
-                    </span>
-                    <ArrowRight className="text-muted-foreground size-3.5 shrink-0" />
-                  </Link>
-                </li>
-              )}
-            </ul>
+                      <ArrowRight className="text-muted-foreground size-3.5 shrink-0" />
+                    </Link>
+                  </li>
+                )}
+              </ul>
             }
           </section>
         </div>
@@ -379,14 +380,14 @@ export default function RmDashboardPage() {
               </select>
               <div className="flex gap-1.5 rounded-xl border bg-white p-1 text-xs">
                 {TIERS.map((t) =>
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setTierFilter(t)}
-                  className={cn(
-                    "rounded-lg px-3 py-1.5 font-semibold transition-all",
-                    tierFilter === t ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"
-                  )}>
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setTierFilter(t)}
+                    className={cn(
+                      "rounded-lg px-3 py-1.5 font-semibold transition-all",
+                      tierFilter === t ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"
+                    )}>
 
                     {t}
                   </button>
@@ -397,7 +398,7 @@ export default function RmDashboardPage() {
 
           <div className="space-y-3">
             {visibleRoster.length === 0 &&
-            <p className="text-muted-foreground p-6 text-center text-sm">No clients match this search.</p>
+              <p className="text-muted-foreground p-6 text-center text-sm">No clients match this search.</p>
             }
             {visibleRoster.map((c) => {
               const wasContacted = contactedIds.includes(c.id);
@@ -420,7 +421,7 @@ export default function RmDashboardPage() {
                         {c.tier}
                       </span>
                       {c.callRequested && !wasContacted &&
-                      <span className="bg-destructive/10 text-destructive rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider">
+                        <span className="bg-destructive/10 text-destructive rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider">
                           Call requested
                         </span>
                       }
@@ -429,15 +430,15 @@ export default function RmDashboardPage() {
                   </div>
 
                   {Array.isArray(c.performanceHistory) &&
-                  <div className="h-9 w-20 shrink-0">
+                    <div className="h-9 w-20 shrink-0">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={c.performanceHistory}>
                           <Line
-                          type="monotone"
-                          dataKey="value"
-                          stroke={isUp ? "var(--color-success)" : "var(--color-destructive)"}
-                          strokeWidth={2}
-                          dot={false} />
+                            type="monotone"
+                            dataKey="value"
+                            stroke={isUp ? "var(--color-success)" : "var(--color-destructive)"}
+                            strokeWidth={2}
+                            dot={false} />
 
                         </LineChart>
                       </ResponsiveContainer>
@@ -454,7 +455,7 @@ export default function RmDashboardPage() {
                       <p className="num text-sm font-semibold">{c.wealthScore ?? "—"}</p>
                     </div>
                     {typeof c.performance30d === "number" &&
-                    <div>
+                      <div>
                         <p className="text-muted-foreground text-[10px] uppercase">30d</p>
                         <p className={cn("num flex items-center justify-end gap-0.5 text-sm font-semibold", isUp ? "text-success" : "text-destructive")}>
                           {isUp ? <TrendingUp className="size-3" /> : <TrendingDown className="size-3" />}

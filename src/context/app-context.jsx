@@ -4,17 +4,20 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState } from
+  useState
+} from
 
-"react";
+  "react";
 
 import { coachReply } from "@/lib/coach";
+import { callSheruLLM } from "@/lib/sheru-api";
 import {
   clearActivePan,
   getActivePan,
   getJourney,
-  saveJourney } from
-"@/lib/journeys";
+  saveJourney
+} from
+  "@/lib/journeys";
 import {
   buildActions,
   defaultDocs,
@@ -25,37 +28,41 @@ import {
   protectionScore,
   totalHealthCover,
   totalLifeCover,
-  transferScore } from
+  transferScore
+} from
 
 
 
 
-"@/lib/derived";
+  "@/lib/derived";
 import { projectGoal } from "@/lib/goal-math";
 import {
   baseScoreInputs,
   idleCash,
   largestAssetSharePct,
   liabilities,
-  taxSaving } from
+  taxSaving
+} from
 
-"@/lib/mock-data";
+  "@/lib/mock-data";
 import { computeScore } from "@/lib/score";
 import {
   emptySim,
   financialDNA,
   readinessScore,
-  simulate } from
+  simulate
+} from
 
 
 
-"@/lib/wealth360";
+  "@/lib/wealth360";
 import {
-  generateWealthIntelligence } from
+  generateWealthIntelligence
+} from
 
 
 
-"@/lib/wealthverse-intelligence";
+  "@/lib/wealthverse-intelligence";
 
 
 
@@ -235,10 +242,10 @@ export const defaultAnswers = {
   retirementAge: 58,
   dependents: 3,
   familyMembers: [
-  { id: "family-spouse", name: "Priya Mehta", relation: "Spouse", age: 34, dependency: "Partial", needs: "Family security" },
-  { id: "family-child-1", name: "Aanya Mehta", relation: "Child", age: 7, dependency: "Full", needs: "Education", educationGoal: "Undergraduate", educationYear: 2034, educationCorpus: 800000 },
-  { id: "family-child-2", name: "Kabir Mehta", relation: "Child", age: 3, dependency: "Full", needs: "Education", educationGoal: "School and university", educationYear: 2038, educationCorpus: 0 },
-  { id: "family-parent", name: "Ramesh Mehta", relation: "Parent", age: 65, dependency: "Partial", needs: "Healthcare and financial security" }],
+    { id: "family-spouse", name: "Priya Mehta", relation: "Spouse", age: 34, dependency: "Partial", needs: "Family security" },
+    { id: "family-child-1", name: "Aanya Mehta", relation: "Child", age: 7, dependency: "Full", needs: "Education", educationGoal: "Undergraduate", educationYear: 2034, educationCorpus: 800000 },
+    { id: "family-child-2", name: "Kabir Mehta", relation: "Child", age: 3, dependency: "Full", needs: "Education", educationGoal: "School and university", educationYear: 2038, educationCorpus: 0 },
+    { id: "family-parent", name: "Ramesh Mehta", relation: "Parent", age: 65, dependency: "Partial", needs: "Healthcare and financial security" }],
 
   familyPriorities: ["Education", "Financial security", "Retirement"],
   salary: 250000,
@@ -264,38 +271,38 @@ export const defaultAnswers = {
   cashSavings: 418600,
   propertyValue: 11500000,
   assets: [
-  { id: "demo-stocks", name: "Direct equity portfolio", type: "Stocks", investedValue: 890000, currentValue: 1158140, startDate: "2022-02-01", holdingPeriod: 3.2, actualReturn: 30, expectedReturn: 11, risk: "High", liquidity: "High", taxTreatment: "Equity LTCG", incomeGenerated: 0, linkedGoal: "Wealth Creation", ownership: "Self", details: { provider: "m.Stock" } },
-  { id: "demo-mutual-funds", name: "Core mutual fund portfolio", type: "Mutual Funds", investedValue: 2400000, currentValue: 2963900, startDate: "2021-06-01", holdingPeriod: 4.5, actualReturn: 12.4, expectedReturn: 10, risk: "Moderate", liquidity: "High", taxTreatment: "Equity LTCG", incomeGenerated: 0, linkedGoal: "Retirement", ownership: "Self", details: { sip: 30000, xirr: 12.4 } },
-  { id: "demo-fd", name: "Family fixed deposit", type: "FD/RD", investedValue: 650000, currentValue: 650000, startDate: "2025-01-01", holdingPeriod: 1.5, actualReturn: 7.1, expectedReturn: 7.1, risk: "Low", liquidity: "Medium", taxTreatment: "Interest taxable", incomeGenerated: 0, linkedGoal: "Emergency Fund", ownership: "Self", details: { maturityMonths: 18, maturityAmount: 720000 } },
-  { id: "demo-gold", name: "Gold and SGB holdings", type: "Gold/SGB", investedValue: 520000, currentValue: 691200, startDate: "2021-01-01", holdingPeriod: 5, actualReturn: 8.2, expectedReturn: 8, risk: "Moderate", liquidity: "Medium", taxTreatment: "Capital gains", incomeGenerated: 0, linkedGoal: "Wealth Creation", ownership: "Family", details: {} },
-  { id: "demo-retirement", name: "EPF and NPS", type: "EPF/PPF/NPS", investedValue: 1700000, currentValue: 1930400, startDate: "2019-04-01", holdingPeriod: 7, actualReturn: 8, expectedReturn: 8, risk: "Moderate", liquidity: "Low", taxTreatment: "Retirement instruments", incomeGenerated: 0, linkedGoal: "Retirement", ownership: "Self", details: { monthlyContribution: 10000 } },
-  { id: "demo-property", name: "Mumbai family home", type: "Real Estate", investedValue: 8200000, currentValue: 11500000, startDate: "2018-01-01", holdingPeriod: 8, actualReturn: 5.3, expectedReturn: 6, risk: "Moderate", liquidity: "Low", taxTreatment: "Property", incomeGenerated: 25000, linkedGoal: "Family home", ownership: "Self", details: { outstandingLoan: 3800000 } }],
+    { id: "demo-stocks", name: "Direct equity portfolio", type: "Stocks", investedValue: 890000, currentValue: 1158140, startDate: "2022-02-01", holdingPeriod: 3.2, actualReturn: 30, expectedReturn: 11, risk: "High", liquidity: "High", taxTreatment: "Equity LTCG", incomeGenerated: 0, linkedGoal: "Wealth Creation", ownership: "Self", details: { provider: "Mirae Asset" } },
+    { id: "demo-mutual-funds", name: "Core mutual fund portfolio", type: "Mutual Funds", investedValue: 2400000, currentValue: 2963900, startDate: "2021-06-01", holdingPeriod: 4.5, actualReturn: 12.4, expectedReturn: 10, risk: "Moderate", liquidity: "High", taxTreatment: "Equity LTCG", incomeGenerated: 0, linkedGoal: "Retirement", ownership: "Self", details: { sip: 30000, xirr: 12.4 } },
+    { id: "demo-fd", name: "Family fixed deposit", type: "FD/RD", investedValue: 650000, currentValue: 650000, startDate: "2025-01-01", holdingPeriod: 1.5, actualReturn: 7.1, expectedReturn: 7.1, risk: "Low", liquidity: "Medium", taxTreatment: "Interest taxable", incomeGenerated: 0, linkedGoal: "Emergency Fund", ownership: "Self", details: { maturityMonths: 18, maturityAmount: 720000 } },
+    { id: "demo-gold", name: "Gold and SGB holdings", type: "Gold/SGB", investedValue: 520000, currentValue: 691200, startDate: "2021-01-01", holdingPeriod: 5, actualReturn: 8.2, expectedReturn: 8, risk: "Moderate", liquidity: "Medium", taxTreatment: "Capital gains", incomeGenerated: 0, linkedGoal: "Wealth Creation", ownership: "Family", details: {} },
+    { id: "demo-retirement", name: "EPF and NPS", type: "EPF/PPF/NPS", investedValue: 1700000, currentValue: 1930400, startDate: "2019-04-01", holdingPeriod: 7, actualReturn: 8, expectedReturn: 8, risk: "Moderate", liquidity: "Low", taxTreatment: "Retirement instruments", incomeGenerated: 0, linkedGoal: "Retirement", ownership: "Self", details: { monthlyContribution: 10000 } },
+    { id: "demo-property", name: "Mumbai family home", type: "Real Estate", investedValue: 8200000, currentValue: 11500000, startDate: "2018-01-01", holdingPeriod: 8, actualReturn: 5.3, expectedReturn: 6, risk: "Moderate", liquidity: "Low", taxTreatment: "Property", incomeGenerated: 25000, linkedGoal: "Family home", ownership: "Self", details: { outstandingLoan: 3800000 } }],
 
   homeLoanEmi: 42000,
   carLoanEmi: 18000,
   personalLoanEmi: 0,
   creditCardDues: 0,
   liabilities: [
-  { id: "demo-home-loan", provider: "HDFC Bank", type: "Home Loan", originalAmount: 5500000, outstandingAmount: 3800000, interestRate: 8.4, emi: 42000, startDate: "2018-01-01", originalTenure: 20, remainingTenure: 11, endDate: "2037-01-01", rateType: "Floating", prepaymentOption: true, prepaymentPenalty: 0 },
-  { id: "demo-car-loan", provider: "ICICI Bank", type: "Vehicle Loan", originalAmount: 1200000, outstandingAmount: 850000, interestRate: 9.2, emi: 18000, startDate: "2024-01-01", originalTenure: 7, remainingTenure: 4, endDate: "2029-01-01", rateType: "Floating", prepaymentOption: true, prepaymentPenalty: 2 },
-  { id: "demo-card", provider: "HDFC Card", type: "Credit Card", originalAmount: 45000, outstandingAmount: 45000, interestRate: 36, emi: 5000, startDate: "2026-01-01", originalTenure: 1, remainingTenure: 1, endDate: "2026-12-01", rateType: "Fixed", prepaymentOption: true, prepaymentPenalty: 0 }],
+    { id: "demo-home-loan", provider: "HDFC Bank", type: "Home Loan", originalAmount: 5500000, outstandingAmount: 3800000, interestRate: 8.4, emi: 42000, startDate: "2018-01-01", originalTenure: 20, remainingTenure: 11, endDate: "2037-01-01", rateType: "Floating", prepaymentOption: true, prepaymentPenalty: 0 },
+    { id: "demo-car-loan", provider: "ICICI Bank", type: "Vehicle Loan", originalAmount: 1200000, outstandingAmount: 850000, interestRate: 9.2, emi: 18000, startDate: "2024-01-01", originalTenure: 7, remainingTenure: 4, endDate: "2029-01-01", rateType: "Floating", prepaymentOption: true, prepaymentPenalty: 2 },
+    { id: "demo-card", provider: "HDFC Card", type: "Credit Card", originalAmount: 45000, outstandingAmount: 45000, interestRate: 36, emi: 5000, startDate: "2026-01-01", originalTenure: 1, remainingTenure: 1, endDate: "2026-12-01", rateType: "Fixed", prepaymentOption: true, prepaymentPenalty: 0 }],
 
   lifeCover: 15000000,
   healthCover: 700000,
   criticalIllnessCover: 0,
   insurancePolicies: [
-  { id: "demo-life-policy", insurer: "Sample Life Insurer", type: "Life", sumAssured: 12000000, premium: 32000, term: 25, startDate: "2021-08-01", renewalDate: "2026-08-01", nominee: "Priya Mehta", coveredMembers: ["Rahul Mehta"] },
-  { id: "demo-health-policy", insurer: "Sample Health Insurer", type: "Health", sumAssured: 1000000, premium: 28000, term: 1, startDate: "2026-01-01", renewalDate: "2027-01-01", nominee: "Rahul Mehta", coveredMembers: ["Rahul Mehta", "Priya Mehta", "Aanya Mehta", "Kabir Mehta"] },
-  { id: "demo-accident-policy", insurer: "Sample Accident Insurer", type: "Personal Accident", sumAssured: 2500000, premium: 5000, term: 1, startDate: "2026-01-01", renewalDate: "2027-01-01", nominee: "Priya Mehta", coveredMembers: ["Rahul Mehta"] }],
+    { id: "demo-life-policy", insurer: "Sample Life Insurer", type: "Life", sumAssured: 12000000, premium: 32000, term: 25, startDate: "2021-08-01", renewalDate: "2026-08-01", nominee: "Priya Mehta", coveredMembers: ["Rahul Mehta"] },
+    { id: "demo-health-policy", insurer: "Sample Health Insurer", type: "Health", sumAssured: 1000000, premium: 28000, term: 1, startDate: "2026-01-01", renewalDate: "2027-01-01", nominee: "Rahul Mehta", coveredMembers: ["Rahul Mehta", "Priya Mehta", "Aanya Mehta", "Kabir Mehta"] },
+    { id: "demo-accident-policy", insurer: "Sample Accident Insurer", type: "Personal Accident", sumAssured: 2500000, premium: 5000, term: 1, startDate: "2026-01-01", renewalDate: "2027-01-01", nominee: "Priya Mehta", coveredMembers: ["Rahul Mehta"] }],
 
   selectedGoals: ["retirement", "education", "home-upgrade", "emergency"],
   monthlyInvestment: 88000,
   goalDetails: {},
   goals: [
-  { id: "demo-education-goal", name: "Child Education", icon: "education", saved: 800000, target: 3500000, targetYear: 2034, duration: 8, monthlyContribution: 15000, expectedReturn: 10, inflation: 6, priority: "High", linkedInvestments: ["demo-mutual-funds"], fundingSource: "Monthly SIP", note: "Undergraduate fees, assumed 8% education inflation." },
-  { id: "demo-retirement-goal", name: "Retirement", icon: "retirement", saved: 1930400, target: 40000000, targetYear: 2050, duration: 24, monthlyContribution: 20000, expectedReturn: 10, inflation: 6, priority: "High", linkedInvestments: ["demo-retirement", "demo-mutual-funds"], fundingSource: "EPF and SIP", note: "EPF, NPS and equity SIPs all feed this goal." },
-  { id: "demo-travel-goal", name: "Travel", icon: "travel", saved: 200000, target: 800000, targetYear: 2028, duration: 2, monthlyContribution: 12000, expectedReturn: 7, inflation: 5, priority: "Medium", linkedInvestments: ["demo-fd"], fundingSource: "Monthly savings", note: "Three weeks with the family." },
-  { id: "demo-emergency-goal", name: "Emergency Fund", icon: "shield", saved: 450000, target: 800000, targetYear: 2027, duration: 1, monthlyContribution: 6600, expectedReturn: 5, inflation: 5, priority: "High", linkedInvestments: ["demo-fd"], fundingSource: "Cash and FD", note: "Parked in a liquid fund for instant access." }],
+    { id: "demo-education-goal", name: "Child Education", icon: "education", saved: 800000, target: 3500000, targetYear: 2034, duration: 8, monthlyContribution: 15000, expectedReturn: 10, inflation: 6, priority: "High", linkedInvestments: ["demo-mutual-funds"], fundingSource: "Monthly SIP", note: "Undergraduate fees, assumed 8% education inflation." },
+    { id: "demo-retirement-goal", name: "Retirement", icon: "retirement", saved: 1930400, target: 40000000, targetYear: 2050, duration: 24, monthlyContribution: 20000, expectedReturn: 10, inflation: 6, priority: "High", linkedInvestments: ["demo-retirement", "demo-mutual-funds"], fundingSource: "EPF and SIP", note: "EPF, NPS and equity SIPs all feed this goal." },
+    { id: "demo-travel-goal", name: "Travel", icon: "travel", saved: 200000, target: 800000, targetYear: 2028, duration: 2, monthlyContribution: 12000, expectedReturn: 7, inflation: 5, priority: "Medium", linkedInvestments: ["demo-fd"], fundingSource: "Monthly savings", note: "Three weeks with the family." },
+    { id: "demo-emergency-goal", name: "Emergency Fund", icon: "shield", saved: 450000, target: 800000, targetYear: 2027, duration: 1, monthlyContribution: 6600, expectedReturn: 5, inflation: 5, priority: "High", linkedInvestments: ["demo-fd"], fundingSource: "Cash and FD", note: "Parked in a liquid fund for instant access." }],
 
   nomineesOnRecord: "some",
   hasWill: false,
@@ -550,226 +557,226 @@ export function synthesizeAAProfile(baseAnswers) {
     selectedGoals: [],
     goalDetails: {},
     assets: [
-    {
-      id: "asset-aa-1",
-      name: "HDFC Bank & ICICI Bank Savings",
-      type: "Cash & Savings",
-      investedValue: 350000,
-      currentValue: 350000,
-      startDate: "2018-04-01",
-      holdingPeriod: 6,
-      actualReturn: 3.5,
-      expectedReturn: 3.5,
-      risk: "Low",
-      liquidity: "High",
-      taxTreatment: "Interest taxable above ₹10k (80TTA)",
-      incomeGenerated: 12250,
-      linkedGoal: "Emergency Fund",
-      ownership: "Self",
-      details: { bank: "HDFC & ICICI", ifsc: "HDFC0000123" }
-    },
-    {
-      id: "asset-aa-2",
-      name: "Zerodha Equity Portfolio (Large & Midcap)",
-      type: "Stocks",
-      investedValue: 820000,
-      currentValue: 1158140,
-      startDate: "2019-06-15",
-      holdingPeriod: 5,
-      actualReturn: 14.8,
-      expectedReturn: 12.0,
-      risk: "High",
-      liquidity: "High",
-      taxTreatment: "LTCG 12.5% over ₹1.25L",
-      incomeGenerated: 14500,
-      linkedGoal: "Retirement",
-      ownership: "Self",
-      details: { depository: "CDSL", broker: "Zerodha" }
-    },
-    {
-      id: "asset-aa-3",
-      name: "CAMS Verified Mutual Funds (Flexi-cap & Large-cap)",
-      type: "Mutual Funds",
-      investedValue: 2150000,
-      currentValue: 2963900,
-      startDate: "2017-09-10",
-      holdingPeriod: 7,
-      actualReturn: 13.6,
-      expectedReturn: 12.0,
-      risk: "Moderate",
-      liquidity: "High",
-      taxTreatment: "Equity LTCG 12.5%",
-      incomeGenerated: 0,
-      linkedGoal: "Aarav's Education",
-      ownership: "Self",
-      details: { rta: "CAMS & KFintech", folios: "5 Folios Active" }
-    },
-    {
-      id: "asset-aa-4",
-      name: "SBI Scheduled Fixed Deposits",
-      type: "FD/RD",
-      investedValue: 800000,
-      currentValue: 850000,
-      startDate: "2023-01-10",
-      holdingPeriod: 1.5,
-      actualReturn: 7.1,
-      expectedReturn: 7.1,
-      risk: "Low",
-      liquidity: "Medium",
-      taxTreatment: "Taxable at slab rate",
-      incomeGenerated: 60350,
-      linkedGoal: "Emergency Fund",
-      ownership: "Joint with Spouse",
-      details: { bank: "State Bank of India", tenure: "3 Years" }
-    },
-    {
-      id: "asset-aa-5",
-      name: "EPFO UAN PF Passbook & PPF",
-      type: "EPF/PPF/NPS",
-      investedValue: 1400000,
-      currentValue: 1850000,
-      startDate: "2015-08-01",
-      holdingPeriod: 9,
-      actualReturn: 8.25,
-      expectedReturn: 8.25,
-      risk: "Low",
-      liquidity: "Low",
-      taxTreatment: "EEE (Exempt-Exempt-Exempt)",
-      incomeGenerated: 0,
-      linkedGoal: "Retirement",
-      ownership: "Self",
-      details: { uan: "100982347101", authority: "EPFO" }
-    },
-    {
-      id: "asset-aa-6",
-      name: "Sovereign Gold Bonds & Digital Gold",
-      type: "Gold/SGB",
-      investedValue: 380000,
-      currentValue: 520000,
-      startDate: "2020-11-20",
-      holdingPeriod: 4,
-      actualReturn: 11.2,
-      expectedReturn: 9.0,
-      risk: "Low",
-      liquidity: "Medium",
-      taxTreatment: "Tax free on RBI redemption",
-      incomeGenerated: 9500,
-      linkedGoal: "Wealth Creation",
-      ownership: "Self",
-      details: { tranche: "2020-21 Series VIII" }
-    },
-    {
-      id: "asset-aa-7",
-      name: "Primary Residential Property (Mumbai Suburbs)",
-      type: "Real Estate",
-      investedValue: 5200000,
-      currentValue: 6500000,
-      startDate: "2019-02-15",
-      holdingPeriod: 5.5,
-      actualReturn: 4.8,
-      expectedReturn: 6.0,
-      risk: "Moderate",
-      liquidity: "Low",
-      taxTreatment: "Section 54 exemption on reinvestment",
-      incomeGenerated: 0,
-      linkedGoal: "Home",
-      ownership: "Joint with Spouse",
-      details: { registration: "Maharashtra IGR Recorded" }
-    }],
+      {
+        id: "asset-aa-1",
+        name: "HDFC Bank & ICICI Bank Savings",
+        type: "Cash & Savings",
+        investedValue: 350000,
+        currentValue: 350000,
+        startDate: "2018-04-01",
+        holdingPeriod: 6,
+        actualReturn: 3.5,
+        expectedReturn: 3.5,
+        risk: "Low",
+        liquidity: "High",
+        taxTreatment: "Interest taxable above ₹10k (80TTA)",
+        incomeGenerated: 12250,
+        linkedGoal: "Emergency Fund",
+        ownership: "Self",
+        details: { bank: "HDFC & ICICI", ifsc: "HDFC0000123" }
+      },
+      {
+        id: "asset-aa-2",
+        name: "Zerodha Equity Portfolio (Large & Midcap)",
+        type: "Stocks",
+        investedValue: 820000,
+        currentValue: 1158140,
+        startDate: "2019-06-15",
+        holdingPeriod: 5,
+        actualReturn: 14.8,
+        expectedReturn: 12.0,
+        risk: "High",
+        liquidity: "High",
+        taxTreatment: "LTCG 12.5% over ₹1.25L",
+        incomeGenerated: 14500,
+        linkedGoal: "Retirement",
+        ownership: "Self",
+        details: { depository: "CDSL", broker: "Zerodha" }
+      },
+      {
+        id: "asset-aa-3",
+        name: "CAMS Verified Mutual Funds (Flexi-cap & Large-cap)",
+        type: "Mutual Funds",
+        investedValue: 2150000,
+        currentValue: 2963900,
+        startDate: "2017-09-10",
+        holdingPeriod: 7,
+        actualReturn: 13.6,
+        expectedReturn: 12.0,
+        risk: "Moderate",
+        liquidity: "High",
+        taxTreatment: "Equity LTCG 12.5%",
+        incomeGenerated: 0,
+        linkedGoal: "Aarav's Education",
+        ownership: "Self",
+        details: { rta: "CAMS & KFintech", folios: "5 Folios Active" }
+      },
+      {
+        id: "asset-aa-4",
+        name: "SBI Scheduled Fixed Deposits",
+        type: "FD/RD",
+        investedValue: 800000,
+        currentValue: 850000,
+        startDate: "2023-01-10",
+        holdingPeriod: 1.5,
+        actualReturn: 7.1,
+        expectedReturn: 7.1,
+        risk: "Low",
+        liquidity: "Medium",
+        taxTreatment: "Taxable at slab rate",
+        incomeGenerated: 60350,
+        linkedGoal: "Emergency Fund",
+        ownership: "Joint with Spouse",
+        details: { bank: "State Bank of India", tenure: "3 Years" }
+      },
+      {
+        id: "asset-aa-5",
+        name: "EPFO UAN PF Passbook & PPF",
+        type: "EPF/PPF/NPS",
+        investedValue: 1400000,
+        currentValue: 1850000,
+        startDate: "2015-08-01",
+        holdingPeriod: 9,
+        actualReturn: 8.25,
+        expectedReturn: 8.25,
+        risk: "Low",
+        liquidity: "Low",
+        taxTreatment: "EEE (Exempt-Exempt-Exempt)",
+        incomeGenerated: 0,
+        linkedGoal: "Retirement",
+        ownership: "Self",
+        details: { uan: "100982347101", authority: "EPFO" }
+      },
+      {
+        id: "asset-aa-6",
+        name: "Sovereign Gold Bonds & Digital Gold",
+        type: "Gold/SGB",
+        investedValue: 380000,
+        currentValue: 520000,
+        startDate: "2020-11-20",
+        holdingPeriod: 4,
+        actualReturn: 11.2,
+        expectedReturn: 9.0,
+        risk: "Low",
+        liquidity: "Medium",
+        taxTreatment: "Tax free on RBI redemption",
+        incomeGenerated: 9500,
+        linkedGoal: "Wealth Creation",
+        ownership: "Self",
+        details: { tranche: "2020-21 Series VIII" }
+      },
+      {
+        id: "asset-aa-7",
+        name: "Primary Residential Property (Mumbai Suburbs)",
+        type: "Real Estate",
+        investedValue: 5200000,
+        currentValue: 6500000,
+        startDate: "2019-02-15",
+        holdingPeriod: 5.5,
+        actualReturn: 4.8,
+        expectedReturn: 6.0,
+        risk: "Moderate",
+        liquidity: "Low",
+        taxTreatment: "Section 54 exemption on reinvestment",
+        incomeGenerated: 0,
+        linkedGoal: "Home",
+        ownership: "Joint with Spouse",
+        details: { registration: "Maharashtra IGR Recorded" }
+      }],
 
     liabilities: [
-    {
-      id: "liab-aa-1",
-      provider: "HDFC Bank",
-      type: "Home Loan",
-      originalAmount: 5000000,
-      outstandingAmount: 4200000,
-      interestRate: 8.4,
-      emi: 45000,
-      startDate: "2019-03-01",
-      originalTenure: 20,
-      remainingTenure: 14.5,
-      endDate: "2039-03-01",
-      rateType: "Floating",
-      prepaymentOption: true,
-      prepaymentPenalty: 0
-    },
-    {
-      id: "liab-aa-2",
-      provider: "ICICI Bank",
-      type: "Vehicle Loan",
-      originalAmount: 850000,
-      outstandingAmount: 450000,
-      interestRate: 8.9,
-      emi: 15000,
-      startDate: "2022-08-15",
-      originalTenure: 5,
-      remainingTenure: 2.8,
-      endDate: "2027-08-15",
-      rateType: "Fixed",
-      prepaymentOption: true,
-      prepaymentPenalty: 0
-    },
-    {
-      id: "liab-aa-3",
-      provider: "Axis Bank Magnus",
-      type: "Credit Card",
-      originalAmount: 28000,
-      outstandingAmount: 28000,
-      interestRate: 42.0,
-      emi: 28000,
-      startDate: "2024-08-01",
-      originalTenure: 0.1,
-      remainingTenure: 0.1,
-      endDate: "2024-09-20",
-      rateType: "Fixed",
-      prepaymentOption: true,
-      prepaymentPenalty: 0
-    }],
+      {
+        id: "liab-aa-1",
+        provider: "HDFC Bank",
+        type: "Home Loan",
+        originalAmount: 5000000,
+        outstandingAmount: 4200000,
+        interestRate: 8.4,
+        emi: 45000,
+        startDate: "2019-03-01",
+        originalTenure: 20,
+        remainingTenure: 14.5,
+        endDate: "2039-03-01",
+        rateType: "Floating",
+        prepaymentOption: true,
+        prepaymentPenalty: 0
+      },
+      {
+        id: "liab-aa-2",
+        provider: "ICICI Bank",
+        type: "Vehicle Loan",
+        originalAmount: 850000,
+        outstandingAmount: 450000,
+        interestRate: 8.9,
+        emi: 15000,
+        startDate: "2022-08-15",
+        originalTenure: 5,
+        remainingTenure: 2.8,
+        endDate: "2027-08-15",
+        rateType: "Fixed",
+        prepaymentOption: true,
+        prepaymentPenalty: 0
+      },
+      {
+        id: "liab-aa-3",
+        provider: "Axis Bank Magnus",
+        type: "Credit Card",
+        originalAmount: 28000,
+        outstandingAmount: 28000,
+        interestRate: 42.0,
+        emi: 28000,
+        startDate: "2024-08-01",
+        originalTenure: 0.1,
+        remainingTenure: 0.1,
+        endDate: "2024-09-20",
+        rateType: "Fixed",
+        prepaymentOption: true,
+        prepaymentPenalty: 0
+      }],
 
     insurancePolicies: [
-    {
-      id: "pol-aa-1",
-      insurer: "HDFC Life Click 2 Protect 3D Plus",
-      type: "Life",
-      sumAssured: 15000000,
-      premium: 22000,
-      term: 35,
-      startDate: "2018-05-10",
-      renewalDate: "2027-05-10",
-      nominee: "Priya Mehta (Spouse - 100%)",
-      coveredMembers: ["Self"]
-    },
-    {
-      id: "pol-aa-2",
-      insurer: "Care Health Supreme Floater",
-      type: "Health",
-      sumAssured: 2500000,
-      premium: 26500,
-      term: 1,
-      startDate: "2020-07-01",
-      renewalDate: "2027-07-01",
-      nominee: "Priya Mehta",
-      coveredMembers: ["Self", "Priya Mehta", "Aanya Mehta", "Kabir Mehta"]
-    }],
+      {
+        id: "pol-aa-1",
+        insurer: "HDFC Life Click 2 Protect 3D Plus",
+        type: "Life",
+        sumAssured: 15000000,
+        premium: 22000,
+        term: 35,
+        startDate: "2018-05-10",
+        renewalDate: "2027-05-10",
+        nominee: "Priya Mehta (Spouse - 100%)",
+        coveredMembers: ["Self"]
+      },
+      {
+        id: "pol-aa-2",
+        insurer: "Care Health Supreme Floater",
+        type: "Health",
+        sumAssured: 2500000,
+        premium: 26500,
+        term: 1,
+        startDate: "2020-07-01",
+        renewalDate: "2027-07-01",
+        nominee: "Priya Mehta",
+        coveredMembers: ["Self", "Priya Mehta", "Aanya Mehta", "Kabir Mehta"]
+      }],
 
     goals: [],
 
     futureEvents: [
-    {
-      id: "event-aa-1",
-      event: "Children Higher Education Abroad",
-      year: 2035,
-      estimatedCost: 8000000,
-      importance: "High"
-    },
-    {
-      id: "event-aa-2",
-      event: "Retirement",
-      year: 2048,
-      estimatedCost: 30000000,
-      importance: "High"
-    }]
+      {
+        id: "event-aa-1",
+        event: "Children Higher Education Abroad",
+        year: 2035,
+        estimatedCost: 8000000,
+        importance: "High"
+      },
+      {
+        id: "event-aa-2",
+        event: "Retirement",
+        year: 2048,
+        estimatedCost: 30000000,
+        importance: "High"
+      }]
 
   };
 }
@@ -799,9 +806,10 @@ export function AppProvider({ children }) {
   });
   const [whatIf, setWhatIfState] = useState({});
   const [contributions, setContributions] = useState(() =>
-  Object.fromEntries((answers.goals || []).map((g) => [g.id, g.monthlyContribution]))
+    Object.fromEntries((answers.goals || []).map((g) => [g.id, g.monthlyContribution]))
   );
   const [messages, setMessages] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
   const [booking, setBooking] = useState(null);
   const [rmOpen, setRmOpen] = useState(false);
   const [stressMode, setStressMode] = useState(false);
@@ -881,17 +889,17 @@ export function AppProvider({ children }) {
   const canAccessAA = true;
   const canAccessRM = subscriptionTier !== "Basic";
   const rmType =
-  subscriptionTier === "Basic" ? "none" :
-  subscriptionTier === "Premium" ? "shared" :
-  subscriptionTier === "Elite" ? "dedicated" : "wealth_desk";
+    subscriptionTier === "Basic" ? "none" :
+      subscriptionTier === "Premium" ? "shared" :
+        subscriptionTier === "Elite" ? "dedicated" : "wealth_desk";
   const canAccessEstatePlanning = subscriptionTier === "Elite" || subscriptionTier === "Enterprise";
   const canAccessAdvancedVault = subscriptionTier === "Elite" || subscriptionTier === "Enterprise";
 
   const [accountAggregatorStatus, setAccountAggregatorStatus] =
-  useState("not_connected");
+    useState("not_connected");
   const [plannedLifeEvents, setPlannedLifeEvents] = useState([
-  "event-child",
-  "event-home"]
+    "event-child",
+    "event-home"]
   );
 
   useEffect(() => {
@@ -908,10 +916,10 @@ export function AppProvider({ children }) {
 
   const goals = useMemo(
     () =>
-    (answers.goals || []).map((g) => ({
-      ...g,
-      monthlyContribution: contributions[g.id] ?? g.monthlyContribution
-    })),
+      (answers.goals || []).map((g) => ({
+        ...g,
+        monthlyContribution: contributions[g.id] ?? g.monthlyContribution
+      })),
     [answers.goals, contributions]
   );
 
@@ -925,8 +933,8 @@ export function AppProvider({ children }) {
 
   const emiTotal = useMemo(() => {
     const cleared = liabilities.
-    filter((l) => clearedLoans.includes(l.id)).
-    reduce((s, l) => s + l.emi, 0);
+      filter((l) => clearedLoans.includes(l.id)).
+      reduce((s, l) => s + l.emi, 0);
     return Math.max(0, derivedEmi(answers) - cleared);
   }, [answers, clearedLoans]);
 
@@ -939,11 +947,11 @@ export function AppProvider({ children }) {
     const income = derivedIncome(answers);
     const expenses = derivedExpenses(answers);
     const onTrack = projections.length > 0 ?
-    projections.filter((x) => x.p.onTrack).length / projections.length * 100 :
-    100;
+      projections.filter((x) => x.p.onTrack).length / projections.length * 100 :
+      100;
     const funded = goals.length > 0 ?
-    goals.reduce((s, g) => s + Math.min(1, g.target > 0 ? g.saved / g.target : 1), 0) / goals.length * 100 :
-    100;
+      goals.reduce((s, g) => s + Math.min(1, g.target > 0 ? g.saved / g.target : 1), 0) / goals.length * 100 :
+      100;
     return {
       ...baseScoreInputs,
       monthlyIncome: income,
@@ -972,10 +980,10 @@ export function AppProvider({ children }) {
 
   const taxHeadroom = useMemo(() => {
     const raw =
-    taxSaving.section80cLimit -
-    taxSaving.section80cUsed + (
-    taxSaving.nps80ccdLimit - taxSaving.nps80ccdUsed) + (
-    taxSaving.healthPremium80dLimit - taxSaving.healthPremium80dUsed);
+      taxSaving.section80cLimit -
+      taxSaving.section80cUsed + (
+        taxSaving.nps80ccdLimit - taxSaving.nps80ccdUsed) + (
+        taxSaving.healthPremium80dLimit - taxSaving.healthPremium80dUsed);
     return Math.max(0, raw - taxTopUp);
   }, [taxTopUp]);
 
@@ -986,29 +994,29 @@ export function AppProvider({ children }) {
 
   const actions = useMemo(
     () =>
-    buildActions({
+      buildActions({
+        cover,
+        nominations,
+        docs,
+        emergencyMonths,
+        emiRatioPct: emiTotal / Math.max(1, derivedIncome(answers)) * 100,
+        goalsOffTrack,
+        extraSip,
+        largestAssetSharePct,
+        taxHeadroom,
+        idleSurplus
+      }),
+    [
+      answers,
       cover,
-      nominations,
       docs,
       emergencyMonths,
-      emiRatioPct: emiTotal / Math.max(1, derivedIncome(answers)) * 100,
-      goalsOffTrack,
+      emiTotal,
       extraSip,
-      largestAssetSharePct,
-      taxHeadroom,
-      idleSurplus
-    }),
-    [
-    answers,
-    cover,
-    docs,
-    emergencyMonths,
-    emiTotal,
-    extraSip,
-    goalsOffTrack,
-    idleSurplus,
-    nominations,
-    taxHeadroom]
+      goalsOffTrack,
+      idleSurplus,
+      nominations,
+      taxHeadroom]
 
   );
 
@@ -1019,27 +1027,27 @@ export function AppProvider({ children }) {
 
   const simResult = useMemo(
     () =>
-    simulate(sim, {
-      surplus: derivedIncome(answers) - derivedExpenses(answers),
-      goalsOnTrack: goals.length - goalsOffTrack,
-      goalsTotal: goals.length
-    }),
+      simulate(sim, {
+        surplus: derivedIncome(answers) - derivedExpenses(answers),
+        goalsOnTrack: goals.length - goalsOffTrack,
+        goalsTotal: goals.length
+      }),
     [answers, goals.length, goalsOffTrack, sim]
   );
 
   const dna = useMemo(
     () =>
-    financialDNA({
-      savingsRate:
-      (derivedIncome(answers) - derivedExpenses(answers)) /
-      Math.max(1, derivedIncome(answers)) *
-      100,
-      protection,
-      emergencyMonths,
-      emiRatio: emiTotal / Math.max(1, derivedIncome(answers)) * 100,
-      riskAppetite: answers.riskAppetite,
-      goalsOnTrackPct: (goals.length - goalsOffTrack) / Math.max(1, goals.length) * 100
-    }),
+      financialDNA({
+        savingsRate:
+          (derivedIncome(answers) - derivedExpenses(answers)) /
+          Math.max(1, derivedIncome(answers)) *
+          100,
+        protection,
+        emergencyMonths,
+        emiRatio: emiTotal / Math.max(1, derivedIncome(answers)) * 100,
+        riskAppetite: answers.riskAppetite,
+        goalsOnTrackPct: (goals.length - goalsOffTrack) / Math.max(1, goals.length) * 100
+      }),
     [answers, emergencyMonths, emiTotal, goals.length, goalsOffTrack, protection]
   );
 
@@ -1051,38 +1059,38 @@ export function AppProvider({ children }) {
 
   const sheruIntelligence = useMemo(
     () =>
-    generateWealthIntelligence({
+      generateWealthIntelligence({
+        answers,
+        score,
+        goals,
+        goalsOffTrack,
+        goalsShortfall,
+        protectionScore: protection,
+        transferScore: transferReadiness,
+        subscriptionTier,
+        totalAssets: totalAssetsVal,
+        totalLiabilities: totalLiabVal,
+        netWorth: totalAssetsVal - totalLiabVal,
+        monthlySurplus: derivedIncome(answers) - derivedExpenses(answers),
+        emergencyMonths,
+        taxHeadroom,
+        unnominatedCount: nominations_summary.missing.length,
+        unnominatedValue: nominations_summary.totalValue - nominations_summary.coveredValue
+      }),
+    [
       answers,
-      score,
+      subscriptionTier,
+      emergencyMonths,
       goals,
       goalsOffTrack,
       goalsShortfall,
-      protectionScore: protection,
-      transferScore: transferReadiness,
-      subscriptionTier,
-      totalAssets: totalAssetsVal,
-      totalLiabilities: totalLiabVal,
-      netWorth: totalAssetsVal - totalLiabVal,
-      monthlySurplus: derivedIncome(answers) - derivedExpenses(answers),
-      emergencyMonths,
+      nominations_summary,
+      protection,
+      score,
       taxHeadroom,
-      unnominatedCount: nominations_summary.missing.length,
-      unnominatedValue: nominations_summary.totalValue - nominations_summary.coveredValue
-    }),
-    [
-    answers,
-    subscriptionTier,
-    emergencyMonths,
-    goals,
-    goalsOffTrack,
-    goalsShortfall,
-    nominations_summary,
-    protection,
-    score,
-    taxHeadroom,
-    totalAssetsVal,
-    totalLiabVal,
-    transferReadiness]
+      totalAssetsVal,
+      totalLiabVal,
+      transferReadiness]
 
   );
 
@@ -1160,7 +1168,7 @@ export function AppProvider({ children }) {
 
   const togglePlannedLifeEvent = useCallback((eventId) => {
     setPlannedLifeEvents((prev) =>
-    prev.includes(eventId) ? prev.filter((id) => id !== eventId) : [...prev, eventId]
+      prev.includes(eventId) ? prev.filter((id) => id !== eventId) : [...prev, eventId]
     );
   }, []);
 
@@ -1193,41 +1201,77 @@ export function AppProvider({ children }) {
       netWorth: totalAssetsVal - totalLiabVal
     }),
     [
-    actions,
-    answers,
-    cover,
-    emergencyMonths,
-    emiTotal,
-    extraSip,
-    goalsOffTrack,
-    goalsShortfall,
-    idleSurplus,
-    nominations_summary,
-    protection,
-    score,
-    taxHeadroom,
-    transferReadiness,
-    totalAssetsVal,
-    totalLiabVal]
+      actions,
+      answers,
+      cover,
+      emergencyMonths,
+      emiTotal,
+      extraSip,
+      goalsOffTrack,
+      goalsShortfall,
+      idleSurplus,
+      nominations_summary,
+      protection,
+      score,
+      taxHeadroom,
+      transferReadiness,
+      totalAssetsVal,
+      totalLiabVal]
 
   );
 
   const sendMessage = useCallback(
-    (text) => {
+    async (text) => {
       const trimmed = text.trim();
       if (!trimmed) return;
-      const reply = coachReply(trimmed, coachContext);
-      setMessages((prev) => [
-      ...prev,
-      { id: nextId(), role: "user", text: trimmed },
-      {
-        id: nextId(),
-        role: "assistant",
-        text: reply.text,
-        ...(reply.bullets ? { bullets: reply.bullets } : {}),
-        ...(reply.followUps ? { followUps: reply.followUps } : {})
-      }]
-      );
+
+      // Immediately show the user bubble
+      const userMsg = { id: nextId(), role: "user", text: trimmed };
+      setMessages((prev) => [...prev, userMsg]);
+      setIsTyping(true);
+
+      // Build conversation history for multi-turn context (user + assistant pairs only)
+      let llmReplyText = null;
+      try {
+        const history = [];
+        setMessages((prev) => {
+          // snapshot current messages for history before the new user message
+          prev.slice(0, -1).forEach((m) => {
+            if (m.role === "user" || m.role === "assistant") {
+              history.push({ role: m.role, text: m.text });
+            }
+          });
+          return prev;
+        });
+
+        llmReplyText = await callSheruLLM(trimmed, coachContext, history);
+      } catch (err) {
+        // Log silently; fall back to local rule engine
+        console.warn("[SHERU] LLM API unavailable, using offline reply:", err?.message);
+      } finally {
+        setIsTyping(false);
+      }
+
+      if (llmReplyText) {
+        // LLM responded: render as plain text message (no structured bullets)
+        setMessages((prev) => [
+          ...prev,
+          { id: nextId(), role: "assistant", text: llmReplyText }
+        ]);
+      } else {
+        // Offline fallback: use the deterministic rule engine
+        const reply = coachReply(trimmed, coachContext);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: nextId(),
+            role: "assistant",
+            text: reply.text,
+            ...(reply.bullets ? { bullets: reply.bullets } : {}),
+            ...(reply.followUps ? { followUps: reply.followUps } : {})
+          }
+        ]);
+      }
     },
     [coachContext]
   );
@@ -1270,9 +1314,9 @@ export function AppProvider({ children }) {
     dismissRiskPrompt,
     contributions,
     setContribution: (goalId, amount) =>
-    setContributions((prev) => ({ ...prev, [goalId]: amount })),
+      setContributions((prev) => ({ ...prev, [goalId]: amount })),
     resetContributions: () =>
-    setContributions(Object.fromEntries((answers.goals || []).map((g) => [g.id, g.monthlyContribution]))),
+      setContributions(Object.fromEntries((answers.goals || []).map((g) => [g.id, g.monthlyContribution]))),
     goalsOffTrack,
     goalsShortfall,
     projections,
@@ -1281,7 +1325,7 @@ export function AppProvider({ children }) {
     addLifeCover: (amount) => setCover((c) => ({ ...c, extraLife: c.extraLife + amount })),
     addHealthCover: (amount) => setCover((c) => ({ ...c, extraHealth: c.extraHealth + amount })),
     addCriticalIllness: (amount) =>
-    setCover((c) => ({ ...c, criticalIllness: c.criticalIllness + amount })),
+      setCover((c) => ({ ...c, criticalIllness: c.criticalIllness + amount })),
     resetCover: () => setCover(noExtraCover),
     lifeCover: totalLifeCover(cover),
     healthCover: totalHealthCover(cover),
@@ -1289,7 +1333,7 @@ export function AppProvider({ children }) {
 
     nominations,
     setNominee: (accountId, nominee) =>
-    setNominations((prev) => ({ ...prev, [accountId]: nominee })),
+      setNominations((prev) => ({ ...prev, [accountId]: nominee })),
     docs,
     toggleDoc: (docId) => setDocs((prev) => ({ ...prev, [docId]: !prev[docId] })),
     nominations_summary,
@@ -1301,9 +1345,9 @@ export function AppProvider({ children }) {
     setSipPlan: (patch) => setSipPlanState((prev) => ({ ...prev, ...patch })),
     clearedLoans,
     toggleClearedLoan: (loanId) =>
-    setClearedLoans((prev) =>
-    prev.includes(loanId) ? prev.filter((id) => id !== loanId) : [...prev, loanId]
-    ),
+      setClearedLoans((prev) =>
+        prev.includes(loanId) ? prev.filter((id) => id !== loanId) : [...prev, loanId]
+      ),
     taxTopUp,
     setTaxTopUp,
     idleMoved,
@@ -1313,7 +1357,7 @@ export function AppProvider({ children }) {
     nextAction,
     dismissedActions,
     dismissAction: (id) =>
-    setDismissedActions((prev) => prev.includes(id) ? prev : [...prev, id]),
+      setDismissedActions((prev) => prev.includes(id) ? prev : [...prev, id]),
     restoreActions: () => setDismissedActions([]),
 
     riskProfile,
@@ -1330,6 +1374,7 @@ export function AppProvider({ children }) {
 
     messages,
     sendMessage,
+    isTyping,
     clearChat: () => setMessages([]),
     booking,
     setBooking,

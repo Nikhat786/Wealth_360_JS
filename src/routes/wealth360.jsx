@@ -49,9 +49,9 @@ const features = [
 ];
 
 const navLinks = [
-  { label: "Invest", to: "/portfolio" },
-  { label: "Protect", to: "/protect" },
-  { label: "Plan", to: "/goals" },
+  // { label: "Invest", to: "/portfolio" },
+  // { label: "Protect", to: "/protect" },
+  // { label: "Plan", to: "/goals" },
 ];
 
 const trustBadges = [
@@ -93,7 +93,7 @@ export default function Wealth360Landing() {
             />
             <span className="font-display text-sm font-bold tracking-tight text-foreground sm:text-base">
               <span className="text-[#1a2d4c]">Mirae Asset</span>{" "}
-              <span className="text-primary font-semibold">Sharekhan</span>
+              <span className="text-primary font-semibold">WealthVerse</span>
             </span>
           </Link>
 
@@ -186,7 +186,7 @@ export default function Wealth360Landing() {
           <div className="flex flex-col items-center gap-8 lg:flex-row lg:items-start lg:gap-12">
             {/* Left Column — Text & CTAs */}
             <div className="max-w-xl flex-1 space-y-6 lg:pt-8">
-              <span className="inline-flex items-center gap-2 text-xs font-bold tracking-widest text-primary uppercase">
+              <span className="inline-flex items-center gap-2 text-lg font-bold tracking-widest text-primary uppercase">
                 <span className="size-2 rounded-full bg-primary" />
                 WEALTHVERSE
               </span>
@@ -294,7 +294,7 @@ export default function Wealth360Landing() {
                 </div>
 
                 {/* This Morning's Review Card */}
-                <div
+                {/* <div
                   className="absolute -top-2 right-0 z-20 w-60 animate-in fade-in slide-in-from-top-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-xl sm:-right-4 lg:-right-8"
                   style={{ animationDelay: "500ms" }}
                 >
@@ -319,7 +319,7 @@ export default function Wealth360Landing() {
                       </li>
                     ))}
                   </ul>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
