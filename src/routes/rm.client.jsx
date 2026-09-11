@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   BadgeIndianRupee,
+  Bot,
   Check,
   CheckCircle2,
   Clock,
@@ -47,6 +48,7 @@ import {
 } from "@/lib/rm-dashboard-export";
 import { cn } from "@/lib/utils";
 import mark from "@/assets/wealth360-mark.png";
+import { CoachPopover } from "@/components/wealth/coach-popover";
 
 const palette = [
   "var(--color-primary)",
@@ -193,7 +195,7 @@ function downloadReport(client, report, outreachLog) {
 }
 
 export default function RmClientPage() {
-  const { isRmSession, logoutRm } = useApp();
+  const { isRmSession, logoutRm, discussWithSheru } = useApp();
   const { clientId } = useParams();
   const navigate = useNavigate();
   const roster = useRmRoster();
@@ -291,6 +293,16 @@ export default function RmClientPage() {
                 <Phone className="mr-1.5 size-3.5" /> Mark contacted
               </Button>
             )}
+
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => discussWithSheru(`Analyze client ${client.name} (Tier: ${client.tier}, AUM: ${formatINRShort(client.aum || 0)}, Score: ${client.wealthScore || 68}/100): suggest priority advisory strategy and meeting talking points.`, { client, rmView: true })}
+              className="border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 font-semibold gap-1.5"
+              title="Open Sheru RM Copilot with complete client dossier"
+            >
+              <Sparkles className="size-3.5 text-gold animate-pulse" /> Discuss with SHERU
+            </Button>
 
             <Button
               size="sm"
@@ -629,6 +641,8 @@ export default function RmClientPage() {
         client={client}
         outreachLog={outreachLog}
       />
+
+      <CoachPopover />
     </div>);
 
 }

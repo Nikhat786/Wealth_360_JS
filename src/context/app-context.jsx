@@ -260,9 +260,9 @@ export const defaultAnswers = {
   emiExpenses: 60000,
   insuranceExpenses: 8500,
   lifestyle: 6500,
-  healthcareExpenses: 0,
-  travelExpenses: 0,
-  otherExpenses: 0,
+  healthcareExpenses: 4000,
+  travelExpenses: 10000,
+  otherExpenses: 5000,
   equity: 1158140,
   mutualFunds: 2963900,
   deposits: 553800,
@@ -295,13 +295,12 @@ export const defaultAnswers = {
     { id: "demo-health-policy", insurer: "Sample Health Insurer", type: "Health", sumAssured: 1000000, premium: 28000, term: 1, startDate: "2026-01-01", renewalDate: "2027-01-01", nominee: "Rahul Mehta", coveredMembers: ["Rahul Mehta", "Priya Mehta", "Aanya Mehta", "Kabir Mehta"] },
     { id: "demo-accident-policy", insurer: "Sample Accident Insurer", type: "Personal Accident", sumAssured: 2500000, premium: 5000, term: 1, startDate: "2026-01-01", renewalDate: "2027-01-01", nominee: "Priya Mehta", coveredMembers: ["Rahul Mehta"] }],
 
-  selectedGoals: ["retirement", "education", "home-upgrade", "emergency"],
+  selectedGoals: ["Child Education", "Retirement", "Emergency Fund"],
   monthlyInvestment: 88000,
   goalDetails: {},
   goals: [
-    { id: "demo-education-goal", name: "Child Education", icon: "education", saved: 800000, target: 3500000, targetYear: 2034, duration: 8, monthlyContribution: 15000, expectedReturn: 10, inflation: 6, priority: "High", linkedInvestments: ["demo-mutual-funds"], fundingSource: "Monthly SIP", note: "Undergraduate fees, assumed 8% education inflation." },
+    { id: "demo-education-goal", name: "Child Education", icon: "education", saved: 800000, target: 3500000, targetYear: 2034, duration: 8, monthlyContribution: 15000, expectedReturn: 10, inflation: 6, priority: "High", linkedInvestments: ["demo-mutual-funds"], fundingSource: "Monthly SIP", note: "Undergraduate fees, assumed 6% education inflation." },
     { id: "demo-retirement-goal", name: "Retirement", icon: "retirement", saved: 1930400, target: 40000000, targetYear: 2050, duration: 24, monthlyContribution: 20000, expectedReturn: 10, inflation: 6, priority: "High", linkedInvestments: ["demo-retirement", "demo-mutual-funds"], fundingSource: "EPF and SIP", note: "EPF, NPS and equity SIPs all feed this goal." },
-    { id: "demo-travel-goal", name: "Travel", icon: "travel", saved: 200000, target: 800000, targetYear: 2028, duration: 2, monthlyContribution: 12000, expectedReturn: 7, inflation: 5, priority: "Medium", linkedInvestments: ["demo-fd"], fundingSource: "Monthly savings", note: "Three weeks with the family." },
     { id: "demo-emergency-goal", name: "Emergency Fund", icon: "shield", saved: 450000, target: 800000, targetYear: 2027, duration: 1, monthlyContribution: 6600, expectedReturn: 5, inflation: 5, priority: "High", linkedInvestments: ["demo-fd"], fundingSource: "Cash and FD", note: "Parked in a liquid fund for instant access." }],
 
   nomineesOnRecord: "some",
@@ -506,25 +505,24 @@ export function synthesizeAAProfile(baseAnswers) {
     mobile,
     email,
     pan,
-    // Account Aggregator can surface holdings, loans & policies, but not income or
-    // goals — those aren't held by any FIP, so they're left at 0 for manual entry.
-    annualIncome: 0,
-    monthlyTakeHome: 0,
-    salary: 0,
-    businessIncome: 0,
-    annualBonus: 0,
-    rentalIncome: 0,
-    dividendsIncome: 0,
-    interestIncome: 0,
-    otherIncome: 0,
-    household: 45000,
-    schoolFees: 15000,
-    emiExpenses: 60000,
-    insuranceExpenses: 8500,
-    lifestyle: 6500,
-    healthcareExpenses: 4000,
-    travelExpenses: 10000,
-    otherExpenses: 5000,
+    // Default cashflow values populated from benchmark profile
+    annualIncome: baseAnswers?.annualIncome || defaultAnswers.annualIncome,
+    monthlyTakeHome: baseAnswers?.monthlyTakeHome || defaultAnswers.monthlyTakeHome,
+    salary: baseAnswers?.salary || defaultAnswers.salary,
+    businessIncome: baseAnswers?.businessIncome ?? defaultAnswers.businessIncome,
+    annualBonus: baseAnswers?.annualBonus ?? defaultAnswers.annualBonus,
+    rentalIncome: baseAnswers?.rentalIncome ?? defaultAnswers.rentalIncome,
+    dividendsIncome: baseAnswers?.dividendsIncome ?? defaultAnswers.dividendsIncome,
+    interestIncome: baseAnswers?.interestIncome ?? defaultAnswers.interestIncome,
+    otherIncome: baseAnswers?.otherIncome ?? defaultAnswers.otherIncome,
+    household: baseAnswers?.household || defaultAnswers.household,
+    schoolFees: baseAnswers?.schoolFees || defaultAnswers.schoolFees,
+    emiExpenses: baseAnswers?.emiExpenses || defaultAnswers.emiExpenses,
+    insuranceExpenses: baseAnswers?.insuranceExpenses || defaultAnswers.insuranceExpenses,
+    lifestyle: baseAnswers?.lifestyle || defaultAnswers.lifestyle,
+    healthcareExpenses: baseAnswers?.healthcareExpenses || defaultAnswers.healthcareExpenses,
+    travelExpenses: baseAnswers?.travelExpenses || defaultAnswers.travelExpenses,
+    otherExpenses: baseAnswers?.otherExpenses || defaultAnswers.otherExpenses,
     equity: 1158140,
     mutualFunds: 2963900,
     deposits: 850000,
@@ -552,10 +550,9 @@ export function synthesizeAAProfile(baseAnswers) {
     retirementAge: 58,
     dependents: 3,
     familyMembers: defaultAnswers.familyMembers,
-    familyPriorities: defaultAnswers.familyPriorities,
-    // Goals are personal aspirations, not FIP-held data — start empty and add manually.
-    selectedGoals: [],
-    goalDetails: {},
+    // Predefined mock goals for life stage
+    selectedGoals: (baseAnswers?.selectedGoals && baseAnswers.selectedGoals.length > 0) ? baseAnswers.selectedGoals : ["Child Education", "Retirement", "Emergency Fund"],
+    goalDetails: baseAnswers?.goalDetails || {},
     assets: [
       {
         id: "asset-aa-1",
@@ -760,7 +757,8 @@ export function synthesizeAAProfile(baseAnswers) {
         coveredMembers: ["Self", "Priya Mehta", "Aanya Mehta", "Kabir Mehta"]
       }],
 
-    goals: [],
+    // 2-3 Predefined mock goals for onboarding journey
+    goals: (baseAnswers?.goals && baseAnswers.goals.length > 0) ? baseAnswers.goals : defaultAnswers.goals.slice(0, 3),
 
     futureEvents: [
       {
@@ -802,6 +800,17 @@ export function AppProvider({ children }) {
     const savedJourney = getJourney(getActivePan());
     if (!savedJourney) return defaultAnswers;
     const { onboardingStatus: _status, updatedAt: _updatedAt, ...rest } = savedJourney;
+    if (!rest.salary && !rest.businessIncome && !rest.rentalIncome) {
+      rest.salary = defaultAnswers.salary;
+      rest.rentalIncome = defaultAnswers.rentalIncome;
+      rest.otherIncome = defaultAnswers.otherIncome;
+      rest.annualIncome = defaultAnswers.annualIncome;
+      rest.monthlyTakeHome = defaultAnswers.monthlyTakeHome;
+    }
+    if (!rest.goals || rest.goals.length === 0) {
+      rest.goals = defaultAnswers.goals.slice(0, 3);
+      rest.selectedGoals = ["Child Education", "Retirement", "Emergency Fund"];
+    }
     return { ...defaultAnswers, ...rest };
   });
   const [whatIf, setWhatIfState] = useState({});
@@ -810,6 +819,8 @@ export function AppProvider({ children }) {
   );
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [coachOpen, setCoachOpen] = useState(false);
+  const [activeRmClient, setActiveRmClient] = useState(null);
   const [booking, setBooking] = useState(null);
   const [rmOpen, setRmOpen] = useState(false);
   const [stressMode, setStressMode] = useState(false);
@@ -1179,6 +1190,7 @@ export function AppProvider({ children }) {
   const coachContext = useMemo(
     () => ({
       clientName: answers.name || "Rahul Mehta",
+      pan: answers.pan || "ABCDE1234F",
       score: score.total,
       grade: score.grade,
       pillars: score.pillars,
@@ -1193,21 +1205,30 @@ export function AppProvider({ children }) {
       monthlyIncome: derivedIncome(answers),
       monthlyExpenses: derivedExpenses(answers),
       monthlyEmi: emiTotal,
+      debtToIncome: Math.round((emiTotal / Math.max(1, derivedIncome(answers))) * 100),
+      savingsRate: Math.round(((derivedIncome(answers) - derivedExpenses(answers) - emiTotal) / Math.max(1, derivedIncome(answers))) * 100),
       emergencyMonths,
       goalsOffTrack,
       goalsShortfall,
       taxHeadroom,
       idleSurplus,
       topAction: actions[0]?.title ?? null,
+      totalAssets: totalAssetsVal,
+      totalLiabilities: totalLiabVal,
       netWorth: totalAssetsVal - totalLiabVal,
       assetsSummary: answers.assets?.map((a) => `${a.name || a.type}: ₹${(a.currentValue / 100000).toFixed(1)}L`).join(", "),
-      liabilitiesSummary: answers.liabilities?.map((l) => `${l.name || l.type}: ₹${(l.outstanding / 100000).toFixed(1)}L`).join(", "),
+      liabilitiesSummary: answers.liabilities?.map((l) => `${l.name || l.type}: ₹${(l.outstanding / 100000).toFixed(1)}L (EMI: ₹${(l.monthlyEmi || 0).toLocaleString("en-IN")})`).join(", "),
       goalsSummary: answers.goals?.map((g) => `${g.name}: ₹${(g.saved / 100000).toFixed(1)}L of ₹${(g.target / 100000).toFixed(1)}L (${g.targetYear})`).join("; "),
       hasWill: answers.hasWill ? "Registered" : "Missing",
-      riskProfile
+      riskProfile,
+      assignedRm: { name: "Vikram Malhotra", title: "Senior Wealth Director", email: "vikram.malhotra@sharekhan.com", phone: "+91 98201 55432" },
+      activeRmClient,
+      isRmSession,
+      accountAggregatorStatus
     }),
     [
       actions,
+      activeRmClient,
       answers,
       cover,
       emergencyMonths,
@@ -1216,6 +1237,8 @@ export function AppProvider({ children }) {
       goalsOffTrack,
       goalsShortfall,
       idleSurplus,
+      isRmSession,
+      accountAggregatorStatus,
       nominations_summary,
       protection,
       riskProfile,
@@ -1228,16 +1251,21 @@ export function AppProvider({ children }) {
   );
 
   const sendMessage = useCallback(
-    async (text) => {
+    async (text, options = {}) => {
       const trimmed = text.trim();
       if (!trimmed) return;
+
+      const targetClient = options.client || activeRmClient;
+      const activeContext = targetClient
+        ? { ...coachContext, activeRmClient: targetClient, client: targetClient, isRmMode: true }
+        : coachContext;
 
       // Immediately show the user bubble
       const userMsg = { id: nextId(), role: "user", text: trimmed };
       setMessages((prev) => [...prev, userMsg]);
       setIsTyping(true);
 
-      // Enforce strict guardrail: Sheru only answers queries within the Wealth 360 dashboard context
+      // Enforce strict guardrail: Sheru only answers queries within the Wealth 360 dashboard / RM context
       const guardrailCheck = validateDashboardScope(trimmed);
       if (!guardrailCheck.inScope) {
         setIsTyping(false);
@@ -1249,7 +1277,8 @@ export function AppProvider({ children }) {
             role: "assistant",
             text: refusal.text,
             bullets: refusal.bullets,
-            followUps: refusal.followUps
+            followUps: refusal.followUps,
+            actions: refusal.actions
           }
         ]);
         return;
@@ -1269,7 +1298,7 @@ export function AppProvider({ children }) {
           return prev;
         });
 
-        llmReplyText = await callSheruLLM(trimmed, coachContext, history);
+        llmReplyText = await callSheruLLM(trimmed, activeContext, history);
       } catch (err) {
         // Log silently; fall back to local rule engine
         console.warn("[SHERU] LLM API unavailable, using offline reply:", err?.message);
@@ -1285,7 +1314,7 @@ export function AppProvider({ children }) {
         ]);
       } else {
         // Offline fallback: use the deterministic rule engine
-        const reply = coachReply(trimmed, coachContext);
+        const reply = coachReply(trimmed, activeContext);
         setMessages((prev) => [
           ...prev,
           {
@@ -1293,13 +1322,26 @@ export function AppProvider({ children }) {
             role: "assistant",
             text: reply.text,
             ...(reply.bullets ? { bullets: reply.bullets } : {}),
-            ...(reply.followUps ? { followUps: reply.followUps } : {})
+            ...(reply.followUps ? { followUps: reply.followUps } : {}),
+            ...(reply.actions ? { actions: reply.actions } : {})
           }
         ]);
       }
     },
-    [coachContext]
+    [coachContext, activeRmClient]
   );
+
+  const discussWithSheru = useCallback((prompt, options = {}) => {
+    if (options.client) {
+      setActiveRmClient(options.client);
+    } else if (options.clearClient) {
+      setActiveRmClient(null);
+    }
+    setCoachOpen(true);
+    if (prompt) {
+      sendMessage(prompt, options);
+    }
+  }, [sendMessage]);
 
   const value = {
     onboardingStatus,
@@ -1400,6 +1442,11 @@ export function AppProvider({ children }) {
     messages,
     sendMessage,
     isTyping,
+    coachOpen,
+    setCoachOpen,
+    activeRmClient,
+    setActiveRmClient,
+    discussWithSheru,
     clearChat: () => setMessages([]),
     booking,
     setBooking,

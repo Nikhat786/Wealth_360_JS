@@ -22,7 +22,7 @@ const PRIORITY_STYLES = {
 };
 
 export default function ProtectPage() {
-  const { answers, totalLiabilities, goalsShortfall, sendMessage, canAccessRM, setRmOpen } = useApp();
+  const { answers, totalLiabilities, goalsShortfall, discussWithSheru, canAccessRM, setRmOpen } = useApp();
 
   const annualIncome = derivedIncome(answers) * 12;
   const lifeGap = computeLifeCoverGap({
@@ -51,36 +51,51 @@ export default function ProtectPage() {
 
         <PillarNav />
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {/* Existing Coverage Summary */}
+        <div className="grid gap-4 sm:grid-cols-3">
           <StatTile
-            tone="navy"
-            label="Life cover"
-            value={formatINRShort(lifeGap.current)}
-            sub={`${Math.round(lifeGap.coveredPct)}% of ${formatINRShort(lifeGap.recommended)} recommended`} />
-
+            label="Term Life Cover"
+            value={formatINR(answers.lifeCover)}
+            hint={
+            lifeGap.gap > 0 ?
+            `Gap of ${formatINR(lifeGap.gap)} against recommendation` :
+            "Adequately covered"
+            }
+            tone={lifeGap.gap > 0 ? "warning" : "positive"} />
+          
           <StatTile
-            label="Health cover"
-            value={formatINRShort(healthGap.current)}
-            sub={`${Math.round(healthGap.coveredPct)}% of ${formatINRShort(healthGap.recommended)} recommended`} />
-
+            label="Health Cover"
+            value={formatINR(answers.healthCover)}
+            hint={
+            healthGap.gap > 0 ?
+            `Gap of ${formatINR(healthGap.gap)} for family size ${answers.dependents}` :
+            "Meets guideline"
+            }
+            tone={healthGap.gap > 0 ? "warning" : "positive"} />
+          
           <StatTile
-            label="Policies on record"
-            value={`${answers.insurancePolicies.length}`}
-            sub="Life, health & accident" />
-
-          <StatTile
-            label="Total protection gap"
-            value={formatINRShort(totalGap)}
-            sub={totalGap > 0 ? "Needs attention" : "Fully covered"} />
-
+            label="Accident Cover"
+            value={hasAccidentCover ? "Active" : "None"}
+            hint={hasAccidentCover ? "Policy on record" : "Recommended: ₹50L personal accident"}
+            tone={hasAccidentCover ? "positive" : "danger"} />
+          
         </div>
 
-        {/* Coverage gap visual */}
-        <div className="surface-card space-y-5 p-5">
-          <SectionHeader title="Where you stand" description="Current cover against what your family would actually need." />
-          <CoverBar label="Life cover" current={lifeGap.current} recommended={lifeGap.recommended} pct={lifeGap.coveredPct} />
-          <CoverBar label="Health cover" current={healthGap.current} recommended={healthGap.recommended} pct={healthGap.coveredPct} />
-        </div>
+        {/* Gap alert banner if any gap */}
+        {totalGap > 0 &&
+        <div className="surface-card flex items-start gap-3 border-amber-500/30 bg-amber-500/5 p-4 text-sm">
+            <ShieldCheck className="mt-0.5 size-5 shrink-0 text-amber-500" />
+            <div className="space-y-1">
+              <p className="font-semibold text-foreground">
+                You have an estimated coverage gap of {formatINRShort(totalGap)}
+              </p>
+              <p className="text-muted-foreground text-xs leading-relaxed">
+                Based on your income of {formatINR(annualIncome)}/yr, outstanding liabilities of{" "}
+                {formatINR(totalLiabilities)}, and family goals shortfall of {formatINR(goalsShortfall)}.
+              </p>
+            </div>
+          </div>
+        }
 
         {/* Recommendations */}
         <div className="space-y-4">
@@ -92,7 +107,7 @@ export default function ProtectPage() {
                   Ask RM to review
                 </Button>
               }
-              <Button size="sm" variant="outline" onClick={() => sendMessage("Can you explain these insurance recommendations?")}>
+              <Button size="sm" variant="outline" onClick={() => discussWithSheru("Can you explain my insurance gaps and recommended policies in detail?")}>
                 <MessageSquareText className="mr-1.5 size-3.5" /> Discuss with SHERU
               </Button>
             </div>

@@ -24,7 +24,7 @@ const palette = [
 
 
 export default function PortfolioPage() {
-  const { answers, totalAssets, totalLiabilities, sendMessage } = useApp();
+  const { answers, totalAssets, totalLiabilities, discussWithSheru } = useApp();
   const holdings = answers.assets;
   const liabilities = answers.liabilities;
   const totalInvested = holdings.reduce((sum, h) => sum + h.investedValue, 0);
@@ -143,7 +143,7 @@ export default function PortfolioPage() {
             <Button
               size="sm"
               variant="outline"
-              onClick={() => sendMessage("Can you walk me through my asset reallocation suggestions?")}>
+              onClick={() => discussWithSheru("Can you walk me through my asset allocation drift and reallocation suggestions?")}>
 
               <MessageSquareText className="mr-1.5 size-3.5" /> Discuss with SHERU
             </Button>

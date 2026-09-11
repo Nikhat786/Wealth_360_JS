@@ -40,7 +40,7 @@ import mark from "@/assets/wealth360-mark.png";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/wealth360/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/know", label: "Know", icon: Compass },
   { to: "/portfolio", label: "Grow", icon: Sprout },
   { to: "/debt", label: "Debt Optimiser", icon: Percent },
@@ -141,8 +141,10 @@ export function AppShell({
           {/* Sidebar Navigation Items */}
           <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
             {NAV_ITEMS.map((item) => {
-              const active =
-                item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+              const isDash = item.to === "/wealth360/dashboard" || item.to === "/";
+              const active = isDash
+                ? pathname === "/wealth360/dashboard" || pathname === "/dashboard"
+                : pathname.startsWith(item.to);
               const Icon = item.icon;
               return (
                 <Link
@@ -357,8 +359,10 @@ export function AppShell({
 
             <div className="mt-4 flex-1 overflow-y-auto space-y-1">
               {NAV_ITEMS.map((item) => {
-                const active =
-                  item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+                const isDash = item.to === "/wealth360/dashboard" || item.to === "/";
+                const active = isDash
+                  ? pathname === "/wealth360/dashboard" || pathname === "/dashboard"
+                  : pathname.startsWith(item.to);
                 const Icon = item.icon;
                 return (
                   <Link

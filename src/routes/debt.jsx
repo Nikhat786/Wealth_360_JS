@@ -1,5 +1,4 @@
-
-import { ArrowRight, Scale, ShieldAlert } from "lucide-react";
+import { ArrowRight, MessageSquareText, Scale, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,7 @@ import { formatINR, formatINRShort } from "@/lib/format";
 
 
 export default function DebtPage() {
-  const { answers } = useApp();
+  const { answers, discussWithSheru } = useApp();
   const [extraMonthly, setExtraMonthly] = useState(15000);
   const liabilities = answers?.liabilities || [];
   const summary = debtSummary(liabilities, derivedIncome(answers));
@@ -25,7 +24,12 @@ export default function DebtPage() {
   return (
     <AppShell>
       <div className="space-y-8">
-        <SectionHeader as="h1" title="Debt Optimiser" description="Find a smarter balance between repaying debt and growing your wealth." />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <SectionHeader as="h1" title="Debt Optimiser" description="Find a smarter balance between repaying debt and growing your wealth." />
+          <Button size="sm" variant="outline" onClick={() => discussWithSheru("How can I optimize my loans, reduce EMIs, and save on interest with prepayment?")}>
+            <MessageSquareText className="mr-1.5 size-3.5" /> Discuss with SHERU
+          </Button>
+        </div>
         <PillarNav />
         <section className="gradient-navy text-navy-foreground rounded-2xl p-6 sm:p-8">
           <p className="text-gold text-xs font-semibold tracking-wide uppercase">Grow · Debt Optimiser</p>

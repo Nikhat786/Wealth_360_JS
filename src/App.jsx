@@ -1,5 +1,4 @@
-import React from "react";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppProvider } from "@/context/app-context";
 
@@ -47,7 +46,8 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<RootLayout />}>
-          <Route path="/" element={<IndexPage />} />
+          <Route path="/" element={<Navigate to="/wealth360" replace />} />
+          <Route path="/dashboard" element={<IndexPage />} />
           <Route path="/portfolio" element={<PortfolioPage />} />
           <Route path="/debt" element={<DebtPage />} />
           <Route path="/transfer" element={<TransferPage />} />

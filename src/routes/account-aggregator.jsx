@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AppShell } from "@/components/wealth/app-shell";
-import { useApp } from "@/context/app-context";
+import { useApp, defaultAnswers } from "@/context/app-context";
 import { cn } from "@/lib/utils";
 
 
@@ -99,20 +99,24 @@ export default function AccountAggregatorPage() {
       age: 36,
       city: "Mumbai",
       maritalStatus: "Married",
-      // Account Aggregator can surface holdings, loans & policies, but not income or
-      // goals — those aren't held by any FIP, so they're left at 0 for manual entry.
-      annualIncome: 0,
-      monthlyTakeHome: 0,
-      salary: 0,
-      businessIncome: 0,
-      annualBonus: 0,
-      rentalIncome: 0,
-      dividendsIncome: 0,
-      interestIncome: 0,
-      otherIncome: 0,
-      household: 45000,
-      schoolFees: 15000,
-      emiExpenses: 60000,
+      // Default benchmark cashflow values
+      annualIncome: defaultAnswers.annualIncome,
+      monthlyTakeHome: defaultAnswers.monthlyTakeHome,
+      salary: defaultAnswers.salary,
+      businessIncome: defaultAnswers.businessIncome,
+      annualBonus: defaultAnswers.annualBonus,
+      rentalIncome: defaultAnswers.rentalIncome,
+      dividendsIncome: defaultAnswers.dividendsIncome,
+      interestIncome: defaultAnswers.interestIncome,
+      otherIncome: defaultAnswers.otherIncome,
+      household: defaultAnswers.household,
+      schoolFees: defaultAnswers.schoolFees,
+      emiExpenses: defaultAnswers.emiExpenses,
+      insuranceExpenses: defaultAnswers.insuranceExpenses,
+      lifestyle: defaultAnswers.lifestyle,
+      healthcareExpenses: defaultAnswers.healthcareExpenses,
+      travelExpenses: defaultAnswers.travelExpenses,
+      otherExpenses: defaultAnswers.otherExpenses,
       equity: 1158140,
       mutualFunds: 2963900,
       deposits: 650000,
@@ -123,8 +127,8 @@ export default function AccountAggregatorPage() {
       healthCover: 1000000,
       nomineesOnRecord: "some",
       hasWill: false,
-      goals: [],
-      selectedGoals: [],
+      goals: defaultAnswers.goals.slice(0, 3),
+      selectedGoals: ["Child Education", "Retirement", "Emergency Fund"],
       goalDetails: {}
     };
 

@@ -27,6 +27,7 @@ import { formatINR, formatINRShort, formatPct } from "@/lib/format";
 import { useRmRoster } from "@/lib/rm-clients";
 import { cn } from "@/lib/utils";
 import mark from "@/assets/wealth360-mark.png";
+import { CoachPopover } from "@/components/wealth/coach-popover";
 
 const TIERS = ["All", "UHNI", "HNI"];
 const SORTS = [
@@ -471,6 +472,7 @@ export default function RmDashboardPage() {
           </div>
         </section>
       </main>
+      <CoachPopover />
     </div>);
 
 }

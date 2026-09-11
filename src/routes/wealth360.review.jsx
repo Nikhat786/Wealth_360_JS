@@ -37,7 +37,7 @@ export default function Wealth360Review() {
           <Summary label="Cashflow" value={`${formatINRShort(monthlyIncome)} monthly income`} detail={`${formatINRShort(monthlySurplus)} monthly surplus`} />
           <Summary label="Investments" value={`${formatINRShort(totalAssets)} total assets`} detail={`${answers?.assets?.length || 6} demo holdings`} />
           <Summary label="Liabilities" value={`${formatINRShort(totalLiabilities)} outstanding`} detail={`${answers?.liabilities?.length || 3} demo liabilities`} />
-          <Summary label="Goals" value={`${answers?.goals?.length || 4} active goals`} detail="Retirement, education and lifestyle" />
+          <Summary label="Goals" value={`${answers?.goals?.length || 3} active goals`} detail="Retirement, education and emergency fund" />
           <Summary label="Protection" value={`${formatINRShort(answers?.lifeCover ?? 0)} life cover`} detail={`${formatINRShort(answers?.healthCover ?? 0)} health cover`} />
           <Summary label="Risk" value="Moderate" detail={`${answers?.horizon ?? 15}-year investment horizon`} />
         </div>

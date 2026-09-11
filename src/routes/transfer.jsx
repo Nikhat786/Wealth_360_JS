@@ -1,5 +1,5 @@
 
-import { ArrowRight, Check, Lock, Phone, ShieldCheck } from "lucide-react";
+import { ArrowRight, Check, Lock, MessageSquareText, Phone, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,8 @@ export default function TransferPage() {
     canAccessEstatePlanning,
     canAccessAdvancedVault,
     triggerUpgradeModal,
-    canAccessRM
+    canAccessRM,
+    discussWithSheru
   } = useApp();
   const [nominationOpen, setNominationOpen] = useState(false);
   const [willOpen, setWillOpen] = useState(false);
@@ -79,10 +80,15 @@ export default function TransferPage() {
   return (
     <AppShell>
       <div className="space-y-8">
-        <SectionHeader
-          as="h1"
-          title="Wealth Continuity"
-          description="You've worked hard to build your wealth. Make sure the right people can access it, understand it and carry it forward." />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <SectionHeader
+            as="h1"
+            title="Wealth Continuity"
+            description="You've worked hard to build your wealth. Make sure the right people can access it, understand it and carry it forward." />
+          <Button size="sm" variant="outline" onClick={() => discussWithSheru("Review my unnominated assets, digital will status, and estate transmission readiness.")}>
+            <MessageSquareText className="mr-1.5 size-3.5" /> Discuss with SHERU
+          </Button>
+        </div>
         
         <PillarNav />
 

@@ -1,11 +1,59 @@
-﻿import { AlertCircle, CheckCircle2, ChevronRight, Star, TrendingUp } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowRight,
+  BadgeIndianRupee,
+  Calculator,
+  CheckCircle2,
+  ChevronRight,
+  FileCheck,
+  FileDown,
+  FileText,
+  Gauge,
+  Headset,
+  Layers,
+  MessageSquare,
+  PlusCircle,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Target,
+  TrendingUp,
+  UserCheck,
+  Users,
+  Zap
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { cn } from "@/lib/utils";
 import coachMark from "@/assets/coach-mark.png";
+import { useApp } from "@/context/app-context";
+import { downloadDashboardPdf } from "@/lib/rm-dashboard-export";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Helpers
 ───────────────────────────────────────────────────────────────────────────── */
+
+function ActionIcon({ name, className = "size-3.5 shrink-0" }) {
+  switch (name) {
+    case "ShieldCheck": return <ShieldCheck className={className} />;
+    case "TrendingUp": return <TrendingUp className={className} />;
+    case "Target": return <Target className={className} />;
+    case "BadgeIndianRupee": return <BadgeIndianRupee className={className} />;
+    case "Calculator": return <Calculator className={className} />;
+    case "FileCheck": return <FileCheck className={className} />;
+    case "FileText": return <FileText className={className} />;
+    case "FileDown": return <FileDown className={className} />;
+    case "Headset": return <Headset className={className} />;
+    case "Gauge": return <Gauge className={className} />;
+    case "PlusCircle": return <PlusCircle className={className} />;
+    case "Layers": return <Layers className={className} />;
+    case "MessageSquare": return <MessageSquare className={className} />;
+    case "UserCheck": return <UserCheck className={className} />;
+    case "Users": return <Users className={className} />;
+    case "Sparkles": return <Sparkles className={className} />;
+    default: return <Zap className={className} />;
+  }
+}
 
 /** Extract score and grade from text like "57/100 (Grade B)" */
 function parseScoreGrade(text) {
@@ -55,7 +103,7 @@ function gradeColor(grade) {
 }
 
 /**
- * Parse raw LLM text into structured sections.
+ * Parse raw LLM text into structured sections, follow-ups, and action buttons.
  */
 function parseLLMResponse(raw) {
   const lines = raw
@@ -65,10 +113,24 @@ function parseLLMResponse(raw) {
     .filter(Boolean);
 
   const sections = [];
-  let followUps  = [];
+  const followUps = [];
+  const actions = [];
   let inFollowUp = false;
 
-  for (const line of lines) {
+  for (let line of lines) {
+    // Extract [ACTION: Label | target] syntax
+    const actionMatch = line.match(/\[ACTION:\s*([^|]+)\|\s*([^\]]+)\]/i);
+    if (actionMatch) {
+      actions.push({
+        label: actionMatch[1].trim(),
+        target: actionMatch[2].trim(),
+        variant: actions.length === 0 ? "primary" : "secondary"
+      });
+      // Strip action trigger from readable line
+      line = line.replace(/\[ACTION:\s*[^|]+\|\s*[^\]]+\]/gi, "").trim();
+      if (!line) continue;
+    }
+
     if (/^\*{0,2}follow.?up/i.test(line)) {
       inFollowUp = true;
       continue;
@@ -100,7 +162,7 @@ function parseLLMResponse(raw) {
     sections.push({ type: "text", content: line });
   }
 
-  return { sections, followUps };
+  return { sections, followUps, actions };
 }
 
 function RichText({ text, className }) {
@@ -120,11 +182,103 @@ function RichText({ text, className }) {
    Rich LLM response renderer
 ───────────────────────────────────────────────────────────────────────────── */
 function RichAssistantMessage({ message, onFollowUp }) {
-  const { sections, followUps: parsedFollowUps } = parseLLMResponse(message.text);
+  const navigate = useNavigate();
+  const { setRmOpen, activeRmClient } = useApp();
+  const { sections, followUps: parsedFollowUps, actions: parsedActions } = parseLLMResponse(message.text);
 
   const allFollowUps = parsedFollowUps.length
     ? parsedFollowUps
     : (message.followUps || []);
+
+  // Determine actions: from parsed tags, explicit message.actions, or derive smart defaults
+  let allActions = parsedActions.length > 0 ? parsedActions : (message.actions || []);
+  if (allActions.length === 0) {
+    const textLower = (message.text || "").toLowerCase();
+    if (textLower.includes("client") || textLower.includes("dossier") || textLower.includes("roster") || textLower.includes("copilot")) {
+      allActions = [
+        { label: "Download 360° PDF Dossier", target: "action:export_dossier", icon: "FileDown", variant: "primary" },
+        { label: "Log Client Outreach Note", target: "action:log_outreach", icon: "MessageSquare" },
+        { label: "View Client Profile", target: "action:view_client", icon: "UserCheck" }
+      ];
+    } else if (textLower.includes("protect") || textLower.includes("insur") || textLower.includes("term") || textLower.includes("cover") || textLower.includes("health")) {
+      allActions = [
+        { label: "Review Protection Gaps", target: "/protect", icon: "ShieldCheck", variant: "primary" },
+        { label: "Book Human RM Review", target: "action:open_rm", icon: "Headset" }
+      ];
+    } else if (textLower.includes("loan") || textLower.includes("debt") || textLower.includes("emi") || textLower.includes("prepay")) {
+      allActions = [
+        { label: "Review Loan Prepayment", target: "/debt", icon: "BadgeIndianRupee", variant: "primary" },
+        { label: "Calculate Prepay Savings", target: "/debt", icon: "Calculator" }
+      ];
+    } else if (textLower.includes("rebalance") || textLower.includes("portfolio") || textLower.includes("allocation") || textLower.includes("drift") || textLower.includes("stock")) {
+      allActions = [
+        { label: "Rebalance Portfolio", target: "/portfolio", icon: "TrendingUp", variant: "primary" },
+        { label: "Deploy Idle Cash", target: "/portfolio", icon: "Zap" }
+      ];
+    } else if (textLower.includes("retire") || textLower.includes("goal") || textLower.includes("corpus") || textLower.includes("education")) {
+      allActions = [
+        { label: "Explore Goals Roadmap", target: "/goals", icon: "Target", variant: "primary" },
+        { label: "Boost Monthly SIP", target: "/portfolio", icon: "PlusCircle" }
+      ];
+    } else if (textLower.includes("nominee") || textLower.includes("will") || textLower.includes("transfer") || textLower.includes("estate")) {
+      allActions = [
+        { label: "Update Missing Nominees", target: "/transfer", icon: "FileCheck", variant: "primary" },
+        { label: "Draft Digital Will", target: "/transfer", icon: "FileText" }
+      ];
+    } else if (textLower.includes("tax") || textLower.includes("80c") || textLower.includes("80d") || textLower.includes("nps")) {
+      allActions = [
+        { label: "Explore Tax Headroom", target: "/portfolio", icon: "Sparkles", variant: "primary" },
+        { label: "Book RM Advisory", target: "action:open_rm", icon: "Headset" }
+      ];
+    } else {
+      allActions = [
+        { label: "Review 6-Pillar Score", target: "/score", icon: "Gauge", variant: "primary" },
+        { label: "Book RM Consultation", target: "action:open_rm", icon: "Headset" }
+      ];
+    }
+  }
+
+  const handleActionClick = (act) => {
+    const target = act.target || act.href || act.action;
+    if (target === "action:open_rm" || act.action === "open_rm") {
+      setRmOpen(true);
+      return;
+    }
+    if (target === "action:export_dossier" || act.action === "export_dossier") {
+      const targetClient = activeRmClient || {
+        name: "Rahul Mehta",
+        tier: "HNI",
+        aum: 7540000,
+        wealthScore: 68,
+        riskProfile: "Moderate Aggressive",
+        assetAllocation: [
+          { name: "Stocks", value: 2850000 },
+          { name: "Mutual Funds", value: 1420000 },
+          { name: "Fixed Deposits", value: 600000 },
+          { name: "Gold/SGB", value: 350000 },
+          { name: "Real Estate", value: 1800000 },
+          { name: "EPF/PPF/NPS", value: 520000 }
+        ]
+      };
+      downloadDashboardPdf(targetClient, []);
+      return;
+    }
+    if (target === "action:log_outreach" || act.action === "log_outreach") {
+      navigate(activeRmClient?.id ? `/rm/client/${activeRmClient.id}` : "/rm/dashboard");
+      return;
+    }
+    if (target === "action:view_client" || act.action === "view_client") {
+      navigate(activeRmClient?.id ? `/rm/client/${activeRmClient.id}` : "/rm/dashboard");
+      return;
+    }
+    if (typeof target === "string" && target.startsWith("/")) {
+      navigate(target);
+      return;
+    }
+    if (act.prompt) {
+      onFollowUp(act.prompt);
+    }
+  };
 
   const firstText  = sections.find((s) => s.type === "text");
   const scoreGrade = firstText ? parseScoreGrade(firstText.content) : null;
@@ -235,6 +389,33 @@ function RichAssistantMessage({ message, onFollowUp }) {
           </div>
         </div>
       ))}
+
+      {/* Immediate Dashboard Actions */}
+      {allActions.length > 0 && (
+        <div className="space-y-2 pt-2 border-t border-border/50">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
+            <Sparkles className="size-3 text-gold" /> Immediate Dashboard Actions
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {allActions.map((act, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => handleActionClick(act)}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]",
+                  act.variant === "primary"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "border border-primary/30 bg-primary/5 text-primary hover:bg-primary/10"
+                )}>
+                <ActionIcon name={act.icon} />
+                <span>{act.label}</span>
+                <ArrowRight className="size-3 opacity-70" />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {allFollowUps.length > 0 && (
         <div className="space-y-1.5 pt-1">

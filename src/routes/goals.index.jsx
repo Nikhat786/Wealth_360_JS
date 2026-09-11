@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
   Calculator,
   Flame,
+  MessageSquareText,
   Plus } from
 "lucide-react";
 
@@ -29,7 +30,7 @@ function categorizeGoal(targetYear) {
 }
 
 export default function GoalsPage() {
-  const { goals, contributions, answers, addGoal, updateGoal, removeGoal } = useApp();
+  const { goals, contributions, answers, addGoal, updateGoal, removeGoal, discussWithSheru } = useApp();
   const [selectedGoalId, setSelectedGoalId] = useState(goals[0]?.id ?? null);
   const [filter, setFilter] = useState("all");
   const [goalDialog, setGoalDialog] = useState({ open: false, goal: null });
@@ -82,10 +83,15 @@ export default function GoalsPage() {
   return (
     <AppShell>
       <div className="space-y-8">
-        <SectionHeader
-          as="h1"
-          title="Goals & FIRE Calculator"
-          description="Every family milestone with mathematical projections, required monthly commitments, and Financial Independence modeling." />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <SectionHeader
+            as="h1"
+            title="Goals & FIRE Calculator"
+            description="Every family milestone with mathematical projections, required monthly commitments, and Financial Independence modeling." />
+          <Button size="sm" variant="outline" onClick={() => discussWithSheru("How do I bridge my goal milestone shortfalls and calculate required SIP adjustments?")}>
+            <MessageSquareText className="mr-1.5 size-3.5" /> Discuss with SHERU
+          </Button>
+        </div>
         
 
         <PillarNav />

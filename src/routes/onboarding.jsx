@@ -71,7 +71,22 @@ export default function Onboarding() {
     synthesizeAAProfile,
     connectAccountAggregator
   } = useApp();
-  const [draft, setDraft] = useState(answers ?? defaultAnswers);
+  const [draft, setDraft] = useState(() => {
+    const base = answers ?? defaultAnswers;
+    const patched = { ...base };
+    if (!patched.salary && !patched.businessIncome && !patched.rentalIncome) {
+      patched.salary = defaultAnswers.salary;
+      patched.rentalIncome = defaultAnswers.rentalIncome;
+      patched.otherIncome = defaultAnswers.otherIncome;
+      patched.annualIncome = defaultAnswers.annualIncome;
+      patched.monthlyTakeHome = defaultAnswers.monthlyTakeHome;
+    }
+    if (!patched.goals || patched.goals.length === 0) {
+      patched.goals = defaultAnswers.goals.slice(0, 3);
+      patched.selectedGoals = ["Child Education", "Retirement", "Emergency Fund"];
+    }
+    return patched;
+  });
   const [chapter, setChapter] = useState(0);
   const [aaState, setAaState] = useState("none");
   const [simIndex, setSimIndex] = useState(0);
@@ -655,6 +670,36 @@ function FamilyStep({ draft, set }) {
 }
 
 function CashflowStep({ draft, set }) {
+  useEffect(() => {
+    if (derivedIncome(draft) === 0) {
+      set("salary", defaultAnswers.salary);
+      set("rentalIncome", defaultAnswers.rentalIncome);
+      set("otherIncome", defaultAnswers.otherIncome);
+      set("annualIncome", defaultAnswers.annualIncome);
+      set("monthlyTakeHome", defaultAnswers.monthlyTakeHome);
+    }
+  }, []);
+
+  const handleApplyDefaults = () => {
+    set("salary", defaultAnswers.salary);
+    set("businessIncome", defaultAnswers.businessIncome || 0);
+    set("annualBonus", defaultAnswers.annualBonus || 0);
+    set("rentalIncome", defaultAnswers.rentalIncome || 0);
+    set("dividendsIncome", defaultAnswers.dividendsIncome || 0);
+    set("interestIncome", defaultAnswers.interestIncome || 0);
+    set("otherIncome", defaultAnswers.otherIncome || 0);
+    set("household", defaultAnswers.household);
+    set("schoolFees", defaultAnswers.schoolFees);
+    set("emiExpenses", defaultAnswers.emiExpenses);
+    set("insuranceExpenses", defaultAnswers.insuranceExpenses);
+    set("healthcareExpenses", defaultAnswers.healthcareExpenses || 4000);
+    set("lifestyle", defaultAnswers.lifestyle);
+    set("travelExpenses", defaultAnswers.travelExpenses || 10000);
+    set("otherExpenses", defaultAnswers.otherExpenses || 5000);
+    set("annualIncome", defaultAnswers.annualIncome);
+    set("monthlyTakeHome", defaultAnswers.monthlyTakeHome);
+  };
+
   const income = derivedIncome(draft);
   const expenses = derivedExpenses(draft);
   const surplus = income - expenses;
@@ -663,6 +708,20 @@ function CashflowStep({ draft, set }) {
   const expenseFields = [["Household", "household"], ["Education", "schoolFees"], ["EMI", "emiExpenses"], ["Insurance", "insuranceExpenses"], ["Healthcare", "healthcareExpenses"], ["Lifestyle", "lifestyle"], ["Travel", "travelExpenses"], ["Other", "otherExpenses"]];
   return (
     <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-muted/60 border px-4 py-2.5 text-xs">
+        <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
+          <Sparkles className="size-3.5 text-primary" />
+          Pre-populated with default benchmark cashflow. You can edit any figure below.
+        </span>
+        <button
+          type="button"
+          onClick={handleApplyDefaults}
+          className="font-semibold text-primary hover:underline"
+        >
+          Reset to default values
+        </button>
+      </div>
+
       <div className="grid gap-5 lg:grid-cols-2">
         <MoneyGroup title="Income sources" fields={incomeFields} draft={draft} set={set} />
         <MoneyGroup title="Monthly expenses" fields={expenseFields} draft={draft} set={set} />
@@ -888,6 +947,20 @@ function GoalsStep({ draft, set }) {
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(emptyForm);
 
+  useEffect(() => {
+    if (!draft.goals || draft.goals.length === 0) {
+      const initialGoals = defaultAnswers.goals.slice(0, 3);
+      set("goals", initialGoals);
+      set("selectedGoals", initialGoals.map((g) => g.name));
+    }
+  }, []);
+
+  const handleLoadPredefinedGoals = () => {
+    const initialGoals = defaultAnswers.goals.slice(0, 3);
+    set("goals", initialGoals);
+    set("selectedGoals", initialGoals.map((g) => g.name));
+  };
+
   const startEdit = (goal) => {
     setEditingId(goal.id);
     setForm(goal);
@@ -929,6 +1002,20 @@ function GoalsStep({ draft, set }) {
   const progressPct = target > 0 ? clamp(saved / target * 100) : 0;
   return (
     <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-muted/60 border px-4 py-2.5 text-xs">
+        <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
+          <Sparkles className="size-3.5 text-primary" />
+          Pre-populated with 3 recommended goals based on your life stage. Edit or add more anytime.
+        </span>
+        <button
+          type="button"
+          onClick={handleLoadPredefinedGoals}
+          className="font-semibold text-primary hover:underline"
+        >
+          Reset to 3 default goals
+        </button>
+      </div>
+
       {draft.goals.length > 0 ?
       <div className="grid gap-3 sm:grid-cols-2">
           {draft.goals.map((goal) =>

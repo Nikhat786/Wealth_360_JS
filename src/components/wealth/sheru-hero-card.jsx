@@ -40,7 +40,7 @@ export function SheruHeroCard() {
     focusArea,
     focusDescription,
     dynamicPriorities,
-    sendMessage,
+    discussWithSheru,
     canAccessRM,
     score,
     setStressMode
@@ -48,7 +48,7 @@ export function SheruHeroCard() {
   const [expandedId, setExpandedId] = useState(null);
 
   const handleChatPrompt = (item) => {
-    sendMessage(`Tell me more about ${item.title}: ${item.headline}`);
+    discussWithSheru(`Tell me more about ${item.title}: ${item.headline}`);
   };
 
   return (

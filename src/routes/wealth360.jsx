@@ -14,6 +14,7 @@ import {
   HeartHandshake,
   Landmark,
   Lock,
+  MessageSquareText,
   Milestone,
   PieChart,
   Play,
@@ -364,7 +365,7 @@ const SHERU_VIDEOS = [
 ];
 
 export default function Wealth360Landing() {
-  const { onboardingComplete, setRmOpen, canAccessRM } = useApp();
+  const { onboardingComplete, setRmOpen, canAccessRM, discussWithSheru } = useApp();
   const { pathname } = useLocation();
   const [navOpen, setNavOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState("idle");
@@ -713,9 +714,19 @@ export default function Wealth360Landing() {
                           Welcome to WealthVerse! Let's elevate your financial health score and build your family legacy.
                         </p>
                       )}
-                      <p className="mt-2 text-[10px] text-gray-400 italic">
-                        Click Sheru or switch modes above ↗
-                      </p>
+                      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 pt-2.5">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => discussWithSheru("Give me an actionable executive review of my Wealth 360 dashboard and top priorities.")}
+                          className="h-7 text-xs font-semibold gap-1.5 border-primary/30 text-primary hover:bg-primary/10 shadow-sm"
+                        >
+                          <MessageSquareText className="size-3.5" /> Discuss with SHERU
+                        </Button>
+                        <p className="text-[10px] text-gray-400 italic">
+                          Click Sheru to switch modes ↗
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
